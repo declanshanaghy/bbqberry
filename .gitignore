@@ -15,10 +15,6 @@ codeship.aes
 *.credential
 
 # Generated files
-vendor/
-!vendor/vendor.json
-
-# Generated files
 mocks/
 cmd/
 models/
