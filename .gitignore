@@ -3,7 +3,6 @@ tmp
 coverage.out
 *.coverprofile
 bin
-vendor/vendor
 
 # Project files
 .idea
@@ -14,6 +13,10 @@ vendor/vendor
 codeship.aes
 *.secret
 *.credential
+
+# Generated files
+vendor/
+!vendor/vendor.json
 
 # Generated files
 mocks/
