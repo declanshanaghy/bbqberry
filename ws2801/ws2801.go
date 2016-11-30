@@ -31,13 +31,8 @@ func NewWS2801(nPixels int, channel byte) WS2801 {
 }
 
 func (s *Strand) init(nPixels int) {
-	glog.Info("action=Init nPixels=%s", nPixels)
-
-	if err := embd.InitSPI(); err != nil {
-		panic(err)
-	}
+	glog.Info("action=init nPixels=%s", nPixels)
 	s.bus = embd.NewSPIBus(embd.SPIMode0, s.channel, 1000000, 8, 0)
-
 	s.pixels = make([]uint8, nPixels * 3)
 	s.data = make([]uint8, nPixels * 3)
 }
