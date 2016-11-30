@@ -18,28 +18,17 @@ type WS2801 interface {
 }
 
 type Strand struct {
-	channel byte
 	bus embd.SPIBus
 	pixels []uint8
 	data []uint8
 }
 
-func NewWS2801(nPixels int, channel byte) WS2801 {
-	s := Strand{channel:channel}
-	s.init(nPixels)
-	return &s
-}
-
-func (s *Strand) init(nPixels int) {
-	glog.Info("action=Init nPixels=%s", nPixels)
-
-	if err := embd.InitSPI(); err != nil {
-		panic(err)
+func NewWS2801(nPixels int, bus embd.SPIBus) WS2801 {
+	return &Strand{
+		bus:bus,
+		pixels: make([]uint8, nPixels * 3),
+		data: make([]uint8, nPixels * 3),
 	}
-	s.bus = embd.NewSPIBus(embd.SPIMode0, s.channel, 1000000, 8, 0)
-
-	s.pixels = make([]uint8, nPixels * 3)
-	s.data = make([]uint8, nPixels * 3)
 }
 
 func (s *Strand) GetNumPixels() int {
@@ -47,7 +36,7 @@ func (s *Strand) GetNumPixels() int {
 }
 
 func (s *Strand) Off() {
-	glog.Info("action=Off nPixels=%s", s.GetNumPixels())
+	glog.Info("action=Off nPixels=%d", s.GetNumPixels())
 	for i := 0; i < s.GetNumPixels(); i++ {
 		s.SetPixelColor(i, 0)
 	}
@@ -55,10 +44,9 @@ func (s *Strand) Off() {
 }
 
 func (s *Strand) Close() {
-	glog.Info("action=Close nPixels=%s", s.GetNumPixels())
+	glog.Info("action=Close nPixels=%d", s.GetNumPixels())
 	s.Off()
-	s.bus.Close()
-	embd.CloseSPI()
+	//s.bus.Close()
 }
 
 func (s *Strand) Update() error {
