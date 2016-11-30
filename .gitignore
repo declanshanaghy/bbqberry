@@ -1,0 +1,22 @@
+# Various scratch files
+tmp
+coverage.out
+*.coverprofile
+bin
+
+# Project files
+.idea
+*.iml
+.vscode*
+
+# Secret keys etc...
+codeship.aes
+*.secret
+*.credential
+
+# Swagger auto-generated files
+cmd/
+models/
+# All files in restapi except the configure files
+restapi/*
+!restapi/configure_*.go
