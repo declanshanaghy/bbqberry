@@ -1,6 +1,6 @@
 # Standard Polaris Makefile
 
-unittest:
+unittest: mock
 	ginkgo -r -v -trace -cover -coverpkg=./...
 	gover
 
@@ -10,18 +10,28 @@ coverage:
 install:
 	time scp bin/bbqberry pi@pi:~/
 
-build:
-	time env GOOS=linux GOARCH=arm go build -o bin/bbqberry main.go
+build: swagger
+	time env GOOS=linux GOARCH=arm go build -o bin/bbqberry cmd/app-server/main.go
 
 run:
-	time ssh pi@pi ~pi/bbqberry -logtostderr=true
+	time ssh pi@pi ~pi/bbqberry --host=0.0.0.0 --port=8000
+
+mock:
+	#mockgen -source vendor/github.com/kidoman/embd/spi.go
+	mkdir -p tmp/vendor
+	rm -rf mocks && mkdir mocks
+	ln -Fs $(shell pwd)/vendor ./tmp/vendor/src
+	GOPATH=$(shell pwd)/tmp/vendor:$$GOPATH \
+	    mockgen github.com/kidoman/embd SPIBus > mocks/embd.go
+	rm vendor/vendor
 
 # Environment target sets up initial dependencies that are not checked into the repo.
 environment:
-	go get github.com/onsi/ginkgo/ginkgo                        # ginkgo BDD framework
-	go get github.com/onsi/gomega                               # BDD matcher library
-	go get github.com/modocache/gover                           # Code coverage aggregation
-	go get github.com/mattn/goveralls                           # coveralls.io online code coverage viewer
+	go get -u github.com/golang/mock/mockgen                        # Mock generator
+	go get -u github.com/onsi/ginkgo/ginkgo                         # ginkgo BDD framework
+	go get -u github.com/onsi/gomega                                # BDD matcher library
+	go get -u github.com/modocache/gover                            # Code coverage aggregation
+	go get -u github.com/mattn/goveralls                            # coveralls.io online code coverage viewer
 	go get -u github.com/kardianos/govendor
 	go get -u github.com/go-openapi/runtime
 	go get -u github.com/go-swagger/go-swagger/cmd/swagger

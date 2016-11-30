@@ -2,9 +2,9 @@ package sensors
 
 import (
 	"github.com/kidoman/embd"
-	"github.com/golang/glog"
 	"github.com/kidoman/embd/convertors/mcp3008"
 	"math"
+	"github.com/Polarishq/middleware/framework/log"
 )
 
 type TemperatureArray interface {
@@ -24,25 +24,20 @@ type BBQTemp struct {
 	adc *mcp3008.MCP3008
 }
 
-func NewTemperature(channel byte) TemperatureArray {
-	s := BBQTemp{channel:channel}
-	s.init()
-	return &s
-}
-
-func (s *BBQTemp) init() {
-	glog.Info("action=init")
-	s.bus = embd.NewSPIBus(embd.SPIMode0, s.channel, 1000000, 8, 0)
-	s.adc = mcp3008.New(mcp3008.SingleMode, s.bus)
+func NewTemperature(bus embd.SPIBus) TemperatureArray {
+	return &BBQTemp{
+		bus: bus,
+		adc: mcp3008.New(mcp3008.SingleMode, bus),
+	}
 }
 
 func (s *BBQTemp) Close() {
-	glog.Info("action=Close")
+	log.Info("action=Close")
 	s.bus.Close()
 }
 
 func (s *BBQTemp) GetTemp(probe int) TemperatureReading {
-	glog.Infof("action=GetTemp probe=%d", probe)
+	log.Debugf("action=GetTemp probe=%d", probe)
 	v, err := s.adc.AnalogValueAt(probe)
 	if err != nil {
 		panic(err)

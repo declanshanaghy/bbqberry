@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"time"
-	"github.com/golang/glog"
+	"github.com/Polarishq/middleware/framework/log"
 )
 
 func BlinkLED() {
@@ -33,7 +33,7 @@ func BlinkLED() {
 	for {
 		select {
 		case <-time.After(250 * time.Millisecond):
-			glog.V(3).Infof("action=on led=0")
+			log.Infof("action=on led=0")
 			if err := led.Toggle(); err != nil {
 				panic(err)
 			}
@@ -42,7 +42,7 @@ func BlinkLED() {
 		}
 		select {
 		case <-time.After(250 * time.Millisecond):
-			glog.V(3).Infof("action=off led=0")
+			log.Infof("action=off led=0")
 			if err := led.Off(); err != nil {
 				panic(err)
 			}

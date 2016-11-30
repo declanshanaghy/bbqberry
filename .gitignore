@@ -3,6 +3,7 @@ tmp
 coverage.out
 *.coverprofile
 bin
+vendor/vendor
 
 # Project files
 .idea
@@ -14,7 +15,8 @@ codeship.aes
 *.secret
 *.credential
 
-# Swagger auto-generated files
+# Generated files
+mocks/
 cmd/
 models/
 # All files in restapi except the configure files

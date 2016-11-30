@@ -1,15 +1,16 @@
 package samples
 
 import (
-	"github.com/golang/glog"
 	"image/color"
 	"time"
 	"math/rand"
 	"github.com/declanshanaghy/bbqberry/ws2801"
+	"github.com/kidoman/embd"
+	"github.com/Polarishq/middleware/framework/log"
 )
 
 func wheel(wp uint8) (r, g, b uint8) {
-	glog.V(4).Infof("action=wheel wp=%d", wp)
+	log.Debugf("action=wheel wp=%d", wp)
 	if wp < 85 {
 		r = wp * 3
 		g = 255 - wp * 3
@@ -28,17 +29,15 @@ func wheel(wp uint8) (r, g, b uint8) {
 	return
 }
 
-func Rainbow(nPixels int) {
-	strand0 := ws2801.NewWS2801(nPixels, 0)
+func Rainbow(nPixels int, bus embd.SPIBus) {
+	strand0 := ws2801.NewWS2801(nPixels, bus)
 	strand0.GetNumPixels()
 	defer strand0.Close()
 
-	glog.Infof("action=Rainbow nPixels=%d", strand0.GetNumPixels())
+	log.Infof("action=Rainbow nPixels=%d", strand0.GetNumPixels())
 	n := strand0.GetNumPixels()
 
 	for j := 0; j < 256; j++ {
-		glog.V(4).Infof("action=outer j=%d", j)
-
 		for i := 0; i < n; i++ {
 			r, g, b := wheel(uint8(((i * 256 / n) + j) % 256))
 			strand0.SetPixelRGB(i, r, g, b)
@@ -51,11 +50,11 @@ func Rainbow(nPixels int) {
 	time.Sleep(1 * time.Second)
 }
 
-func RedGreenBlueRandom(nPixels int) {
-	strand0 := ws2801.NewWS2801(nPixels, 0)
+func RedGreenBlueRandom(nPixels int, bus embd.SPIBus) {
+	strand0 := ws2801.NewWS2801(nPixels, bus)
 	defer strand0.Close()
 
-	glog.Infof("action=RedGreenBlueRandom nPixels=%d", strand0.GetNumPixels())
+	log.Infof("action=RedGreenBlueRandom nPixels=%d", strand0.GetNumPixels())
 
 	for i := 0; i < strand0.GetNumPixels(); i++ {
 		strand0.SetPixelRGBA(i, color.RGBA{R:0xFF, G:0x00, B:0x00})
