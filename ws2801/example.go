@@ -63,8 +63,8 @@ func wheel(wp uint8) (r, g, b uint8) {
 }
 
 func Rainbow(nPixels int) {
-	strand0 := Strand{channel:0}
-	strand0.Init(nPixels)
+	strand0 := NewWS2801(nPixels, 0)
+	strand0.GetNumPixels()
 	defer strand0.Close()
 
 	glog.Infof("action=Rainbow nPixels=%d", strand0.GetNumPixels())
@@ -86,8 +86,7 @@ func Rainbow(nPixels int) {
 }
 
 func RedGreenBlueRandom(nPixels int) {
-	strand0 := Strand{channel:0}
-	strand0.Init(nPixels)
+	strand0 := NewWS2801(nPixels, 0)
 	defer strand0.Close()
 
 	glog.Infof("action=RedGreenBlueRandom nPixels=%d", strand0.GetNumPixels())

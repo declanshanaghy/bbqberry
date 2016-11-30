@@ -8,11 +8,10 @@ import (
 )
 
 type WS2801 interface {
-	Init(nPixels int)
 	GetNumPixels() int
 	Close()
 	Off()
-	Update()
+	Update() error
 	SetPixelRGB(n int, r uint8, g uint8, b uint8)
 	SetPixelRGBA(n int, color color.RGBA)
 	SetPixelColor(n int, color int)
@@ -25,7 +24,13 @@ type Strand struct {
 	data []uint8
 }
 
-func (s *Strand) Init(nPixels int) {
+func NewWS2801(nPixels int, channel byte) WS2801 {
+	s := Strand{channel:channel}
+	s.init(nPixels)
+	return &s
+}
+
+func (s *Strand) init(nPixels int) {
 	glog.Info("action=Init nPixels=%s", nPixels)
 
 	if err := embd.InitSPI(); err != nil {
