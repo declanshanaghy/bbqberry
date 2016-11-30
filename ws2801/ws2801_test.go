@@ -9,12 +9,11 @@ import (
 
 var _ = Describe("WS2801", func() {
 	var (
-		strand Strand
+		strand *Strand
 	)
 
 	BeforeEach(func() {
-		strand := Strand{}
-		strand.Init(10)
+		strand = NewWS2801(10, 0)
 	})
 
 	AfterEach(func() {
