@@ -15,12 +15,13 @@ import (
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/go-openapi/swag"
 	"github.com/declanshanaghy/bbqberry/framework/log"
-	"github.com/declanshanaghy/bbqberry/restapi/operations/sensors"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
 )
 
 type CmdOptions struct {
 	LogFile     string `short:"l" long:"logfile" description:"Specify the log file" default:""`
 	Verbose     bool   `short:"v" long:"verbose" description:"Show verbose debug information"`
+	StaticDir   string `short:"s" long:"static" description:"The path to the static dirs" default:""`
 }
 
 var CmdOptionsValues CmdOptions // export for testing
@@ -64,8 +65,8 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 	api.ExampleHelloHandler = example.HelloHandlerFunc(func(params example.HelloParams) middleware.Responder {
 		return framework.HandleApiRequestWithError(backend.Hello())
 	})
-	api.SensorsGetTemperatureHandler = sensors.GetTemperatureHandlerFunc(
-		func(params sensors.GetTemperatureParams) middleware.Responder {
+	api.TemperatureGetTemperatureHandler = temperature.GetTemperatureHandlerFunc(
+		func(params temperature.GetTemperatureParams) middleware.Responder {
 			return framework.HandleApiRequestWithError(backend.GetTemperature(&params))
 		})
 
@@ -93,5 +94,5 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 // The middleware configuration happens before anything, this middleware also applies to serving the swagger.json document.
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
-	return framework.NewPanicHandler(handler)
+	return framework.NewPanicHandler(framework.NewSwaggerUIHandler(handler, CmdOptionsValues.StaticDir))
 }

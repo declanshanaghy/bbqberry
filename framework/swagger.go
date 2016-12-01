@@ -15,10 +15,11 @@ type SwaggerUIHandler struct {
 }
 
 func NewSwaggerUIHandler(handler http.Handler, dir string) *SwaggerUIHandler {
+	// swagger ui path not set up let's try to discover it
 	if dir == "" {
 		// swagger ui path not set up let's try to discover it
 		gopath := os.Getenv("GOPATH")
-		dir = gopath + "/src" + "/splunk/avanti-container" + AuxPath
+		dir = gopath + "/src" + "/github.com/declanshanaghy/bbqberry" + AuxPath
 	}
 	return &SwaggerUIHandler{handler: handler, dir: dir}
 }
@@ -34,9 +35,10 @@ func (s *SwaggerUIHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, nf, http.StatusNotFound)
 		}
 		
-		log.Infof(s.dir)
-		http.StripPrefix("", http.FileServer(http.Dir(s.dir))).ServeHTTP(w, r)
-		log.Infof("request served by the swagger-ui handler")
+		hDir := http.Dir(s.dir)
+		srv := http.FileServer(hDir)
+		handler := http.StripPrefix("", srv)
+		handler.ServeHTTP(w, r)
 		return
 	}
 	

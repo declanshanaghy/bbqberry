@@ -2,12 +2,12 @@ package backend
 
 import (
 	"github.com/declanshanaghy/bbqberry/models"
-	"github.com/declanshanaghy/bbqberry/restapi/operations/sensors"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/go-openapi/strfmt"
 )
 
-func GetTemperature(params *sensors.GetTemperatureParams) (m models.Temperature, err error) {
+func GetTemperature(params *temperature.GetTemperatureParams) (m models.Temperature, err error) {
 	bus := hardware.NewSPIBus(1)
 	sTemp := hardware.NewTemperature(bus)
 	reading := sTemp.GetTemp(params.Probe)
