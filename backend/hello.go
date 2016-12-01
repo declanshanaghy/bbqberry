@@ -1,12 +1,22 @@
 package backend
 
-import "github.com/declanshanaghy/bbqberry/models"
+import (
+	"github.com/declanshanaghy/bbqberry/models"
+	"github.com/declanshanaghy/bbqberry/influx/example"
+	"github.com/declanshanaghy/bbqberry/influx"
+	"fmt"
+)
 
 // Hello World ...
-func Hello() (models.Hello, error) {
-	h := models.Hello{}
-	message := "A dinner fit for a king"
-	h.Message = &message
+func Hello() (h models.Hello, err error) {
+	client := influx.GetClient()
+	pt, err := influx_example.WriteExamplePoint(client)
 
-	return h, nil
+	if err == nil {
+		h = models.Hello{}
+		message := fmt.Sprintf("Wrote %s:%v at %s", pt.Name(), pt.Fields(), pt.Time())
+		h.Message = &message
+	}
+
+	return h, err
 }

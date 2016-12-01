@@ -13,41 +13,50 @@ import (
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
 	"github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/framework"
-	"github.com/declanshanaghy/bbqberry/samples"
-	_ "github.com/kidoman/embd/host/rpi"
-	"github.com/kidoman/embd"
+	"github.com/go-openapi/swag"
+	"github.com/Polarishq/middleware/framework/log"
 )
 
+type CmdOptions struct {
+	LogFile     string `short:"l" long:"logfile" description:"Specify the log file" default:""`
+	Verbose     bool   `short:"v" long:"verbose" description:"Show verbose debug information"`                    // always defaults to false
+	VeryVerbose bool   `short:"V" long:"very-verbose" description:"Show verbose debug information including aws"` // always defaults to false
+	StaticDir   string `short:"s" long:"static" description:"The path to the static dirs" default:""`             // default auto
+}
+
+var CmdOptionsValues CmdOptions // export for testing
+
 func configureFlags(api *operations.AppAPI) {
-	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
-}
-
-func configureHardware() {
-	if err := embd.InitSPI(); err != nil {
-		panic(err)
+	api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{
+		swag.CommandLineOptionsGroup{
+			ShortDescription: "BBQ Berry Server Flags",
+			LongDescription:  "BBQ Berry Server Flags",
+			Options:          &CmdOptionsValues,
+		},
 	}
-}
 
-func shutdownHardware() {
-	embd.CloseSPI()
 }
+//func configureHardware() {
+//	if err := embd.InitSPI(); err != nil {
+//		panic(err)
+//	}
+//}
+//
+//func shutdownHardware() {
+//	embd.CloseSPI()
+//}
 
 func configureAPI(api *operations.AppAPI) http.Handler {
-	configureHardware()
-
 	// configure the api here
 	api.ServeError = errors.ServeError
 
-	// Set your custom logger if needed. Default one is log.Printf
-	// Expected interface func(string, ...interface{})
-	//
-	// Example:
-	// s.api.Logger = log.Printf
-
-	closer := samples.DoStuff()
+	log.SetDebug(CmdOptionsValues.Verbose || CmdOptionsValues.VeryVerbose)
+	if CmdOptionsValues.LogFile != "" {
+		log.SetOutput(CmdOptionsValues.LogFile)
+	}
+	api.Logger = log.Infof
 
 	api.JSONConsumer = runtime.JSONConsumer()
-
 	api.JSONProducer = runtime.JSONProducer()
 
 	api.HealthHealthHandler = health.HealthHandlerFunc(func(params health.HealthParams) middleware.Responder {
@@ -57,10 +66,12 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 		return framework.HandleApiRequestWithError(backend.Hello())
 	})
 
-	api.ServerShutdown = func() {
-		shutdownHardware()
-		closer.Close()
-	}
+	//configureHardware()
+	//closer := samples.DoStuff()
+	//api.ServerShutdown = func() {
+	//	shutdownHardware()
+	//	closer.Close()
+	//}
 
 	return setupGlobalMiddleware(api.Serve(setupMiddlewares))
 }
