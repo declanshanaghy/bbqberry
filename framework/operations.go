@@ -26,6 +26,7 @@ func (a *apiOperation) WriteResponse(rw http.ResponseWriter, producer runtime.Pr
 	var err error
 	switch t := a.Response.(type) {
 	case error:
+		log.Error(t)
 		errors.ServeError(rw, nil, t)
 	default:
 		// success sent a 2xx response

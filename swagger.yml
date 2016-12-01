@@ -11,12 +11,13 @@ consumes:
 produces:
   - application/json
 paths:
-  /hello:
+  /sensors/temperature:
     get:
-      operationId: hello
+      operationId: getTemperature
       tags:
-        - Example
-      summary: "Example versioned hello world endpoint"
+        - Temperature
+        - Sensors
+      summary: "Get the current temperature reading from the given probe"
       responses:
         200:
           description: "Service is operating normally"
@@ -28,6 +29,21 @@ paths:
               message:
                 type: string
                 description: A greeting fit for a king!
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+  /hello:
+    get:
+      operationId: hello
+      tags:
+        - Example
+      summary: "Example versioned hello world endpoint"
+      responses:
+        200:
+          description: "Sample hello world endpoint"
+          schema:
+            $ref: "#/definitions/Hello"
         default:
           description: Unexpected error
           schema:

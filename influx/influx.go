@@ -1,31 +1,32 @@
 package influx
 
 import (
-	"log"
 	"github.com/influxdata/influxdb/client/v2"
 	"fmt"
 )
 
 const (
 	host = "influx"
-	port = 8086
+	port_http = 8086
+	port_udp = 8089
 	username = "bbqberry"
 	password = "piberry"
 
 	DB = "explore"
 )
 
-func GetClient() client.Client {
-	// Make client
-	c, err := client.NewHTTPClient(client.HTTPConfig{
-		Addr: fmt.Sprintf("http://%s:%d", host, port),
+func GetHttpClient() (client.Client, error) {
+	return client.NewHTTPClient(client.HTTPConfig{
+		Addr: fmt.Sprintf("http://%s:%d", host, port_http),
 		Username: username,
 		Password: password,
 	})
+}
 
-	if err != nil {
-		log.Fatalln("Error: ", err)
-	}
+func GetUdpClient() (client.Client, error) {
+	return client.NewUDPClient(client.UDPConfig{Addr:fmt.Sprintf("%s:%d", host, port_udp)})
+}
 
-	return c
+func GetDefaultClient() (client.Client, error) {
+	return GetHttpClient()
 }
