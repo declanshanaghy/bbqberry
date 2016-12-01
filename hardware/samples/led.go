@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"time"
-	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/framework/log"
 )
 
 func BlinkLED() {

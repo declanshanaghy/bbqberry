@@ -2,7 +2,7 @@ package hardware
 
 import (
 	"github.com/kidoman/embd"
-	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/framework/log"
 )
 
 func NewSPIBus(channel byte) embd.SPIBus {

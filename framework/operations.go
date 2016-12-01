@@ -6,8 +6,7 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/Polarishq/middleware/framework/log"
-	"runtime/debug"
+	"github.com/declanshanaghy/bbqberry/framework/log"
 )
 
 type Closer interface {
@@ -48,24 +47,4 @@ func HandleApiRequestWithError(response interface{}, e error) middleware.Respond
 	}
 
 	return &op
-}
-
-type PanicHandler struct {
-	handler http.Handler
-}
-
-func NewPanicHandler(handler http.Handler) *PanicHandler {
-	return &PanicHandler{handler: handler}
-}
-
-func (p *PanicHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	defer func() {
-		if err := recover(); err != nil {
-			log.Errorf("action=panic url=%v r=%v, error=%v", r.RequestURI, r, err)
-			debug.PrintStack()
-			errors.ServeError(rw, nil, err.(error))
-		}
-	}()
-
-	p.handler.ServeHTTP(rw, r)
 }

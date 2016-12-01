@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"github.com/declanshanaghy/bbqberry/hardware/ws2801"
 	"github.com/kidoman/embd"
-	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/framework/log"
 )
 
 func wheel(wp uint8) (r, g, b uint8) {

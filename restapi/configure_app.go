@@ -14,7 +14,7 @@ import (
 	"github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/go-openapi/swag"
-	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/framework/log"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/sensors"
 )
 

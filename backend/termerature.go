@@ -5,12 +5,10 @@ import (
 	"github.com/declanshanaghy/bbqberry/restapi/operations/sensors"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/go-openapi/strfmt"
-	"github.com/kidoman/embd"
 )
 
 func GetTemperature(params *sensors.GetTemperatureParams) (m models.Temperature, err error) {
-	//bus := hardware.NewSPIBus(1)
-	bus := embd.NewSPIBus(embd.SPIMode0, 0, 1000000, 8, 0)
+	bus := hardware.NewSPIBus(1)
 	sTemp := hardware.NewTemperature(bus)
 	reading := sTemp.GetTemp(params.Probe)
 	

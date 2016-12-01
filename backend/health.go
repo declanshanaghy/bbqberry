@@ -3,7 +3,7 @@ package backend
 import (
 	"github.com/declanshanaghy/bbqberry/models"
 	"github.com/declanshanaghy/bbqberry/framework"
-	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/framework/log"
 	"github.com/declanshanaghy/bbqberry/influx"
 	"github.com/declanshanaghy/bbqberry/framework/error"
 	"github.com/declanshanaghy/bbqberry/influx/example"

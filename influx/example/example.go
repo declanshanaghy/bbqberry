@@ -2,7 +2,7 @@ package influx_example
 
 import (
 	"time"
-	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/framework/log"
 	"github.com/influxdata/influxdb/client/v2"
 	"github.com/declanshanaghy/bbqberry/influx"
 )

@@ -5,7 +5,7 @@ import (
 	"sync"
 	"github.com/kidoman/embd"
 	"github.com/declanshanaghy/bbqberry/hardware"
-	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/framework/log"
 	"github.com/declanshanaghy/bbqberry/framework"
 )
 

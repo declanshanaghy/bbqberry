@@ -1,7 +1,7 @@
 package hardware
 
 import (
-	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/framework/log"
 )
 
 // SPIBus interface allows interaction with the SPI bus.
