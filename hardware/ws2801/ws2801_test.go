@@ -3,7 +3,7 @@ package ws2801_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/declanshanaghy/bbqberry/ws2801"
+	. "github.com/declanshanaghy/bbqberry/hardware/ws2801"
 	"github.com/golang/mock/gomock"
 	"github.com/declanshanaghy/bbqberry/mocks"
 	"fmt"

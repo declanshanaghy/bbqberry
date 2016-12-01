@@ -15,6 +15,7 @@ import (
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/go-openapi/swag"
 	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/sensors"
 )
 
 type CmdOptions struct {
@@ -48,7 +49,7 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
 
-	log.SetDebug(CmdOptionsValues.Verbose || CmdOptionsValues.VeryVerbose)
+	log.SetDebug(CmdOptionsValues.Verbose)
 	if CmdOptionsValues.LogFile != "" {
 		log.SetOutput(CmdOptionsValues.LogFile)
 	}
@@ -63,6 +64,10 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 	api.ExampleHelloHandler = example.HelloHandlerFunc(func(params example.HelloParams) middleware.Responder {
 		return framework.HandleApiRequestWithError(backend.Hello())
 	})
+	api.SensorsGetTemperatureHandler = sensors.GetTemperatureHandlerFunc(
+		func(params sensors.GetTemperatureParams) middleware.Responder {
+			return framework.HandleApiRequestWithError(backend.GetTemperature(&params))
+		})
 
 	//configureHardware()
 	//closer := samples.DoStuff()
@@ -88,5 +93,5 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 // The middleware configuration happens before anything, this middleware also applies to serving the swagger.json document.
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
-	return handler
+	return framework.NewPanicHandler(handler)
 }

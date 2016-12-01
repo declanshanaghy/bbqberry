@@ -4,7 +4,7 @@ import (
 	"image/color"
 	"time"
 	"math/rand"
-	"github.com/declanshanaghy/bbqberry/ws2801"
+	"github.com/declanshanaghy/bbqberry/hardware/ws2801"
 	"github.com/kidoman/embd"
 	"github.com/Polarishq/middleware/framework/log"
 )

@@ -10,10 +10,10 @@ import (
 )
 
 // Hello World ...
-func Hello() (h models.Hello, err error) {
+func Hello() (m models.Hello, err error) {
 	client, err := influx.GetDefaultClient()
 	if err != nil {
-		return h, err
+		return m, err
 	}
 
 	tags := map[string]string{"cpu": "total"}
@@ -32,10 +32,10 @@ func Hello() (h models.Hello, err error) {
 
 	pt, err := influx_example.WriteExamplePoint(client, "cpu_usage", tags, fields)
 	if err == nil {
-		h = models.Hello{}
+		m = models.Hello{}
 		message := fmt.Sprintf("Wrote %s:%v at %s", pt.Name(), pt.Fields(), pt.Time())
-		h.Message = &message
+		m.Message = &message
 	}
 
-	return h, err
+	return m, err
 }

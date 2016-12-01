@@ -52,6 +52,12 @@
 			"revisionTime": "2016-11-30T22:15:31Z"
 		},
 		{
+			"checksumSHA1": "vHvJA+LcJOd1VQoK24HnlrIeVmA=",
+			"path": "github.com/facebookgo/stack",
+			"revision": "751773369052141c013c6e827a71e8f35c07879c",
+			"revisionTime": "2016-02-09T18:44:15Z"
+		},
+		{
 			"checksumSHA1": "wz2tj5H81a0kaN8rT8VCVHuRKN8=",
 			"path": "github.com/go-openapi/analysis",
 			"revision": "7222828b8ce19afee3c595aef6643b9e42150120",

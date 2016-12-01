@@ -11,24 +11,28 @@ consumes:
 produces:
   - application/json
 paths:
-  /sensors/temperature:
+  /sensors/temperature/{probe}:
     get:
       operationId: getTemperature
       tags:
         - Temperature
         - Sensors
       summary: "Get the current temperature reading from the given probe"
+      parameters:
+        - name: probe
+          in: path
+          description: The termerature probe number to query
+          required: true
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 7
+          default: 0
       responses:
         200:
-          description: "Service is operating normally"
+          description: "Temperature was read successfully"
           schema:
-            type: object
-            required:
-              - message
-            properties:
-              message:
-                type: string
-                description: A greeting fit for a king!
+            $ref: "#/definitions/Temperature"
         default:
           description: Unexpected error
           schema:
@@ -68,6 +72,35 @@ paths:
             $ref: "#/definitions/Error"
 
 definitions:
+  Temperature:
+    type: object
+    required:
+      - kelvin
+      - celcuis
+      - fahrenheit
+      - probe
+      - time
+    properties:
+      kelvin:
+        type: number
+        format: float
+        description: Temperature reading in degrees kelvin
+      celcuis:
+        type: number
+        format: float
+        description: Temperature reading in degrees celcuis
+      fahrenheit:
+        type: number
+        format: float
+        description: Temperature reading in degrees fahrenheit
+      probe:
+        type: integer
+        format: int32
+        description: The probe number the temperature came from
+      time:
+        type: time
+        format: date-time
+        description: The date and time of the reading
   Hello:
     type: object
     required:

@@ -10,19 +10,18 @@ coverage:
 install:
 	time scp bin/bbqberry pi@pi:~/
 
-build: swagger
+build:
 	time env GOOS=linux GOARCH=arm go build -o bin/bbqberry cmd/app-server/main.go
 
 run:
 	time ssh pi@pi ~pi/bbqberry --host=0.0.0.0 --port=8000
 
 mock:
-	#mockgen -source vendor/github.com/kidoman/embd/spi.go
 	mkdir -p tmp/vendor
-	rm -rf mocks && mkdir mocks
+	rm -rf mocks && mkdir -p mocks/mock_embd
 	ln -Fs $(shell pwd)/vendor ./tmp/vendor/src
 	GOPATH=$(shell pwd)/tmp/vendor:$$GOPATH \
-	    mockgen github.com/kidoman/embd SPIBus > mocks/embd.go
+	    mockgen github.com/kidoman/embd SPIBus > mocks/mock_embd/embd.go
 	rm vendor/vendor
 
 # Environment target sets up initial dependencies that are not checked into the repo.

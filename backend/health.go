@@ -10,28 +10,27 @@ import (
 	"fmt"
 )
 
-// Health check endpoint ...
-func Health() (h models.Health, err error) {
+func Health() (m models.Health, err error) {
 	defer func() {
-		log.Infof("service=%s healthy=%t", *h.ServiceInfo.Name, *h.Healthy)
+		log.Infof("service=%s healthy=%t", *m.ServiceInfo.Name, *m.Healthy)
 	}()
 
 	healthy := false
-	h = models.Health{ Healthy: &healthy }
+	m = models.Health{ Healthy: &healthy }
 
 	si := new(models.ServiceInfo)
 	si.Name = &framework.ConstantsObj.ServiceName
 	si.Version = &framework.ConstantsObj.Version
-	h.ServiceInfo = si
+	m.ServiceInfo = si
 
 	client, err := influx.GetDefaultClient()
 	if err != nil {
 		e := new(models.Error)
-		code := error_codes.ERR_INFLUX_UNAVAILABLE
+		code := error_codes.ErrInfluxUnavailable
 		e.Code = &code
-		e.Message = fmt.Sprintf("%s %s", error_codes.MESSAGES[*e.Code], err)
-		h.Error = e
-		return h, nil
+		e.Message = fmt.Sprintf("%s %s", error_codes.GetText(*e.Code), err)
+		m.Error = e
+		return m, nil
 	}
 
 	tags := map[string]string{"service": *si.Name}
@@ -42,13 +41,13 @@ func Health() (h models.Health, err error) {
 	_, err = influx_example.WriteExamplePoint(client, "health", tags, fields)
 	if err != nil {
 		e := new(models.Error)
-		code := error_codes.ERR_INFLUX_WRITE_ERROR
+		code := error_codes.ErrInfluxWrite
 		e.Code = &code
-		e.Message = fmt.Sprintf("%s %s", error_codes.MESSAGES[*e.Code], err)
-		h.Error = e
-		return h, nil
+		e.Message = fmt.Sprintf("%s %s", error_codes.GetText(*e.Code), err)
+		m.Error = e
+		return m, nil
 	}
 
 	healthy = true
-	return h, nil
+	return m, nil
 }
