@@ -19,9 +19,7 @@ import (
 
 type CmdOptions struct {
 	LogFile     string `short:"l" long:"logfile" description:"Specify the log file" default:""`
-	Verbose     bool   `short:"v" long:"verbose" description:"Show verbose debug information"`                    // always defaults to false
-	VeryVerbose bool   `short:"V" long:"very-verbose" description:"Show verbose debug information including aws"` // always defaults to false
-	StaticDir   string `short:"s" long:"static" description:"The path to the static dirs" default:""`             // default auto
+	Verbose     bool   `short:"v" long:"verbose" description:"Show verbose debug information"`
 }
 
 var CmdOptionsValues CmdOptions // export for testing
