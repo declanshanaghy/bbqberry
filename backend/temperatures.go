@@ -32,7 +32,7 @@ func GetTemperatureProbeReadings(params *temperature.GetProbeReadingsParams) (m 
 		if err != nil {
 			return nil, err
 		}
-		
+
 		t := strfmt.DateTime(reading.Time)
 		z := models.TemperatureReading{
 			Time:       &t,
