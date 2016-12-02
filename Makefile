@@ -1,5 +1,6 @@
 # Standard Polaris Makefile
 
+APP_NAME = bbqberry
 
 unittest: code_report
 	ginkgo -r -v -p --progress -trace -cover -coverpkg=./...
@@ -20,10 +21,10 @@ install: swagger
 	cp $$GOPATH/bin/app-server /tmp/bin
 
 build: swagger mock
-	go build -o bin/bbqberry cmd/app-server/main.go
+	go build -o bin/$(APP_NAME) cmd/app-server/main.go
 
 build_arm:
-	env GOOS=linux GOARCH=arm go build -o bin/bbqberry cmd/app-server/main.go
+	env GOOS=linux GOARCH=arm go build -o bin/$(APP_NAME) cmd/app-server/main.go
 
 build_docker:
 	docker build -f Dockerfile-app -t polarishq/$(shell basename $(shell pwd)) .
@@ -37,7 +38,7 @@ mock:
 	rm vendor/vendor || true
 
 code_report: build
-	./scripts/code_analysis.sh; \
+	./skel/scripts/code_analysis.sh; \
 	    if [ "$$?" == "0" ]; then \
 	        echo "Code Report passed"; \
 	    else \
@@ -45,11 +46,11 @@ code_report: build
 	    fi
 
 code_quality:
-	./scripts/code_quality.sh
+	./skel/scripts/code_quality.sh
 
 # Environment target sets up initial dependencies that are not checked into the repo.
 environment:
-	./scripts/setup_environment.sh
+	./skel/scripts/setup_environment.sh
 
 encrypt:
 	jet encrypt dockercfg.secret.json dockercfg.json.encrypted
