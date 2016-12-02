@@ -13,6 +13,7 @@ RUN go get -u github.com/onsi/ginkgo/ginkgo                         # ginkgo BDD
 RUN go get -u github.com/modocache/gover                            # Code coverage aggregation
 RUN go get -u github.com/mattn/goveralls                            # coveralls.io online code coverage viewer
 RUN go get -u github.com/kardianos/govendor
+RUN go get -u github.com/jessevdk/go-flags
 RUN go get -u github.com/go-openapi/runtime
 RUN go get -u github.com/go-swagger/go-swagger/cmd/swagger
 

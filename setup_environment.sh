@@ -8,6 +8,7 @@ go get -u github.com/modocache/gover                            # Code coverage 
 go get -u github.com/mattn/goveralls                            # coveralls.io online code coverage viewer
 go get -u github.com/kardianos/govendor
 go get -u github.com/go-openapi/runtime
+go get -u github.com/jessevdk/go-flags
 go get -u github.com/go-swagger/go-swagger/cmd/swagger
 
 # Required for code standards reporting (Analysis reporting only, no automatic source changes)

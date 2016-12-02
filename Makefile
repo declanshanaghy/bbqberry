@@ -1,7 +1,7 @@
 # Standard Polaris Makefile
 
 
-unittest: clean goreport
+unittest: goreport
 	ginkgo -r -v -p --progress -trace -cover -coverpkg=./...
 	gover
 	cat gover.coverprofile | \
@@ -58,10 +58,16 @@ clean_coverage:
 	find . -name "*.coverprofile*" -delete
 	find . -name cover.html -delete
 
-clean: clean_coverage
-	go clean
-	rm -rf tmp/ cmd/ models/
+clean_vendor:
+	find ./vendor -d 1 -type dir | xargs rm -rf
+
+clean_swagger:
+	rm -rf cmd/ models/
 	rm -rf restapi/operations restapi/doc.go restapi/embedded_spec.go restapi/server.go
+
+clean: clean_coverage clean_vendor clean_swagger
+	go clean
+	rm -rf tmp/
 
 validate_swagger:
 	swagger validate swagger.yml
@@ -78,6 +84,6 @@ dependencies:
 	govendor sync
 	govendor remove +unused
 
-codeship: clean
+codeship: clean dependencies
 	jet steps $(XARGS)
 
