@@ -4,7 +4,7 @@
   - name: Generate code, run tests & publish code coverage
     command: make coverage
   - name: Build Executable
-    command: make install
+    command: make build
 
 - type: push
   service: app
