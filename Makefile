@@ -1,7 +1,7 @@
 # Standard Polaris Makefile
 
 
-unittest: swagger mock goreport
+unittest: clean goreport
 	ginkgo -r -v -p --progress -trace -cover -coverpkg=./...
 	gover
 	cat gover.coverprofile | \
@@ -19,7 +19,7 @@ install: swagger
 	go install -v ./...
 	cp $$GOPATH/bin/app-server /tmp/bin
 
-build_native:
+build_native: swagger mock
 	go build -o bin/bbqberry cmd/app-server/main.go
 
 build_arm:
@@ -52,12 +52,13 @@ environment:
 	./setup_environment.sh
 
 encrypt:
-	jet encrypt credentials.env.secret credentials.env.encrypted
+	jet encrypt dockercfg.secret.json dockercfg.json.encrypted
 
 clean_coverage:
 	find . -name "*.coverprofile*" -delete
+	find . -name cover.html -delete
 
-clean:
+clean: clean_coverage
 	go clean
 	rm -rf tmp/ cmd/ models/
 	rm -rf restapi/operations restapi/doc.go restapi/embedded_spec.go restapi/server.go

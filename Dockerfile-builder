@@ -17,7 +17,11 @@ RUN go get -u github.com/go-openapi/runtime
 RUN go get -u github.com/go-swagger/go-swagger/cmd/swagger
 
 # Required for code standards reporting (Analysis reporting only, no automatic source changes)
+RUN go get -u github.com/fzipp/gocyclo                              # Calculates cyclomatic complexities
+RUN go get -u github.com/gordonklaus/ineffassign                    # Detects ineffectual assignments
 RUN go get -u github.com/golang/lint/golint                         # Code linter
+RUN go get -u github.com/client9/misspell/cmd/misspell              # Detects common mispellings
+
 
 # Set the WORKDIR to the project path in your GOPATH, e.g. /go/src/github.com/Polarishq/SERVICE_NAME/
 WORKDIR /go/src/github.com/declanshanaghy/bbqberry

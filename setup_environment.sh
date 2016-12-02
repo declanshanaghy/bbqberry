@@ -14,7 +14,7 @@ go get -u github.com/go-swagger/go-swagger/cmd/swagger
 go get -u github.com/fzipp/gocyclo                              # Calculates cyclomatic complexities
 go get -u github.com/gordonklaus/ineffassign                    # Detects ineffectual assignments
 go get -u github.com/golang/lint/golint                         # Code linter
-go get -u github.com/client9/misspell                           # Detects common mispellings
+go get -u github.com/client9/misspell/cmd/misspell              # Detects common mispellings
 
 # Required for code quality analysis (Automatically change files on disk to be committed by dev)
 #go get -u golang.org/x/tools/cmd/gofmt                          # Reformats go source code

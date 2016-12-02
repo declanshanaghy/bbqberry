@@ -5,3 +5,8 @@
     command: make coverage
   - name: Build Executable
     command: make install
+
+- type: push
+  service: app
+  image_name:  declanshanaghy/bbqberry
+  encrypted_dockercfg_path: dockercfg.json.encrypted

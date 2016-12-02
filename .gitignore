@@ -9,10 +9,11 @@ bin
 *.iml
 .vscode*
 
-# Secret keys etc...
-codeship.aes
-*.secret
-*.credential
+# Secrets
+*.aes
+*secret
+*credential
+
 
 # Generated files
 cover.html

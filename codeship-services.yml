@@ -10,7 +10,7 @@ builder:
 
 app:
   build:
-    image: 137462835382.dkr.ecr.us-west-2.amazonaws.com/logmgmtrouter
+    image: declanshanaghy/bbqberry
     dockerfile_path: Dockerfile-app
   cached: true
   volumes:
