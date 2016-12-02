@@ -1,9 +1,2 @@
-# Starting from the latest Alpine container
-FROM alpine
-
-# Copy the executable binary into place
-COPY ./tmp/bin/app-server /go/bin/app-server
-
-USER root
-EXPOSE 80
-CMD ["/go/bin/app-server", "--host=0.0.0.0", "--port=80"]
+# Start from the latest PolarisHQ skel-app container
+FROM polarishq/skel-app

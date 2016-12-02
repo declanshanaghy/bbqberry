@@ -1,8 +1,8 @@
-# Start from the latest golang base
+# Start from the latest PolarisHQ skel-builder image
 FROM polarishq/skel-builder
 
 # Set the WORKDIR to the project path in your GOPATH, e.g. /go/src/github.com/Polarishq/SERVICE_NAME/
 WORKDIR /go/src/github.com/declanshanaghy/bbqberry
 
-# Copy the content of the repository into the container
+# Copy the source files into place
 COPY . ./

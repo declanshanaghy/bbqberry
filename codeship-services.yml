@@ -3,6 +3,7 @@ builder:
     image: declanshanaghy/bbqberry-builder
     dockerfile_path: Dockerfile-builder
   cached: true
+  encrypted_env_file: credentials.env.encrypted
   links:
   - influxdb
   volumes:
