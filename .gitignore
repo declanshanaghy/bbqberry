@@ -1,7 +1,7 @@
 # Various scratch files
 tmp
 coverage.out
-*.coverprofile
+*.coverprofile*
 bin
 
 # Project files

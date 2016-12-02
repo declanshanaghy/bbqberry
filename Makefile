@@ -3,12 +3,13 @@
 unittest:
 	ginkgo -r -v -p --progress -trace -cover -coverpkg=./...
 	gover
+	cat gover.coverprofile | grep -v vendor | grep -v client | grep -v models | grep -v restapi | grep -v cmd | grep -v mocks | grep -v example | grep -v test > gover.coverprofile.sanitized
 
-coverage:
-	go tool cover -html=gover.coverprofile -o cover.html
+coverage_html:
+	go tool cover -html=gover.coverprofile.sanitized -o cover.html
 
 goveralls:
-	goveralls -coverprofile=gover.coverprofile -service=codeship -repotoken V3p8U7YnvB2xRXYJVmWvrYFsvSXuPSyQx
+	goveralls -coverprofile=gover.coverprofile.sanitized -service=codeship -repotoken V3p8U7YnvB2xRXYJVmWvrYFsvSXuPSyQx
 
 install:
 	time scp bin/bbqberry pi@pi:~/
@@ -43,7 +44,7 @@ encrypt:
 
 clean:
 	go clean
-	find . -name "*.coverprofile" -delete
+	find . -name "*.coverprofile*" -delete
 	rm -rf tmp/ cmd/ models/
 	rm -rf restapi/operations restapi/doc.go restapi/embedded_spec.go restapi/server.go
 

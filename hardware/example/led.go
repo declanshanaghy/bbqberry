@@ -1,4 +1,4 @@
-package samples
+package example
 
 import (
 	"github.com/kidoman/embd"
