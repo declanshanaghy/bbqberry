@@ -7,15 +7,15 @@ builder:
   links:
   - influxdb
   volumes:
-  - ./tmp/bin:/tmp/bin
+  - tmp/bin:/tmp/bin
 
 app:
   build:
     image: declanshanaghy/bbqberry
     dockerfile_path: Dockerfile-app
   cached: true
-  volumes:
-  - ./tmp/bin:/tmp/bin
+  volumes_from:
+  - builder
 
 influxdb:
   image: influxdb
