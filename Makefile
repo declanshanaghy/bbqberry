@@ -49,7 +49,7 @@ code_quality:
 
 # Environment target sets up initial dependencies that are not checked into the repo.
 environment:
-	./setup_environment.sh
+	./scripts/setup_environment.sh
 
 encrypt:
 	jet encrypt dockercfg.secret.json dockercfg.json.encrypted

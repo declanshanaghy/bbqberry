@@ -17,5 +17,4 @@ go get -u github.com/golang/lint/golint                         # Code linter
 go get -u github.com/client9/misspell/cmd/misspell              # Detects common mispellings
 
 # Required for code quality analysis (Automatically change files on disk to be committed by dev)
-go get -u golang.org/x/tools/cmd/gofmt                          # Reformats go source code
 go get -u golang.org/x/tools/cmd/goimports                      # Fixes imports
