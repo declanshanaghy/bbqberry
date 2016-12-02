@@ -4,7 +4,10 @@ unittest:
 	ginkgo -r -v -p --progress -trace -cover -coverpkg=./...
 	gover
 
-coverage: unittest
+coverage:
+	go tool cover -html=gover.coverprofile -o cover.html
+
+goveralls:
 	goveralls -coverprofile=gover.coverprofile -service=codeship -repotoken V3p8U7YnvB2xRXYJVmWvrYFsvSXuPSyQx
 
 install:
