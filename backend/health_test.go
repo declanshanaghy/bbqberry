@@ -10,7 +10,7 @@ import (
 func TestHealth(t *testing.T) {
 	health, err := Health()
 	assert.Nil(t, err, "Standard health check returned an error")
-	assert.Equal(t, *health.Healthy, false, "Standard health check returned unexpected status")
+	assert.Equal(t, *health.Healthy, true, "Standard health check returned unhealthy")
 
 	si := new(models.ServiceInfo)
 	si.Name = &framework.ConstantsObj.ServiceName

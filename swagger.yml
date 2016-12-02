@@ -11,27 +11,53 @@ consumes:
 produces:
   - application/json
 paths:
-  /sensors/temperature/{probe}:
+  /temperatures/monitors/{probe}:
     get:
-      operationId: getTemperature
+      operationId: getMonitors
       tags:
         - Temperature
-      summary: "Get the current temperature reading from the given probe"
+      summary: "Get monitor settings for the requested probe"
       parameters:
         - name: probe
           in: path
-          description: The termerature probe number to query
+          description: The termerature probe for which to retrieve configured monitors
           required: true
           type: integer
           format: int32
-          minimum: 0
-          maximum: 7
           default: 0
+          minimum: 0
+          maximum: 3
+      responses:
+        200:
+          description: "The currently configured monitor(s) were retrieved successfully"
+          schema:
+            $ref: "#/definitions/TemperatureMonitors"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+  /temperatures/probes/reading:
+    get:
+      operationId: getProbeReadings
+      tags:
+        - Temperature
+      summary: "Get the current temperature reading from the requested probe(s)"
+      parameters:
+        - name: probe
+          in: query
+          description: The termerature probe to read from (or all probes if the given probe
+            number is 0 or not specified)
+          required: false
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+          maximum: 4
       responses:
         200:
           description: "Temperature was read successfully"
           schema:
-            $ref: "#/definitions/Temperature"
+            $ref: "#/definitions/TemperatureReading"
         default:
           description: Unexpected error
           schema:
@@ -71,7 +97,42 @@ paths:
             $ref: "#/definitions/Error"
 
 definitions:
-  Temperature:
+  TemperatureMonitors:
+    type: object
+    additionalProperties:
+      type: array
+      items:
+        $ref: "#/definitions/TemperatureMonitor"
+  TemperatureMonitor:
+    type: object
+    required:
+      - probe
+      - scale
+      - min
+      - max
+    properties:
+      scale:
+        type: string
+        description: The temperature scale
+      min:
+        type: number
+        format: float
+        description: The minimum temperature, below which an alert will be generated
+      max:
+        type: number
+        format: float
+        description: The maximium temperature, below which an alert will be generated
+      probe:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 3
+        default: 0
+  TemperatureReadings:
+    type: array
+    items:
+      $ref: "#/definitions/TemperatureReading"
+  TemperatureReading:
     type: object
     required:
       - kelvin
@@ -92,14 +153,16 @@ definitions:
         type: number
         format: float
         description: Temperature reading in degrees fahrenheit
+      time:
+        type: string
+        format: date-time
+        description: The date and time of the reading
       probe:
         type: integer
         format: int32
-        description: The probe number the temperature came from
-      time:
-        type: time
-        format: date-time
-        description: The date and time of the reading
+        minimum: 0
+        maximum: 7
+        default: 0
   Hello:
     type: object
     required:
@@ -138,18 +201,17 @@ definitions:
         type: string
         description: Service API version
       error:
+        $ref: "#/definitions/Error"
   Health:
     type: object
     required:
       - healthy
-      - message
       - service_info
     properties:
       healthy:
         type: boolean
         description: Flag indicating whether or not ALL internal checks passed
       error:
-        type: object
         $ref: "#/definitions/Error"
       service_info:
         $ref: "#/definitions/ServiceInfo"

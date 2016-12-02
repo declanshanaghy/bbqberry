@@ -16,6 +16,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/declanshanaghy/bbqberry/framework/log"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
+	"github.com/declanshanaghy/bbqberry/hardware"
 )
 
 type CmdOptions struct {
@@ -36,16 +37,6 @@ func configureFlags(api *operations.AppAPI) {
 	}
 
 }
-//func configureHardware() {
-//	if err := embd.InitSPI(); err != nil {
-//		panic(err)
-//	}
-//}
-//
-//func shutdownHardware() {
-//	embd.CloseSPI()
-//}
-
 func configureAPI(api *operations.AppAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
@@ -62,20 +53,23 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 	api.HealthHealthHandler = health.HealthHandlerFunc(func(params health.HealthParams) middleware.Responder {
 		return framework.HandleApiRequestWithError(backend.Health())
 	})
-	api.ExampleHelloHandler = example.HelloHandlerFunc(func(params example.HelloParams) middleware.Responder {
-		return framework.HandleApiRequestWithError(backend.Hello())
-	})
-	api.TemperatureGetTemperatureHandler = temperature.GetTemperatureHandlerFunc(
-		func(params temperature.GetTemperatureParams) middleware.Responder {
-			return framework.HandleApiRequestWithError(backend.GetTemperature(&params))
+	api.ExampleHelloHandler = example.HelloHandlerFunc(
+		func(params example.HelloParams) middleware.Responder {
+			return framework.HandleApiRequestWithError(backend.Hello())
+		})
+	api.TemperatureGetProbeReadingsHandler = temperature.GetProbeReadingsHandlerFunc(
+		func(params temperature.GetProbeReadingsParams) middleware.Responder {
+			return framework.HandleApiRequestWithError(backend.GetTemperatureProbeReadings(&params))
+		})
+	api.TemperatureGetMonitorsHandler = temperature.GetMonitorsHandlerFunc(
+		func(params temperature.GetMonitorsParams) middleware.Responder {
+			return framework.HandleApiRequestWithError(backend.GetTemperatureMonitors(&params))
 		})
 
-	//configureHardware()
-	//closer := samples.DoStuff()
-	//api.ServerShutdown = func() {
-	//	shutdownHardware()
-	//	closer.Close()
-	//}
+	hardware.Startup()
+	api.ServerShutdown = func() {
+		hardware.Shutdown()
+	}
 
 	return setupGlobalMiddleware(api.Serve(setupMiddlewares))
 }

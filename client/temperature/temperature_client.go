@@ -23,30 +23,58 @@ type Client struct {
 }
 
 /*
-GetTemperature gets the current temperature reading from the given probe
+GetMonitors gets monitor settings for the requested probe
 */
-func (a *Client) GetTemperature(params *GetTemperatureParams) (*GetTemperatureOK, error) {
+func (a *Client) GetMonitors(params *GetMonitorsParams) (*GetMonitorsOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewGetTemperatureParams()
+		params = NewGetMonitorsParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "getTemperature",
+		ID:                 "getMonitors",
 		Method:             "GET",
-		PathPattern:        "/sensors/temperature/{probe}",
+		PathPattern:        "/temperatures/monitors/{probe}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &GetTemperatureReader{formats: a.formats},
+		Reader:             &GetMonitorsReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetTemperatureOK), nil
+	return result.(*GetMonitorsOK), nil
+
+}
+
+/*
+GetProbeReadings gets the current temperature reading from the requested probe s
+*/
+func (a *Client) GetProbeReadings(params *GetProbeReadingsParams) (*GetProbeReadingsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetProbeReadingsParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "getProbeReadings",
+		Method:             "GET",
+		PathPattern:        "/temperatures/probes/reading",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetProbeReadingsReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetProbeReadingsOK), nil
 
 }
 

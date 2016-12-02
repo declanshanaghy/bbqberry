@@ -9,7 +9,7 @@ import (
 	"github.com/declanshanaghy/bbqberry/framework"
 )
 
-func reader(w *sync.WaitGroup, temp chan<- hardware.TemperatureReading, t hardware.TemperatureArray) {
+func reader(w *sync.WaitGroup, temp chan<- *hardware.TemperatureReading, t hardware.TemperatureArray) {
 	// When the sending channel is closed a panic will occur, this is the signal to exit
 	defer func() {
 		if r := recover(); r != nil {
@@ -24,13 +24,13 @@ func reader(w *sync.WaitGroup, temp chan<- hardware.TemperatureReading, t hardwa
 
 	ticker := time.NewTicker(time.Second * 1)
 	for tick := range ticker.C {
-		t := t.GetTemp(0)
+		t, _ := t.GetTemperatureReading(1)
 		log.Debugf("action=tx time=%s temp=%v", tick, t)
 		temp <- t
 	}
 }
 
-func processor(w *sync.WaitGroup, temp <-chan hardware.TemperatureReading) {
+func processor(w *sync.WaitGroup, temp <-chan *hardware.TemperatureReading) {
 	loop := true
 	for loop {
 		select {
@@ -53,7 +53,7 @@ type StuffCloser struct {
 	w *sync.WaitGroup
 	bus0 embd.SPIBus
 	bus1 embd.SPIBus
-	cTemp chan hardware.TemperatureReading
+	cTemp chan *hardware.TemperatureReading
 }
 
 func (c *StuffCloser) Close() {
@@ -73,8 +73,8 @@ func DoStuff() framework.Closer {
 	}()
 
 	bus1 := embd.NewSPIBus(embd.SPIMode0, 1, 1000000, 8, 0)
-	sTemp := hardware.NewTemperature(bus1)
-	cTemp := make(chan hardware.TemperatureReading, 1)
+	sTemp := hardware.NewBBQTempReader(1, bus1)
+	cTemp := make(chan *hardware.TemperatureReading, 1)
 
 	go reader(&w, cTemp, sTemp)
 	go processor(&w, cTemp)

@@ -5,6 +5,7 @@ import (
 	"github.com/golang/glog"
 	"image/color"
 	"fmt"
+	"errors"
 )
 
 type WS2801 interface {
@@ -12,9 +13,9 @@ type WS2801 interface {
 	Close()
 	Off()
 	Update() error
-	SetPixelRGB(n int, r uint8, g uint8, b uint8)
-	SetPixelRGBA(n int, color color.RGBA)
-	SetPixelColor(n int, color int)
+	SetPixelRGB(n int, r uint8, g uint8, b uint8) error
+	SetPixelRGBA(n int, color color.RGBA) error
+	SetPixelColor(n int, color int) error
 }
 
 type Strand struct {
@@ -46,7 +47,7 @@ func (s *Strand) Off() {
 func (s *Strand) Close() {
 	glog.Info("action=Close nPixels=%d", s.GetNumPixels())
 	s.Off()
-	//s.bus.Close()
+	s.bus.Close()
 }
 
 func (s *Strand) Update() error {
@@ -55,29 +56,31 @@ func (s *Strand) Update() error {
 	return s.bus.TransferAndReceiveData(s.data)
 }
 
-func (s *Strand) SetPixelRGBA(n int, color color.RGBA) {
+func (s *Strand) SetPixelRGBA(n int, color color.RGBA) error {
 	glog.V(3).Infof("action=SetPixelRGBA n=%d, color=%#06x", n, color)
-	s.SetPixelRGB(n, color.R, color.G, color.B)
+	return s.SetPixelRGB(n, color.R, color.G, color.B)
 }
 
-func (s *Strand) SetPixelColor(n int, color int) {
+func (s *Strand) SetPixelColor(n int, color int) error {
 	glog.V(3).Infof("action=SetPixelColor n=%d, color=%#06x", n, color)
-	s.SetPixelRGB(n, uint8(color>>16 & 0xFF), uint8(color>>8 & 0xFF), uint8(color & 0xFF))
+	return s.SetPixelRGB(n, uint8(color>>16 & 0xFF), uint8(color>>8 & 0xFF), uint8(color & 0xFF))
 }
 
-func (s *Strand) SetPixelRGB(n int, r uint8, g uint8, b uint8) {
-	s.ValidatePixel(n)
+func (s *Strand) SetPixelRGB(n int, r uint8, g uint8, b uint8) error {
+	if err := s.validatePixel(n); err != nil {
+		return err
+	}
 	base := n * 3
 	glog.V(3).Infof("action=SetPixelRGB n=%d base=%d nPixels=%d r=%#02x g=%#02x b=%#02x", n, base, len(s.pixels), r, g, b)
 	s.pixels[base] = r
 	s.pixels[base+1] = g
 	s.pixels[base+2] = b
+	return nil
 }
 
-func (s *Strand) ValidatePixel(n int) {
-	if n > s.GetNumPixels() {
-		msg := fmt.Sprintf("action=invalid pixel=%d, max=%d", n, s.GetNumPixels())
-		glog.Error(msg)
-		panic(msg)
+func (s *Strand) validatePixel(n int) (err error) {
+	if n < 0 || n > s.GetNumPixels() {
+		err = errors.New(fmt.Sprintf("action=invalid pixel=%d, max=%d", n, s.GetNumPixels()))
 	}
+	return err
 }

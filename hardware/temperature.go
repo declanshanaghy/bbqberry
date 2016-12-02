@@ -6,13 +6,17 @@ import (
 	"math"
 	"github.com/declanshanaghy/bbqberry/framework/log"
 	"time"
+	"fmt"
+	"errors"
 )
 
 type TemperatureArray interface {
 	/*
 	Reads the tempearature from the requested probe and returns the value in Kelvin, Celcius & Fahrenheit
 	 */
-	GetTemp(probe int32) *TemperatureReading
+	GetTemperatureReading(probe int32) (*TemperatureReading, error)
+	GetNumProbes() int32
+	Close()
 }
 
 type TemperatureReading struct {
@@ -22,13 +26,14 @@ type TemperatureReading struct {
 }
 
 type BBQTemp struct {
-	channel byte
+	numProbes int32
 	bus embd.SPIBus
 	adc *mcp3008.MCP3008
 }
 
-func NewTemperature(bus embd.SPIBus) TemperatureArray {
+func NewBBQTempReader(numProbes int32, bus embd.SPIBus) TemperatureArray {
 	return &BBQTemp{
+		numProbes: numProbes,
 		bus: bus,
 		adc: mcp3008.New(mcp3008.SingleMode, bus),
 	}
@@ -39,7 +44,15 @@ func (s *BBQTemp) Close() {
 	s.bus.Close()
 }
 
-func (s *BBQTemp) GetTemp(probe int32) *TemperatureReading {
+func (s *BBQTemp) GetNumProbes() int32 {
+	return s.numProbes
+}
+
+func (s *BBQTemp) GetTemperatureReading(probe int32) (*TemperatureReading, error) {
+	if probe < 1 || probe > s.numProbes {
+		return nil, errors.New(fmt.Sprintf("Invalid probe: %d. Must be between 1 and %d", probe, s.numProbes))
+	}
+	
 	log.Debugf("action=GetTemp probe=%d", probe)
 	v, err := s.adc.AnalogValueAt(int(probe))
 	if err != nil {
@@ -52,7 +65,7 @@ func (s *BBQTemp) GetTemp(probe int32) *TemperatureReading {
 		Kelvin: float32(k),
 		Celcius: float32(c),
 		Fahrenheit: float32(f),
-	}
+	}, nil
 }
 
 func convertVoltToTemp(volt int) (k, c, f float64) {
