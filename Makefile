@@ -1,7 +1,7 @@
 # Standard Polaris Makefile
 
-unittest: clean swagger mock
-	ginkgo -r -v -trace -cover -coverpkg=./...
+unittest:
+	ginkgo -r -v -p --progress -trace -cover -coverpkg=./...
 	gover
 
 coverage: unittest
