@@ -19,5 +19,5 @@ app:
 influxdb:
   image: influxdb
   ports:
-    - 8083:8083
-    - 8086:8086
+  - "8083"
+  - "8086"
