@@ -20,6 +20,10 @@ cover.html
 mocks/
 cmd/
 models/
+
 # All files in restapi except the configure files
 restapi/*
 !restapi/configure_*.go
+
+# Allow vendor models
+!vendor/**/models
