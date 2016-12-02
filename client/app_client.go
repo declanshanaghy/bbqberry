@@ -11,6 +11,7 @@ import (
 
 	"github.com/declanshanaghy/bbqberry/client/example"
 	"github.com/declanshanaghy/bbqberry/client/health"
+	"github.com/declanshanaghy/bbqberry/client/temperature"
 )
 
 // Default app HTTP client.
@@ -34,6 +35,8 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *App {
 
 	cli.Health = health.New(transport, formats)
 
+	cli.Temperature = temperature.New(transport, formats)
+
 	return cli
 }
 
@@ -42,6 +45,8 @@ type App struct {
 	Example *example.Client
 
 	Health *health.Client
+
+	Temperature *temperature.Client
 
 	Transport runtime.ClientTransport
 }
@@ -53,5 +58,7 @@ func (c *App) SetTransport(transport runtime.ClientTransport) {
 	c.Example.SetTransport(transport)
 
 	c.Health.SetTransport(transport)
+
+	c.Temperature.SetTransport(transport)
 
 }

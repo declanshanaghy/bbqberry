@@ -13,53 +13,62 @@ import (
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
 	"github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/framework"
-	"github.com/declanshanaghy/bbqberry/samples"
-	_ "github.com/kidoman/embd/host/rpi"
-	"github.com/kidoman/embd"
+	"github.com/go-openapi/swag"
+	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
+	"github.com/declanshanaghy/bbqberry/hardware"
 )
 
+type CmdOptions struct {
+	LogFile     string `short:"l" long:"logfile" description:"Specify the log file" default:""`
+	Verbose     bool   `short:"v" long:"verbose" description:"Show verbose debug information"`
+	StaticDir   string `short:"s" long:"static" description:"The path to the static dirs" default:""`
+}
+
+var CmdOptionsValues CmdOptions // export for testing
+
 func configureFlags(api *operations.AppAPI) {
-	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
-}
-
-func configureHardware() {
-	if err := embd.InitSPI(); err != nil {
-		panic(err)
+	api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{
+		swag.CommandLineOptionsGroup{
+			ShortDescription: "BBQ Berry Server Flags",
+			LongDescription:  "BBQ Berry Server Flags",
+			Options:          &CmdOptionsValues,
+		},
 	}
-}
 
-func shutdownHardware() {
-	embd.CloseSPI()
 }
-
 func configureAPI(api *operations.AppAPI) http.Handler {
-	configureHardware()
-
 	// configure the api here
 	api.ServeError = errors.ServeError
 
-	// Set your custom logger if needed. Default one is log.Printf
-	// Expected interface func(string, ...interface{})
-	//
-	// Example:
-	// s.api.Logger = log.Printf
-
-	closer := samples.DoStuff()
+	log.SetDebug(CmdOptionsValues.Verbose)
+	if CmdOptionsValues.LogFile != "" {
+		log.SetOutput(CmdOptionsValues.LogFile)
+	}
+	api.Logger = log.Infof
 
 	api.JSONConsumer = runtime.JSONConsumer()
-
 	api.JSONProducer = runtime.JSONProducer()
 
 	api.HealthHealthHandler = health.HealthHandlerFunc(func(params health.HealthParams) middleware.Responder {
 		return framework.HandleApiRequestWithError(backend.Health())
 	})
-	api.ExampleHelloHandler = example.HelloHandlerFunc(func(params example.HelloParams) middleware.Responder {
-		return framework.HandleApiRequestWithError(backend.Hello())
-	})
+	api.ExampleHelloHandler = example.HelloHandlerFunc(
+		func(params example.HelloParams) middleware.Responder {
+			return framework.HandleApiRequestWithError(backend.Hello())
+		})
+	api.TemperatureGetProbeReadingsHandler = temperature.GetProbeReadingsHandlerFunc(
+		func(params temperature.GetProbeReadingsParams) middleware.Responder {
+			return framework.HandleApiRequestWithError(backend.GetTemperatureProbeReadings(&params))
+		})
+	api.TemperatureGetMonitorsHandler = temperature.GetMonitorsHandlerFunc(
+		func(params temperature.GetMonitorsParams) middleware.Responder {
+			return framework.HandleApiRequestWithError(backend.GetTemperatureMonitors(&params))
+		})
 
+	hardware.Startup()
 	api.ServerShutdown = func() {
-		shutdownHardware()
-		closer.Close()
+		hardware.Shutdown()
 	}
 
 	return setupGlobalMiddleware(api.Serve(setupMiddlewares))
@@ -79,5 +88,5 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 // The middleware configuration happens before anything, this middleware also applies to serving the swagger.json document.
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
-	return handler
+	return framework.NewPanicHandler(framework.NewSwaggerUIHandler(handler, CmdOptionsValues.StaticDir))
 }

@@ -1,29 +1,28 @@
 # Standard Polaris Makefile
 
-unittest: mock
+unittest: clean swagger mock
 	ginkgo -r -v -trace -cover -coverpkg=./...
 	gover
 
-coverage:
-	goveralls -coverprofile=gover.coverprofile -service=codeship -repotoken $COVERALLS_TOKEN
+coverage: unittest
+	goveralls -coverprofile=gover.coverprofile -service=codeship -repotoken V3p8U7YnvB2xRXYJVmWvrYFsvSXuPSyQx
 
 install:
 	time scp bin/bbqberry pi@pi:~/
 
-build: swagger
+build:
 	time env GOOS=linux GOARCH=arm go build -o bin/bbqberry cmd/app-server/main.go
 
 run:
 	time ssh pi@pi ~pi/bbqberry --host=0.0.0.0 --port=8000
 
 mock:
-	#mockgen -source vendor/github.com/kidoman/embd/spi.go
 	mkdir -p tmp/vendor
-	rm -rf mocks && mkdir mocks
+	rm -rf mocks && mkdir -p mocks/mock_embd
 	ln -Fs $(shell pwd)/vendor ./tmp/vendor/src
 	GOPATH=$(shell pwd)/tmp/vendor:$$GOPATH \
-	    mockgen github.com/kidoman/embd SPIBus > mocks/embd.go
-	rm vendor/vendor
+	    mockgen github.com/kidoman/embd SPIBus > mocks/mock_embd/embd.go
+	rm vendor/vendor || true
 
 # Environment target sets up initial dependencies that are not checked into the repo.
 environment:
@@ -45,7 +44,11 @@ clean:
 	rm -rf tmp/ cmd/ models/
 	rm -rf restapi/operations restapi/doc.go restapi/embedded_spec.go restapi/server.go
 
-swagger: clean
+validate_swagger:
+	swagger validate swagger.yml
+
+swagger: validate_swagger clean
+	rm -rf client/
 	swagger generate server --name app --spec swagger.yml
 	swagger generate client --name app --spec swagger.yml
 	swagger generate support --name app --spec swagger.yml

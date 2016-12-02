@@ -6,7 +6,7 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/framework/log"
 )
 
 type Closer interface {
@@ -26,6 +26,7 @@ func (a *apiOperation) WriteResponse(rw http.ResponseWriter, producer runtime.Pr
 	var err error
 	switch t := a.Response.(type) {
 	case error:
+		log.Error(t)
 		errors.ServeError(rw, nil, t)
 	default:
 		// success sent a 2xx response

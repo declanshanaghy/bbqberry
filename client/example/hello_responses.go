@@ -49,10 +49,10 @@ func NewHelloOK() *HelloOK {
 
 /*HelloOK handles this case with default header values.
 
-Service is operating normally
+Sample hello world endpoint
 */
 type HelloOK struct {
-	Payload HelloOKBody
+	Payload *models.Hello
 }
 
 func (o *HelloOK) Error() string {
@@ -61,8 +61,10 @@ func (o *HelloOK) Error() string {
 
 func (o *HelloOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	o.Payload = new(models.Hello)
+
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 
@@ -105,14 +107,4 @@ func (o *HelloDefault) readResponse(response runtime.ClientResponse, consumer ru
 	}
 
 	return nil
-}
-
-/*HelloOKBody hello o k body
-swagger:model HelloOKBody
-*/
-type HelloOKBody struct {
-
-	// A greeting fit for a king!
-	// Required: true
-	Message *string `json:"message"`
 }
