@@ -1,14 +1,17 @@
 # Standard Polaris Makefile
 
-unittest:
+unittest: clean_coverage
 	ginkgo -r -v -p --progress -trace -cover -coverpkg=./...
 	gover
-	cat gover.coverprofile | grep -v vendor | grep -v client | grep -v models | grep -v restapi | grep -v cmd | grep -v mocks | grep -v example | grep -v test > gover.coverprofile.sanitized
+	cat gover.coverprofile | \
+	    grep -v vendor | grep -v client | grep -v models | grep -v restapi | \
+	    grep -v cmd | grep -v mocks | grep -v example | grep -v test \
+	    > gover.coverprofile.sanitized
 
-coverage_html:
+coverage_local:
 	go tool cover -html=gover.coverprofile.sanitized -o cover.html
 
-goveralls:
+coverage:
 	goveralls -coverprofile=gover.coverprofile.sanitized -service=codeship -repotoken V3p8U7YnvB2xRXYJVmWvrYFsvSXuPSyQx
 
 install:
@@ -42,9 +45,11 @@ environment:
 encrypt:
 	jet encrypt credentials.env.secret credentials.env.encrypted
 
+clean_coverage:
+	find . -name "*.coverprofile*" -delete
+
 clean:
 	go clean
-	find . -name "*.coverprofile*" -delete
 	rm -rf tmp/ cmd/ models/
 	rm -rf restapi/operations restapi/doc.go restapi/embedded_spec.go restapi/server.go
 

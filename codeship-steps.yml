@@ -1,0 +1,5 @@
+- type: serial
+  service: builder
+  steps:
+  - name: Generate code, run tests & publish code coverage
+    command: make unittest coverage

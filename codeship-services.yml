@@ -1,0 +1,5 @@
+builder:
+  build:
+    image: declanshanaghy/bbqberry-builder
+    dockerfile_path: Dockerfile-builder
+  cached: true

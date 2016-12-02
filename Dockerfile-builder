@@ -1,0 +1,19 @@
+# Start from the latest golang base
+FROM golang:alpine
+
+RUN apk add --update musl-dev gcc make bash git openssh
+
+RUN go get -u github.com/golang/mock/mockgen                        # Mock generator
+RUN go get -u github.com/onsi/ginkgo/ginkgo                         # ginkgo BDD framework
+RUN go get -u github.com/onsi/gomega                                # BDD matcher library
+RUN go get -u github.com/modocache/gover                            # Code coverage aggregation
+RUN go get -u github.com/mattn/goveralls                            # coveralls.io online code coverage viewer
+RUN go get -u github.com/kardianos/govendor
+RUN go get -u github.com/go-openapi/runtime
+RUN go get -u github.com/go-swagger/go-swagger/cmd/swagger
+
+# Set the WORKDIR to the project path in your GOPATH, e.g. /go/src/github.com/Polarishq/SERVICE_NAME/
+WORKDIR /go/src/github.com/declanshanaghy/bbqberry
+
+# Copy the content of the repository into the container
+COPY . ./
