@@ -136,7 +136,7 @@ definitions:
     type: object
     required:
       - kelvin
-      - celcuis
+      - celsius
       - fahrenheit
       - probe
       - time
@@ -145,7 +145,7 @@ definitions:
         type: number
         format: float
         description: Temperature reading in degrees kelvin
-      celcuis:
+      celsius:
         type: number
         format: float
         description: Temperature reading in degrees celcuis
@@ -200,8 +200,6 @@ definitions:
       version:
         type: string
         description: Service API version
-      error:
-        $ref: "#/definitions/Error"
   Health:
     type: object
     required:

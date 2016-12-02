@@ -55,10 +55,7 @@
 //	- Handle different argument/return types (e.g. ..., chan, map, interface).
 package gomock
 
-import (
-	"sync"
-	"log"
-)
+import "sync"
 
 // A TestReporter is something that can be used to report test failures.
 // It is satisfied by the standard library's *testing.T.
@@ -84,8 +81,6 @@ func NewController(t TestReporter) *Controller {
 }
 
 func (ctrl *Controller) RecordCall(receiver interface{}, method string, args ...interface{}) *Call {
-	log.Printf("RecordCall %v, %v, %v", receiver, method, args)
-	
 	// TODO: check arity, types.
 	margs := make([]Matcher, len(args))
 	for i, arg := range args {

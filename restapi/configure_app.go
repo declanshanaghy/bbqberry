@@ -8,21 +8,21 @@ import (
 	runtime "github.com/go-openapi/runtime"
 	middleware "github.com/go-openapi/runtime/middleware"
 
+	"github.com/declanshanaghy/bbqberry/backend"
+	"github.com/declanshanaghy/bbqberry/framework"
+	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/restapi/operations"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/example"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
-	"github.com/declanshanaghy/bbqberry/backend"
-	"github.com/declanshanaghy/bbqberry/framework"
-	"github.com/go-openapi/swag"
-	"github.com/declanshanaghy/bbqberry/framework/log"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
-	"github.com/declanshanaghy/bbqberry/hardware"
+	"github.com/go-openapi/swag"
 )
 
 type CmdOptions struct {
-	LogFile     string `short:"l" long:"logfile" description:"Specify the log file" default:""`
-	Verbose     bool   `short:"v" long:"verbose" description:"Show verbose debug information"`
-	StaticDir   string `short:"s" long:"static" description:"The path to the static dirs" default:""`
+	LogFile   string `short:"l" long:"logfile" description:"Specify the log file" default:""`
+	Verbose   bool   `short:"v" long:"verbose" description:"Show verbose debug information"`
+	StaticDir string `short:"s" long:"static" description:"The path to the static dirs" default:""`
 }
 
 var CmdOptionsValues CmdOptions // export for testing

@@ -1,11 +1,6 @@
-# Start from the latest golang base
-FROM golang:alpine
+#!/bin/bash
 
-RUN apk add --update musl-dev gcc make bash git openssh
-
-# Most of these same statements are in install_environment.sh
-# But we don't ADD that file then execute it because that would
-# invalidate the docker cache and cause very long build time
+# Required for building and testing
 go get -u github.com/fzipp/gocyclo                              # Calculates cyclomatic complexities
 go get -u github.com/golang/lint                                # Code linter
 go get -u github.com/gordonklaus/ineffassign                    # Detects ineffectual assignments
@@ -19,8 +14,6 @@ go get -u github.com/kardianos/govendor
 go get -u github.com/go-openapi/runtime
 go get -u github.com/go-swagger/go-swagger/cmd/swagger
 
-# Set the WORKDIR to the project path in your GOPATH, e.g. /go/src/github.com/Polarishq/SERVICE_NAME/
-WORKDIR /go/src/github.com/declanshanaghy/bbqberry
-
-# Copy the content of the repository into the container
-COPY . ./
+# Required for code quality analysis
+go get -u golang.org/x/tools/cmd/goimports                      # Fixes imports
+go get -u golang.org/x/tools/cmd/gofmt                          # Reformats go source code

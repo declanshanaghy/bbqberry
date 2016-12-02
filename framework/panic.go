@@ -3,8 +3,9 @@ package framework
 import (
 	"net/http"
 	"runtime/debug"
-	"github.com/go-openapi/errors"
+
 	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/go-openapi/errors"
 )
 
 type PanicHandler struct {
@@ -23,6 +24,6 @@ func (p *PanicHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 			errors.ServeError(rw, nil, err.(error))
 		}
 	}()
-	
+
 	p.handler.ServeHTTP(rw, r)
 }

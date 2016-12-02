@@ -3,3 +3,9 @@ builder:
     image: declanshanaghy/bbqberry-builder
     dockerfile_path: Dockerfile-builder
   cached: true
+
+influxdb:
+  image: influxdb
+  ports:
+    - 8083:8083
+    - 8086:8086

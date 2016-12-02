@@ -34,14 +34,13 @@ func (s *SwaggerUIHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			nf := notFoundString + " dir=" + s.dir
 			http.Error(w, nf, http.StatusNotFound)
 		}
-		
+
 		hDir := http.Dir(s.dir)
 		srv := http.FileServer(hDir)
 		handler := http.StripPrefix("", srv)
 		handler.ServeHTTP(w, r)
 		return
 	}
-	
+
 	s.handler.ServeHTTP(w, r)
 }
-

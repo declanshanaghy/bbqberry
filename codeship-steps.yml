@@ -1,5 +1,7 @@
 - type: serial
-  service: builder
+  services:
+  - influxdb
+  - builder
   steps:
   - name: Generate code, run tests & publish code coverage
     command: make coverage

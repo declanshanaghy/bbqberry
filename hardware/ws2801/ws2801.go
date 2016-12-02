@@ -1,11 +1,12 @@
 package ws2801
 
 import (
-	"github.com/kidoman/embd"
-	"github.com/golang/glog"
-	"image/color"
-	"fmt"
 	"errors"
+	"fmt"
+	"image/color"
+
+	"github.com/golang/glog"
+	"github.com/kidoman/embd"
 )
 
 type WS2801 interface {
@@ -19,16 +20,16 @@ type WS2801 interface {
 }
 
 type Strand struct {
-	bus embd.SPIBus
+	bus    embd.SPIBus
 	pixels []uint8
-	data []uint8
+	data   []uint8
 }
 
 func NewWS2801(nPixels int, bus embd.SPIBus) WS2801 {
 	return &Strand{
-		bus:bus,
-		pixels: make([]uint8, nPixels * 3),
-		data: make([]uint8, nPixels * 3),
+		bus:    bus,
+		pixels: make([]uint8, nPixels*3),
+		data:   make([]uint8, nPixels*3),
 	}
 }
 
@@ -63,7 +64,7 @@ func (s *Strand) SetPixelRGBA(n int, color color.RGBA) error {
 
 func (s *Strand) SetPixelColor(n int, color int) error {
 	glog.V(3).Infof("action=SetPixelColor n=%d, color=%#06x", n, color)
-	return s.SetPixelRGB(n, uint8(color>>16 & 0xFF), uint8(color>>8 & 0xFF), uint8(color & 0xFF))
+	return s.SetPixelRGB(n, uint8(color>>16&0xFF), uint8(color>>8&0xFF), uint8(color&0xFF))
 }
 
 func (s *Strand) SetPixelRGB(n int, r uint8, g uint8, b uint8) error {

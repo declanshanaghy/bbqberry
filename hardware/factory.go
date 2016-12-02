@@ -1,20 +1,20 @@
 package hardware
 
 import (
-	"github.com/kidoman/embd"
 	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/kidoman/embd"
 )
 
 //TODO: Abstract this entire file to work on Mac
 
 func init() {
 	HardwareConfig = HWconfig{
-		NumTemperatureProbes:    3,
+		NumTemperatureProbes: 3,
 	}
 }
 
 type HWconfig struct {
-	NumTemperatureProbes    int32
+	NumTemperatureProbes int32
 }
 
 var HardwareConfig HWconfig

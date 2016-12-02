@@ -1,13 +1,14 @@
 package backend
 
 import (
-	"github.com/declanshanaghy/bbqberry/models"
+	"fmt"
+
 	"github.com/declanshanaghy/bbqberry/framework"
+	"github.com/declanshanaghy/bbqberry/framework/error"
 	"github.com/declanshanaghy/bbqberry/framework/log"
 	"github.com/declanshanaghy/bbqberry/influx"
-	"github.com/declanshanaghy/bbqberry/framework/error"
 	"github.com/declanshanaghy/bbqberry/influx/example"
-	"fmt"
+	"github.com/declanshanaghy/bbqberry/models"
 )
 
 func Health() (m models.Health, err error) {
@@ -16,7 +17,7 @@ func Health() (m models.Health, err error) {
 	}()
 
 	healthy := false
-	m = models.Health{ Healthy: &healthy }
+	m = models.Health{Healthy: &healthy}
 
 	si := new(models.ServiceInfo)
 	si.Name = &framework.ConstantsObj.ServiceName
@@ -35,9 +36,9 @@ func Health() (m models.Health, err error) {
 
 	tags := map[string]string{"service": *si.Name}
 	fields := map[string]interface{}{
-		"version":   si.Version,
+		"version": si.Version,
 	}
-	
+
 	_, err = influx_example.WriteExamplePoint(client, "health", tags, fields)
 	if err != nil {
 		e := new(models.Error)

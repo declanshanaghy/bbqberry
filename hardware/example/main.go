@@ -1,12 +1,13 @@
 package example
 
 import (
-	"time"
 	"sync"
-	"github.com/kidoman/embd"
-	"github.com/declanshanaghy/bbqberry/hardware"
-	"github.com/declanshanaghy/bbqberry/framework/log"
+	"time"
+
 	"github.com/declanshanaghy/bbqberry/framework"
+	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/declanshanaghy/bbqberry/hardware"
+	"github.com/kidoman/embd"
 )
 
 func reader(w *sync.WaitGroup, temp chan<- *hardware.TemperatureReading, t hardware.TemperatureArray) {
@@ -50,9 +51,9 @@ func processor(w *sync.WaitGroup, temp <-chan *hardware.TemperatureReading) {
 }
 
 type StuffCloser struct {
-	w *sync.WaitGroup
-	bus0 embd.SPIBus
-	bus1 embd.SPIBus
+	w     *sync.WaitGroup
+	bus0  embd.SPIBus
+	bus1  embd.SPIBus
 	cTemp chan *hardware.TemperatureReading
 }
 
@@ -79,7 +80,5 @@ func DoStuff() framework.Closer {
 	go reader(&w, cTemp, sTemp)
 	go processor(&w, cTemp)
 
-	return &StuffCloser{w:&w, bus0:bus0, bus1:bus1, cTemp:cTemp}
+	return &StuffCloser{w: &w, bus0: bus0, bus1: bus1, cTemp: cTemp}
 }
-
-

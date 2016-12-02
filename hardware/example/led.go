@@ -1,11 +1,12 @@
 package example
 
 import (
-	"github.com/kidoman/embd"
 	"os"
 	"os/signal"
 	"time"
+
 	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/kidoman/embd"
 )
 
 func BlinkLED() {

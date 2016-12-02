@@ -3,10 +3,10 @@ package framework
 import (
 	"net/http"
 
+	"github.com/declanshanaghy/bbqberry/framework/log"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/declanshanaghy/bbqberry/framework/log"
 )
 
 type Closer interface {
