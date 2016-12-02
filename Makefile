@@ -1,7 +1,7 @@
 # Standard Polaris Makefile
 
 
-unittest: goreport
+unittest: code_report
 	ginkgo -r -v -p --progress -trace -cover -coverpkg=./...
 	gover
 	cat gover.coverprofile | \
@@ -19,7 +19,7 @@ install: swagger
 	go install -v ./...
 	cp $$GOPATH/bin/app-server /tmp/bin
 
-build_native: swagger mock
+build: swagger mock
 	go build -o bin/bbqberry cmd/app-server/main.go
 
 build_arm:
@@ -36,7 +36,7 @@ mock:
 	    mockgen github.com/kidoman/embd SPIBus > mocks/mock_embd/embd.go
 	rm vendor/vendor || true
 
-goreport: build_native
+code_report: build
 	./scripts/code_analysis.sh; \
 	    if [ "$$?" == "0" ]; then \
 	        echo "Code Report passed"; \
@@ -65,7 +65,7 @@ clean_swagger:
 	rm -rf cmd/ models/
 	rm -rf restapi/operations restapi/doc.go restapi/embedded_spec.go restapi/server.go
 
-clean: clean_coverage clean_vendor clean_swagger
+clean: clean_coverage clean_swagger
 	go clean
 	rm -rf tmp/
 
@@ -78,12 +78,12 @@ swagger: validate_swagger clean
 	swagger generate client --name app --spec swagger.yml
 	swagger generate support --name app --spec swagger.yml
 
-dependencies:
+dependencies: clean_vendor
 	govendor fetch +missing
 	govendor add +external
 	govendor sync
 	govendor remove +unused
 
-codeship: clean dependencies
+codeship: clean
 	jet steps $(XARGS)
 
