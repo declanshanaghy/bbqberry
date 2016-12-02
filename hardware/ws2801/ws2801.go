@@ -1,13 +1,14 @@
 package ws2801
 
 import (
-	"github.com/kidoman/embd"
-	"github.com/golang/glog"
-	"image/color"
 	"fmt"
-	"errors"
+	"image/color"
+
+	"github.com/golang/glog"
+	"github.com/kidoman/embd"
 )
 
+// WS2801 privdes an interface for communicating with an LED strip which uses the WS2801 chip
 type WS2801 interface {
 	GetNumPixels() int
 	Close()
@@ -18,25 +19,26 @@ type WS2801 interface {
 	SetPixelColor(n int, color int) error
 }
 
-type Strand struct {
-	bus embd.SPIBus
+type ws2801Strand struct {
+	bus    embd.SPIBus
 	pixels []uint8
-	data []uint8
+	data   []uint8
 }
 
+// NewWS2801 creates a new object capable of communicating with a WS2801 LED strip
 func NewWS2801(nPixels int, bus embd.SPIBus) WS2801 {
-	return &Strand{
-		bus:bus,
-		pixels: make([]uint8, nPixels * 3),
-		data: make([]uint8, nPixels * 3),
+	return &ws2801Strand{
+		bus:    bus,
+		pixels: make([]uint8, nPixels*3),
+		data:   make([]uint8, nPixels*3),
 	}
 }
 
-func (s *Strand) GetNumPixels() int {
+func (s *ws2801Strand) GetNumPixels() int {
 	return len(s.pixels) / 3
 }
 
-func (s *Strand) Off() {
+func (s *ws2801Strand) Off() {
 	glog.Info("action=Off nPixels=%d", s.GetNumPixels())
 	for i := 0; i < s.GetNumPixels(); i++ {
 		s.SetPixelColor(i, 0)
@@ -44,29 +46,29 @@ func (s *Strand) Off() {
 	s.Update()
 }
 
-func (s *Strand) Close() {
+func (s *ws2801Strand) Close() {
 	glog.Info("action=Close nPixels=%d", s.GetNumPixels())
 	s.Off()
 	s.bus.Close()
 }
 
-func (s *Strand) Update() error {
+func (s *ws2801Strand) Update() error {
 	glog.V(3).Infof("action=Update nPixels=%d", s.GetNumPixels())
 	copy(s.data, s.pixels)
 	return s.bus.TransferAndReceiveData(s.data)
 }
 
-func (s *Strand) SetPixelRGBA(n int, color color.RGBA) error {
+func (s *ws2801Strand) SetPixelRGBA(n int, color color.RGBA) error {
 	glog.V(3).Infof("action=SetPixelRGBA n=%d, color=%#06x", n, color)
 	return s.SetPixelRGB(n, color.R, color.G, color.B)
 }
 
-func (s *Strand) SetPixelColor(n int, color int) error {
+func (s *ws2801Strand) SetPixelColor(n int, color int) error {
 	glog.V(3).Infof("action=SetPixelColor n=%d, color=%#06x", n, color)
-	return s.SetPixelRGB(n, uint8(color>>16 & 0xFF), uint8(color>>8 & 0xFF), uint8(color & 0xFF))
+	return s.SetPixelRGB(n, uint8(color>>16&0xFF), uint8(color>>8&0xFF), uint8(color&0xFF))
 }
 
-func (s *Strand) SetPixelRGB(n int, r uint8, g uint8, b uint8) error {
+func (s *ws2801Strand) SetPixelRGB(n int, r uint8, g uint8, b uint8) error {
 	if err := s.validatePixel(n); err != nil {
 		return err
 	}
@@ -78,9 +80,9 @@ func (s *Strand) SetPixelRGB(n int, r uint8, g uint8, b uint8) error {
 	return nil
 }
 
-func (s *Strand) validatePixel(n int) (err error) {
+func (s *ws2801Strand) validatePixel(n int) (err error) {
 	if n < 0 || n > s.GetNumPixels() {
-		err = errors.New(fmt.Sprintf("action=invalid pixel=%d, max=%d", n, s.GetNumPixels()))
+		err = fmt.Errorf("action=invalid pixel=%d, max=%d", n, s.GetNumPixels())
 	}
 	return err
 }

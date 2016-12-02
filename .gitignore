@@ -1,7 +1,7 @@
 # Various scratch files
 tmp
 coverage.out
-*.coverprofile
+*.coverprofile*
 bin
 
 # Project files
@@ -9,15 +9,21 @@ bin
 *.iml
 .vscode*
 
-# Secret keys etc...
-codeship.aes
-*.secret
-*.credential
+# Secrets
+*.aes
+*secret
+*credential
+
 
 # Generated files
+cover.html
 mocks/
 cmd/
 models/
+
 # All files in restapi except the configure files
 restapi/*
 !restapi/configure_*.go
+
+# Allow vendor models
+!vendor/**/models

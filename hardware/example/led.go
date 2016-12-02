@@ -1,13 +1,15 @@
-package samples
+package example
 
 import (
-	"github.com/kidoman/embd"
 	"os"
 	"os/signal"
 	"time"
+
 	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/kidoman/embd"
 )
 
+// BlinkLED blinks the on board led continuously until a SIGKILL is received
 func BlinkLED() {
 	if err := embd.InitLED(); err != nil {
 		panic(err)

@@ -1,34 +1,36 @@
-package samples
+package example
 
 import (
 	"image/color"
-	"time"
 	"math/rand"
+	"time"
+
+	"github.com/declanshanaghy/bbqberry/framework/log"
 	"github.com/declanshanaghy/bbqberry/hardware/ws2801"
 	"github.com/kidoman/embd"
-	"github.com/declanshanaghy/bbqberry/framework/log"
 )
 
 func wheel(wp uint8) (r, g, b uint8) {
 	log.Debugf("action=wheel wp=%d", wp)
 	if wp < 85 {
 		r = wp * 3
-		g = 255 - wp * 3
+		g = 255 - wp*3
 		b = 0
 	} else if wp < 170 {
 		wp -= 85
-		r = 255 - wp * 3
+		r = 255 - wp*3
 		g = 0
 		b = wp * 3
 	} else {
 		wp -= 170
 		r = 0
 		g = wp * 3
-		b = 255 - wp * 3
+		b = 255 - wp*3
 	}
 	return
 }
 
+// Rainbow cycles the LED strand through the rainbow colors
 func Rainbow(nPixels int, bus embd.SPIBus) {
 	strand0 := ws2801.NewWS2801(nPixels, bus)
 	strand0.GetNumPixels()
@@ -50,6 +52,8 @@ func Rainbow(nPixels int, bus embd.SPIBus) {
 	time.Sleep(1 * time.Second)
 }
 
+// RedGreenBlueRandom sets the LED colors to all Red, all Green,
+// all Blue, then all random assignments of Red, Green or Blue
 func RedGreenBlueRandom(nPixels int, bus embd.SPIBus) {
 	strand0 := ws2801.NewWS2801(nPixels, bus)
 	defer strand0.Close()
@@ -57,7 +61,7 @@ func RedGreenBlueRandom(nPixels int, bus embd.SPIBus) {
 	log.Infof("action=RedGreenBlueRandom nPixels=%d", strand0.GetNumPixels())
 
 	for i := 0; i < strand0.GetNumPixels(); i++ {
-		strand0.SetPixelRGBA(i, color.RGBA{R:0xFF, G:0x00, B:0x00})
+		strand0.SetPixelRGBA(i, color.RGBA{R: 0xFF, G: 0x00, B: 0x00})
 	}
 	strand0.Update()
 	time.Sleep(1 * time.Second)

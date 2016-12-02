@@ -1,20 +1,33 @@
-package backend
+package backend_test
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
-	"github.com/declanshanaghy/bbqberry/models"
+	. "github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/framework"
+	"github.com/declanshanaghy/bbqberry/models"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-func TestHealth(t *testing.T) {
-	health, err := Health()
-	assert.Nil(t, err, "Standard health check returned an error")
-	assert.Equal(t, *health.Healthy, true, "Standard health check returned unhealthy")
+var _ = Describe("Health", func() {
+	Describe("Basic test", func() {
+		Context("of API", func() {
+			It("should return healthy", func() {
+				health, err := Health()
 
-	si := new(models.ServiceInfo)
-	si.Name = &framework.ConstantsObj.ServiceName
-	si.Version = &framework.ConstantsObj.Version
+				Expect(err).ShouldNot(HaveOccurred(), "Health check returned an error")
 
-	assert.Equal(t, health.ServiceInfo, si, "Standard health check returned unexpected ServiceInfo")
-}
+				healthy := true
+				si := models.ServiceInfo{
+					Name:    &framework.Constants.ServiceName,
+					Version: &framework.Constants.Version,
+				}
+				h := models.Health{
+					Healthy:     &healthy,
+					ServiceInfo: &si,
+				}
+
+				Expect(h).To(Equal(health))
+			})
+		})
+	})
+})

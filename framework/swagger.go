@@ -6,20 +6,22 @@ import (
 	"strings"
 )
 
-const SwaggerUIPath = "/swagger-ui"
-const AuxPath = "/static/"
+const swaggerUIPath = "/swagger-ui"
+const auxPath = "/static/"
 
+// SwaggerUIHandler serves the swagger ui static resources
 type SwaggerUIHandler struct {
 	handler http.Handler
 	dir     string
 }
 
+// NewSwaggerUIHandler creates a new SwaggerUIHandler
 func NewSwaggerUIHandler(handler http.Handler, dir string) *SwaggerUIHandler {
 	// swagger ui path not set up let's try to discover it
 	if dir == "" {
 		// swagger ui path not set up let's try to discover it
 		gopath := os.Getenv("GOPATH")
-		dir = gopath + "/src" + "/github.com/declanshanaghy/bbqberry" + AuxPath
+		dir = gopath + "/src" + "/github.com/declanshanaghy/bbqberry" + auxPath
 	}
 	return &SwaggerUIHandler{handler: handler, dir: dir}
 }
@@ -29,19 +31,18 @@ swagger-ui is not found.
 `
 
 func (s *SwaggerUIHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if strings.Index(r.URL.Path, SwaggerUIPath) == 0 {
+	if strings.Index(r.URL.Path, swaggerUIPath) == 0 {
 		if _, err := os.Stat(s.dir); os.IsNotExist(err) {
 			nf := notFoundString + " dir=" + s.dir
 			http.Error(w, nf, http.StatusNotFound)
 		}
-		
+
 		hDir := http.Dir(s.dir)
 		srv := http.FileServer(hDir)
 		handler := http.StripPrefix("", srv)
 		handler.ServeHTTP(w, r)
 		return
 	}
-	
+
 	s.handler.ServeHTTP(w, r)
 }
-

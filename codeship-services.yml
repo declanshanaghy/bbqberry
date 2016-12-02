@@ -1,0 +1,23 @@
+builder:
+  build:
+    image: declanshanaghy/bbqberry-builder
+    dockerfile_path: Dockerfile-builder
+  cached: true
+  links:
+  - influxdb
+  volumes:
+  - ./tmp/bin:/tmp/bin
+
+app:
+  build:
+    image: declanshanaghy/bbqberry
+    dockerfile_path: Dockerfile-app
+  cached: true
+  volumes:
+  - ./tmp/bin:/tmp/bin
+
+influxdb:
+  image: influxdb
+  ports:
+    - 8083:8083
+    - 8086:8086

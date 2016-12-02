@@ -136,7 +136,7 @@ definitions:
     type: object
     required:
       - kelvin
-      - celcuis
+      - celsius
       - fahrenheit
       - probe
       - time
@@ -144,15 +144,15 @@ definitions:
       kelvin:
         type: number
         format: float
-        description: Temperature reading in degrees kelvin
-      celcuis:
+        description: Temperature reading in degrees Kelvin
+      celsius:
         type: number
         format: float
-        description: Temperature reading in degrees celcuis
+        description: Temperature reading in degrees Celsius
       fahrenheit:
         type: number
         format: float
-        description: Temperature reading in degrees fahrenheit
+        description: Temperature reading in degrees Fahrenheit
       time:
         type: string
         format: date-time
@@ -200,8 +200,6 @@ definitions:
       version:
         type: string
         description: Service API version
-      error:
-        $ref: "#/definitions/Error"
   Health:
     type: object
     required:

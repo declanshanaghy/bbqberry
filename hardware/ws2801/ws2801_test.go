@@ -1,21 +1,20 @@
 package ws2801_test
 
 import (
+	"github.com/declanshanaghy/bbqberry/framework_test"
+	. "github.com/declanshanaghy/bbqberry/hardware/ws2801"
+	"github.com/declanshanaghy/bbqberry/mocks/mock_embd"
+	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/declanshanaghy/bbqberry/hardware/ws2801"
-	"github.com/golang/mock/gomock"
-	"github.com/declanshanaghy/bbqberry/mocks/mock_embd"
-	"github.com/declanshanaghy/bbqberry/framework_test"
 )
-
 
 var _ = Describe("WS2801", func() {
 	var (
-		t 		framework_test.GinkgoTestReporter
-		ctrl	*gomock.Controller
-		bus 	*mock_embd.MockSPIBus
-		strand	WS2801
+		t      framework_test.GinkgoTestReporter
+		ctrl   *gomock.Controller
+		bus    *mock_embd.MockSPIBus
+		strand WS2801
 	)
 
 	BeforeEach(func() {

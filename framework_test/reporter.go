@@ -1,11 +1,12 @@
 package framework_test
 
 import (
-	. "github.com/onsi/ginkgo"
 	"fmt"
+
+	. "github.com/onsi/ginkgo"
 )
 
-type GinkgoTestReporter struct {}
+type GinkgoTestReporter struct{}
 
 func (g GinkgoTestReporter) Errorf(format string, args ...interface{}) {
 	Fail(fmt.Sprintf(format, args))
