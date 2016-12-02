@@ -31,7 +31,7 @@ func Hello() (m models.Hello, err error) {
 		"user":   u,
 	}
 
-	pt, err := influx_example.WriteExamplePoint(client, "cpu_usage", tags, fields)
+	pt, err := influxexample.WriteExamplePoint(client, "cpu_usage", tags, fields)
 	if err == nil {
 		m = models.Hello{}
 		message := fmt.Sprintf("Wrote %s:%v at %s", pt.Name(), pt.Fields(), pt.Time())

@@ -1,7 +1,7 @@
 # Standard Polaris Makefile
 
 
-unittest: clean swagger mock lint
+unittest: swagger mock goreport
 	ginkgo -r -v -p --progress -trace -cover -coverpkg=./...
 	gover
 	cat gover.coverprofile | \
@@ -9,26 +9,24 @@ unittest: clean swagger mock lint
 	    grep -v cmd | grep -v mocks | grep -v example | grep -v test \
 	    > gover.coverprofile.sanitized
 
-goreport:
-	./scripts/code_analysis.sh
-
-code_quality:
-	./scripts/code_quality.sh
-
 coverage_local: unittest
 	go tool cover -html=gover.coverprofile.sanitized -o cover.html
 
 coverage: unittest
 	goveralls -coverprofile=gover.coverprofile.sanitized -service=codeship -repotoken V3p8U7YnvB2xRXYJVmWvrYFsvSXuPSyQx
 
-install:
-	time scp bin/bbqberry pi@pi:~/
+install: swagger
+	go install -v ./...
+	cp $$GOPATH/bin/app-server /tmp/bin
 
-build:
-	time env GOOS=linux GOARCH=arm go build -o bin/bbqberry cmd/app-server/main.go
+build_native:
+	go build -o bin/bbqberry cmd/app-server/main.go
 
-run:
-	time ssh pi@pi ~pi/bbqberry --host=0.0.0.0 --port=8000
+build_arm:
+	env GOOS=linux GOARCH=arm go build -o bin/bbqberry cmd/app-server/main.go
+
+build_docker:
+	docker build -f Dockerfile-app -t polarishq/$(shell basename $(shell pwd)) .
 
 mock:
 	mkdir -p tmp/vendor
@@ -38,8 +36,20 @@ mock:
 	    mockgen github.com/kidoman/embd SPIBus > mocks/mock_embd/embd.go
 	rm vendor/vendor || true
 
+goreport: build_native
+	./scripts/code_analysis.sh; \
+	    if [ "$$?" == "0" ]; then \
+	        echo "Code Report passed"; \
+	    else \
+	        echo "Code report failed" && exit 1; \
+	    fi
+
+code_quality:
+	./scripts/code_quality.sh
+
 # Environment target sets up initial dependencies that are not checked into the repo.
 environment:
+	./setup_environment.sh
 
 encrypt:
 	jet encrypt credentials.env.secret credentials.env.encrypted

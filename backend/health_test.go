@@ -18,8 +18,8 @@ var _ = Describe("Health", func() {
 
 				healthy := true
 				si := models.ServiceInfo{
-					Name:    &framework.ConstantsObj.ServiceName,
-					Version: &framework.ConstantsObj.Version,
+					Name:    &framework.Constants.ServiceName,
+					Version: &framework.Constants.Version,
 				}
 				h := models.Health{
 					Healthy:     &healthy,

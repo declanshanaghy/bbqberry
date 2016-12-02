@@ -4,7 +4,8 @@ import (
 	"github.com/declanshanaghy/bbqberry/framework/log"
 )
 
-// SPIBus interface allows interaction with the SPI bus.
+// MockSPIBus interface allows interaction with a fake SPI bus when
+// running the service without the required supporting hardware
 type MockSPIBus struct{}
 
 // TransferAndReceiveData transmits data in a buffer(slice) and receives into it.

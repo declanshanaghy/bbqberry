@@ -11,6 +11,7 @@ import (
 	"github.com/declanshanaghy/bbqberry/models"
 )
 
+// Health performs all internal health checks to ensure all systems are functioning
 func Health() (m models.Health, err error) {
 	defer func() {
 		log.Infof("service=%s healthy=%t", *m.ServiceInfo.Name, *m.Healthy)
@@ -20,16 +21,16 @@ func Health() (m models.Health, err error) {
 	m = models.Health{Healthy: &healthy}
 
 	si := new(models.ServiceInfo)
-	si.Name = &framework.ConstantsObj.ServiceName
-	si.Version = &framework.ConstantsObj.Version
+	si.Name = &framework.Constants.ServiceName
+	si.Version = &framework.Constants.Version
 	m.ServiceInfo = si
 
 	client, err := influx.GetDefaultClient()
 	if err != nil {
 		e := new(models.Error)
-		code := error_codes.ErrInfluxUnavailable
+		code := errorcodes.ErrInfluxUnavailable
 		e.Code = &code
-		e.Message = fmt.Sprintf("%s %s", error_codes.GetText(*e.Code), err)
+		e.Message = fmt.Sprintf("%s %s", errorcodes.GetText(*e.Code), err)
 		m.Error = e
 		return m, nil
 	}
@@ -39,12 +40,12 @@ func Health() (m models.Health, err error) {
 		"version": si.Version,
 	}
 
-	_, err = influx_example.WriteExamplePoint(client, "health", tags, fields)
+	_, err = influxexample.WriteExamplePoint(client, "health", tags, fields)
 	if err != nil {
 		e := new(models.Error)
-		code := error_codes.ErrInfluxWrite
+		code := errorcodes.ErrInfluxWrite
 		e.Code = &code
-		e.Message = fmt.Sprintf("%s %s", error_codes.GetText(*e.Code), err)
+		e.Message = fmt.Sprintf("%s %s", errorcodes.GetText(*e.Code), err)
 		m.Error = e
 		return m, nil
 	}

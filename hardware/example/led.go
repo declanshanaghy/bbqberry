@@ -9,6 +9,7 @@ import (
 	"github.com/kidoman/embd"
 )
 
+// BlinkLED blinks the on board led continuously until a SIGKILL is received
 func BlinkLED() {
 	if err := embd.InitLED(); err != nil {
 		panic(err)

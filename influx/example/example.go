@@ -1,4 +1,4 @@
-package influx_example
+package influxexample
 
 import (
 	"time"
@@ -8,12 +8,13 @@ import (
 	"github.com/influxdata/influxdb/client/v2"
 )
 
+// WriteExamplePoint writes a single point to the influxDB
 func WriteExamplePoint(c client.Client, name string, tags map[string]string,
 	fields map[string]interface{}) (*client.Point, error) {
 
 	// Create a new point batch
 	bp, err := client.NewBatchPoints(client.BatchPointsConfig{
-		Database:  influx.DB,
+		Database:  influx.DefaultDB,
 		Precision: "s",
 	})
 
@@ -31,7 +32,7 @@ func WriteExamplePoint(c client.Client, name string, tags map[string]string,
 	// Write the batch and check for an error
 	if err = c.Write(bp); err != nil {
 		return nil, err
-	} else {
-		return pt, nil
 	}
+
+	return pt, nil
 }

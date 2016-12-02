@@ -3,6 +3,18 @@ builder:
     image: declanshanaghy/bbqberry-builder
     dockerfile_path: Dockerfile-builder
   cached: true
+  links:
+  - influxdb
+  volumes:
+  - ./tmp/bin:/tmp/bin
+
+app:
+  build:
+    image: 137462835382.dkr.ecr.us-west-2.amazonaws.com/logmgmtrouter
+    dockerfile_path: Dockerfile-app
+  cached: true
+  volumes:
+  - ./tmp/bin:/tmp/bin
 
 influxdb:
   image: influxdb

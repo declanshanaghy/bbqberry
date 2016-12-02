@@ -8,10 +8,12 @@ import (
 	"github.com/go-openapi/errors"
 )
 
+// PanicHandler is a concreate class which can recover from panics and return a standardized error response
 type PanicHandler struct {
 	handler http.Handler
 }
 
+// NewPanicHandler creates a new PanicHandler object
 func NewPanicHandler(handler http.Handler) *PanicHandler {
 	return &PanicHandler{handler: handler}
 }

@@ -9,10 +9,12 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 )
 
+// Closer provides an interface to receive a callback when the service is shutting down
 type Closer interface {
 	Close()
 }
 
+// IError provides an interface for obtaining error codes and messages
 type IError interface {
 	Code() int32
 	Error() string
@@ -22,6 +24,7 @@ type apiOperation struct {
 	Response interface{}
 }
 
+// WriteResponse writes the pending HTTP response to the given producer
 func (a *apiOperation) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 	var err error
 	switch t := a.Response.(type) {
@@ -38,7 +41,10 @@ func (a *apiOperation) WriteResponse(rw http.ResponseWriter, producer runtime.Pr
 	}
 }
 
-func HandleApiRequestWithError(response interface{}, e error) middleware.Responder {
+// HandleAPIRequestWithError evaluates the given response and error object,
+// if an error has occurred a standardized HTTP error response is returned in JSON format,
+// otherwise the given response is returned.
+func HandleAPIRequestWithError(response interface{}, e error) middleware.Responder {
 	op := apiOperation{}
 	if e != nil {
 		op.Response = e

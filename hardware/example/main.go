@@ -50,21 +50,23 @@ func processor(w *sync.WaitGroup, temp <-chan *hardware.TemperatureReading) {
 	w.Done()
 }
 
-type StuffCloser struct {
+type closer struct {
 	w     *sync.WaitGroup
 	bus0  embd.SPIBus
 	bus1  embd.SPIBus
 	cTemp chan *hardware.TemperatureReading
 }
 
-func (c *StuffCloser) Close() {
+func (c *closer) Close() {
 	c.bus0.Close()
 	c.bus1.Close()
 	close(c.cTemp)
 	c.w.Wait()
 }
 
-func DoStuff() framework.Closer {
+// ReaderWriterExample provides an example of how to read temperature values from the hardware and communicate them
+// to a separate goroutine for processing
+func ReaderWriterExample() framework.Closer {
 	var w sync.WaitGroup
 	w.Add(2)
 
@@ -74,11 +76,11 @@ func DoStuff() framework.Closer {
 	}()
 
 	bus1 := embd.NewSPIBus(embd.SPIMode0, 1, 1000000, 8, 0)
-	sTemp := hardware.NewBBQTempReader(1, bus1)
+	sTemp := hardware.NewTemperatureArray(1, bus1)
 	cTemp := make(chan *hardware.TemperatureReading, 1)
 
 	go reader(&w, cTemp, sTemp)
 	go processor(&w, cTemp)
 
-	return &StuffCloser{w: &w, bus0: bus0, bus1: bus1, cTemp: cTemp}
+	return &closer{w: &w, bus0: bus0, bus1: bus1, cTemp: cTemp}
 }

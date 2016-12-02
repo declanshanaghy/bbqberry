@@ -1,15 +1,16 @@
 package framework
 
 func init() {
-	ConstantsObj = Constants{
+	Constants = constants{
 		ServiceName: "bbqberry",
 		Version:     "v1",
 	}
 }
 
-type Constants struct {
+type constants struct {
 	ServiceName string
 	Version     string
 }
 
-var ConstantsObj Constants
+// Constants contains static information about the running service
+var Constants constants

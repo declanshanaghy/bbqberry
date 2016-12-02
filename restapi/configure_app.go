@@ -51,19 +51,19 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 	api.JSONProducer = runtime.JSONProducer()
 
 	api.HealthHealthHandler = health.HealthHandlerFunc(func(params health.HealthParams) middleware.Responder {
-		return framework.HandleApiRequestWithError(backend.Health())
+		return framework.HandleAPIRequestWithError(backend.Health())
 	})
 	api.ExampleHelloHandler = example.HelloHandlerFunc(
 		func(params example.HelloParams) middleware.Responder {
-			return framework.HandleApiRequestWithError(backend.Hello())
+			return framework.HandleAPIRequestWithError(backend.Hello())
 		})
 	api.TemperatureGetProbeReadingsHandler = temperature.GetProbeReadingsHandlerFunc(
 		func(params temperature.GetProbeReadingsParams) middleware.Responder {
-			return framework.HandleApiRequestWithError(backend.GetTemperatureProbeReadings(&params))
+			return framework.HandleAPIRequestWithError(backend.GetTemperatureProbeReadings(&params))
 		})
 	api.TemperatureGetMonitorsHandler = temperature.GetMonitorsHandlerFunc(
 		func(params temperature.GetMonitorsParams) middleware.Responder {
-			return framework.HandleApiRequestWithError(backend.GetTemperatureMonitors(&params))
+			return framework.HandleAPIRequestWithError(backend.GetTemperatureMonitors(&params))
 		})
 
 	hardware.Startup()

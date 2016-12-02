@@ -7,6 +7,7 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
+// GetTemperatureProbeReadings reads the current sensor values from the onboard temperature sensors
 func GetTemperatureProbeReadings(params *temperature.GetProbeReadingsParams) (m models.TemperatureReadings,
 	err error) {
 
@@ -37,7 +38,7 @@ func GetTemperatureProbeReadings(params *temperature.GetProbeReadingsParams) (m 
 			Time:       &t,
 			Probe:      &reading.Probe,
 			Kelvin:     &reading.Kelvin,
-			Celcuis:    &reading.Celsius,
+			Celsius:    &reading.Celsius,
 			Fahrenheit: &reading.Fahrenheit,
 		}
 		m = append(m, &z)

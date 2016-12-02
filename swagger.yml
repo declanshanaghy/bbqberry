@@ -144,15 +144,15 @@ definitions:
       kelvin:
         type: number
         format: float
-        description: Temperature reading in degrees kelvin
+        description: Temperature reading in degrees Kelvin
       celsius:
         type: number
         format: float
-        description: Temperature reading in degrees celcuis
+        description: Temperature reading in degrees Celsius
       fahrenheit:
         type: number
         format: float
-        description: Temperature reading in degrees fahrenheit
+        description: Temperature reading in degrees Fahrenheit
       time:
         type: string
         format: date-time

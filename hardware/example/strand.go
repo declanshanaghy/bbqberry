@@ -30,6 +30,7 @@ func wheel(wp uint8) (r, g, b uint8) {
 	return
 }
 
+// Rainbow cycles the LED strand through the rainbow colors
 func Rainbow(nPixels int, bus embd.SPIBus) {
 	strand0 := ws2801.NewWS2801(nPixels, bus)
 	strand0.GetNumPixels()
@@ -51,6 +52,8 @@ func Rainbow(nPixels int, bus embd.SPIBus) {
 	time.Sleep(1 * time.Second)
 }
 
+// RedGreenBlueRandom sets the LED colors to all Red, all Green,
+// all Blue, then all random assignments of Red, Green or Blue
 func RedGreenBlueRandom(nPixels int, bus embd.SPIBus) {
 	strand0 := ws2801.NewWS2801(nPixels, bus)
 	defer strand0.Close()
