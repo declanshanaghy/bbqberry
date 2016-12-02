@@ -15,6 +15,7 @@ codeship.aes
 *.credential
 
 # Generated files
+cover.html
 mocks/
 cmd/
 models/

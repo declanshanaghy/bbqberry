@@ -1,6 +1,6 @@
 # Standard Polaris Makefile
 
-unittest: clean_coverage
+unittest: clean swagger mock
 	ginkgo -r -v -p --progress -trace -cover -coverpkg=./...
 	gover
 	cat gover.coverprofile | \
@@ -8,10 +8,10 @@ unittest: clean_coverage
 	    grep -v cmd | grep -v mocks | grep -v example | grep -v test \
 	    > gover.coverprofile.sanitized
 
-coverage_local:
+coverage_local: unittest
 	go tool cover -html=gover.coverprofile.sanitized -o cover.html
 
-coverage:
+coverage: unittest
 	goveralls -coverprofile=gover.coverprofile.sanitized -service=codeship -repotoken V3p8U7YnvB2xRXYJVmWvrYFsvSXuPSyQx
 
 install:
