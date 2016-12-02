@@ -11,8 +11,8 @@ bin
 
 # Secrets
 *.aes
-*secret
-*credential
+*secret*
+*credential*
 
 
 # Generated files
