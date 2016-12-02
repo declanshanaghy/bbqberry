@@ -40,10 +40,24 @@
 			"revisionTime": "2016-10-29T20:57:26Z"
 		},
 		{
-			"checksumSHA1": "JKoX/oamX88ZxXBGqZ1ZZHxdw64=",
-			"path": "github.com/docker/go-units",
-			"revision": "e30f1e79f3cd72542f2026ceec18d3bd67ab859c",
-			"revisionTime": "2016-11-30T22:15:31Z"
+			"path": "github.com/declanshanaghy/bbqberry/models",
+			"revision": ""
+		},
+		{
+			"path": "github.com/declanshanaghy/bbqberry/restapi/operations",
+			"revision": ""
+		},
+		{
+			"path": "github.com/declanshanaghy/bbqberry/restapi/operations/example",
+			"revision": ""
+		},
+		{
+			"path": "github.com/declanshanaghy/bbqberry/restapi/operations/health",
+			"revision": ""
+		},
+		{
+			"path": "github.com/declanshanaghy/bbqberry/restapi/operations/temperature",
+			"revision": ""
 		},
 		{
 			"checksumSHA1": "vHvJA+LcJOd1VQoK24HnlrIeVmA=",
@@ -96,12 +110,6 @@
 		{
 			"checksumSHA1": "LbE1Ybo73I5zOS3LDBYcPQOMKKA=",
 			"path": "github.com/go-openapi/runtime/client",
-			"revision": "14b161b40ece9dac8e244ab2fde2d209e108c6f5",
-			"revisionTime": "2016-11-24T20:43:25Z"
-		},
-		{
-			"checksumSHA1": "xx0S8sRKVcTU2ezgmcmEcPHqy8w=",
-			"path": "github.com/go-openapi/runtime/flagext",
 			"revision": "14b161b40ece9dac8e244ab2fde2d209e108c6f5",
 			"revisionTime": "2016-11-24T20:43:25Z"
 		},
@@ -266,12 +274,6 @@
 			"path": "github.com/influxdata/influxdb/pkg/escape",
 			"revision": "f7c686dbefbf116f79493739f3a9f6e26ef351b5",
 			"revisionTime": "2016-12-01T20:08:10Z"
-		},
-		{
-			"checksumSHA1": "Taa32/ZRgrCjrhCjAUEBcTrJYvs=",
-			"path": "github.com/jessevdk/go-flags",
-			"revision": "8bc97d602c3bfeb5fc6fc9b5a9c898f245495637",
-			"revisionTime": "2016-11-04T22:31:17Z"
 		},
 		{
 			"checksumSHA1": "SWUm1cRgLqjDizkHdJPKYOvWTWw=",
@@ -533,12 +535,6 @@
 			"revisionTime": "2016-11-17T07:43:51Z"
 		},
 		{
-			"checksumSHA1": "7WFMoppeRY8IUu/SkOZyw5rKoJ8=",
-			"path": "github.com/tylerb/graceful",
-			"revision": "4df1190835320af7076dfcf27b3d071fd3612caf",
-			"revisionTime": "2016-11-17T16:53:25Z"
-		},
-		{
 			"checksumSHA1": "nWs4qqzFggPLM4TDN36TXSQC1B8=",
 			"origin": "github.com/Polarishq/middleware/vendor/github.com/x-cray/logrus-prefixed-formatter",
 			"path": "github.com/x-cray/logrus-prefixed-formatter",
@@ -558,26 +554,8 @@
 			"revisionTime": "2016-11-15T21:05:04Z"
 		},
 		{
-			"checksumSHA1": "1sXY3uXLCQaN3Yl5SLzNvWxBYTA=",
-			"path": "golang.org/x/net/http2",
-			"revision": "97edce0b2e423f6a8debb459af47f4a3cb4ff954",
-			"revisionTime": "2016-12-02T00:04:21Z"
-		},
-		{
-			"checksumSHA1": "59c8b4Fzij9W7gQkAQFTnjrZ1O0=",
-			"path": "golang.org/x/net/http2/hpack",
-			"revision": "97edce0b2e423f6a8debb459af47f4a3cb4ff954",
-			"revisionTime": "2016-12-02T00:04:21Z"
-		},
-		{
 			"checksumSHA1": "n5oKv09EMGZZ9GUWdLiXZRzEsg0=",
 			"path": "golang.org/x/net/idna",
-			"revision": "97edce0b2e423f6a8debb459af47f4a3cb4ff954",
-			"revisionTime": "2016-12-02T00:04:21Z"
-		},
-		{
-			"checksumSHA1": "UOJDYDq9dPMJ3Re3Dc9vvbi+UI0=",
-			"path": "golang.org/x/net/lex/httplex",
 			"revision": "97edce0b2e423f6a8debb459af47f4a3cb4ff954",
 			"revisionTime": "2016-12-02T00:04:21Z"
 		},
