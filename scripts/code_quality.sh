@@ -1,6 +1,6 @@
-#!/usr/bin/env bash -x
+#!/usr/bin/env bash
 
 
 source ./scripts/common.sh
 
-gofmt -l $OUR_DIRS
+gofmt -s -w $OUR_DIRS

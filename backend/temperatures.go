@@ -25,7 +25,7 @@ func GetTemperatureProbeReadings(params *temperature.GetProbeReadingsParams) (m 
 		probes[0] = *params.Probe
 	}
 
-	for i, _ := range probes {
+	for i := range probes {
 		probeNumber := int32(probes[i])
 		reading, err := tReader.GetTemperatureReading(probeNumber)
 		if err != nil {
