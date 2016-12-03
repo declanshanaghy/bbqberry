@@ -25,7 +25,7 @@ import (
 type CmdOptions struct {
 	LogFile   string `short:"l" long:"logfile" description:"Specify the log file" default:""`
 	Verbose   bool   `short:"v" long:"verbose" description:"Show verbose debug information"`
-	StaticDir string `short:"s" long:"static" description:"The path to the static dirs" default:""`
+	StaticDir string `short:"s" long:"static" description:"The path to the directory containing static resources" default:""`
 }
 
 var CmdOptionsValues CmdOptions // export for testing

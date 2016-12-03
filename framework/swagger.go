@@ -7,7 +7,6 @@ import (
 )
 
 const swaggerUIPath = "/swagger-ui"
-const auxPath = "/static/"
 
 // SwaggerUIHandler serves the swagger ui static resources
 type SwaggerUIHandler struct {
@@ -21,7 +20,7 @@ func NewSwaggerUIHandler(handler http.Handler, dir string) *SwaggerUIHandler {
 	if dir == "" {
 		// swagger ui path not set up let's try to discover it
 		gopath := os.Getenv("GOPATH")
-		dir = gopath + "/src" + "/github.com/declanshanaghy/bbqberry" + auxPath
+		dir = gopath + "/src" + "/github.com/declanshanaghy/bbqberry/static"
 	}
 	return &SwaggerUIHandler{handler: handler, dir: dir}
 }
