@@ -5,11 +5,6 @@
     command: make coverage
   - name: Build Executable
     command: make build
-- type: serial
-  service: app
-  steps:
-  - name: Build app image
-    command: true
 
 - type: push
   service: app
