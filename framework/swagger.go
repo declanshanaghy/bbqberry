@@ -20,7 +20,7 @@ func NewSwaggerUIHandler(handler http.Handler, dir string) *SwaggerUIHandler {
 	if dir == "" {
 		// swagger ui path not set up let's try to discover it
 		gopath := os.Getenv("GOPATH")
-		dir = gopath + "/src" + "/github.com/declanshanaghy/bbqberry/static"
+		dir = gopath + "/src" + "/github.com/declanshanaghy/bbqberry/static/"
 	}
 	return &SwaggerUIHandler{handler: handler, dir: dir}
 }
