@@ -1,6 +1,10 @@
 # Start from the latest PolarisHQ skel-app container
 FROM polarishq/skel-app
 
+USER root
+EXPOSE 80
+
+COPY /tmp/bin/bbqberry /go/bin/
 COPY static /var/www/static
 
-CMD ["/go/bin/app-server", "--host=0.0.0.0", "--port=80", "--static=/var/www/static"]
+CMD ["/go/bin/bbqberry", "--host=0.0.0.0", "--port=80", "--static=/var/www/static"]
