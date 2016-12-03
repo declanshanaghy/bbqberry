@@ -56,7 +56,7 @@ type GetMonitorsOK struct {
 }
 
 func (o *GetMonitorsOK) Error() string {
-	return fmt.Sprintf("[GET /temperatures/monitors/{probe}][%d] getMonitorsOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /temperatures/monitors][%d] getMonitorsOK  %+v", 200, o.Payload)
 }
 
 func (o *GetMonitorsOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -92,7 +92,7 @@ func (o *GetMonitorsDefault) Code() int {
 }
 
 func (o *GetMonitorsDefault) Error() string {
-	return fmt.Sprintf("[GET /temperatures/monitors/{probe}][%d] getMonitors default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /temperatures/monitors][%d] getMonitors default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *GetMonitorsDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

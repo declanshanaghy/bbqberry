@@ -34,7 +34,7 @@ func (a *Client) GetMonitors(params *GetMonitorsParams) (*GetMonitorsOK, error) 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "getMonitors",
 		Method:             "GET",
-		PathPattern:        "/temperatures/monitors/{probe}",
+		PathPattern:        "/temperatures/monitors",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},

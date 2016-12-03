@@ -11,9 +11,9 @@ import (
 var _ = Describe("Health API", func() {
 	It("should return healthy", func() {
 		health, err := Health()
-	
+
 		Expect(err).ShouldNot(HaveOccurred(), "Health check returned an error")
-	
+
 		healthy := true
 		si := models.ServiceInfo{
 			Name:    &framework.Constants.ServiceName,
@@ -23,7 +23,7 @@ var _ = Describe("Health API", func() {
 			Healthy:     &healthy,
 			ServiceInfo: &si,
 		}
-	
+
 		Expect(h).To(Equal(health))
 	})
 })

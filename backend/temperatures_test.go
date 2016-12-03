@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Termperature API", func() {
+var _ = Describe("Termperatures API", func() {
 	It("should return a single temperature reading when given a probe number", func() {
 		probe := int32(1)
 		params := temperature.GetProbeReadingsParams{

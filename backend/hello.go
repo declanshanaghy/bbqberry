@@ -12,7 +12,7 @@ import (
 
 // Hello World ...
 func Hello() (m models.Hello, err error) {
-	client, err := influx.GetDefaultClient()
+	client, err := influx.NewDefaultClient()
 	if err != nil {
 		return m, err
 	}
