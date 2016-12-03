@@ -9,7 +9,6 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	"github.com/declanshanaghy/bbqberry/client/example"
 	"github.com/declanshanaghy/bbqberry/client/health"
 	"github.com/declanshanaghy/bbqberry/client/temperature"
 )
@@ -31,8 +30,6 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *App {
 	cli := new(App)
 	cli.Transport = transport
 
-	cli.Example = example.New(transport, formats)
-
 	cli.Health = health.New(transport, formats)
 
 	cli.Temperature = temperature.New(transport, formats)
@@ -42,8 +39,6 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *App {
 
 // App is a client for app
 type App struct {
-	Example *example.Client
-
 	Health *health.Client
 
 	Temperature *temperature.Client
@@ -54,8 +49,6 @@ type App struct {
 // SetTransport changes the transport on the client and all its subresources
 func (c *App) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
-
-	c.Example.SetTransport(transport)
 
 	c.Health.SetTransport(transport)
 

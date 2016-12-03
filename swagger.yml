@@ -63,21 +63,6 @@ paths:
           description: Unexpected error
           schema:
             $ref: "#/definitions/Error"
-  /hello:
-    get:
-      operationId: hello
-      tags:
-        - Example
-      summary: "Example versioned hello world endpoint"
-      responses:
-        200:
-          description: "Sample hello world endpoint"
-          schema:
-            $ref: "#/definitions/Hello"
-        default:
-          description: Unexpected error
-          schema:
-            $ref: "#/definitions/Error"
   /health:
     get:
       operationId: health
@@ -164,14 +149,6 @@ definitions:
         minimum: 0
         maximum: 7
         default: 0
-  Hello:
-    type: object
-    required:
-      - message
-    properties:
-      message:
-        type: string
-        description: An example message
   Error:
     type: object
     required:

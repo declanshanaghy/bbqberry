@@ -56,10 +56,6 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 	api.HealthHealthHandler = health.HealthHandlerFunc(func(params health.HealthParams) middleware.Responder {
 		return framework.HandleAPIRequestWithError(backend.Health())
 	})
-	api.ExampleHelloHandler = example.HelloHandlerFunc(
-		func(params example.HelloParams) middleware.Responder {
-			return framework.HandleAPIRequestWithError(backend.Hello())
-		})
 	api.TemperatureGetProbeReadingsHandler = temperature.GetProbeReadingsHandlerFunc(
 		func(params temperature.GetProbeReadingsParams) middleware.Responder {
 			return framework.HandleAPIRequestWithError(backend.GetTemperatureProbeReadings(&params))
