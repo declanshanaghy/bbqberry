@@ -13,7 +13,6 @@ import (
 	"github.com/declanshanaghy/bbqberry/framework/log"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/restapi/operations"
-	"github.com/declanshanaghy/bbqberry/restapi/operations/example"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
 	"github.com/go-openapi/swag"
