@@ -17,8 +17,8 @@ const (
 	DefaultDB = "explore"
 )
 
-// GetHTTPClient creates a new client for reading & writing data to influxDB over HTTP
-func getHTTPClient() (client.Client, error) {
+// NewHTTPClient creates a new client for reading & writing data to influxDB over HTTP
+func NewHTTPClient() (client.Client, error) {
 	return client.NewHTTPClient(client.HTTPConfig{
 		Addr:     fmt.Sprintf("http://%s:%d", host, portHTTP),
 		Username: username,
@@ -26,13 +26,13 @@ func getHTTPClient() (client.Client, error) {
 	})
 }
 
-// GetUDPClient creates a new client for reading & writing data to influxDB over UDP
-func getUDPClient() (client.Client, error) {
+// NewUDPClient creates a new client for reading & writing data to influxDB over UDP
+func NewUDPClient() (client.Client, error) {
 	return client.NewUDPClient(client.UDPConfig{Addr: fmt.Sprintf("%s:%d", host, portUDP)})
 }
 
-// GetDefaultClient creates a new client for communication with InfluxDB
+// NewDefaultClient creates a new client for communication with InfluxDB
 // using the default communication protocol (HTTP)
-func GetDefaultClient() (client.Client, error) {
-	return getHTTPClient()
+func NewDefaultClient() (client.Client, error) {
+	return NewHTTPClient()
 }

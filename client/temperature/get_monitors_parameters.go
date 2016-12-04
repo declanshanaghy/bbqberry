@@ -62,7 +62,7 @@ for the get monitors operation typically these are written to a http.Request
 type GetMonitorsParams struct {
 
 	/*Probe
-	  The termerature probe for which to retrieve configured monitors
+	  The termerature probe for which to retrieve configured monitors (or all probes if the given probe number is 0 or not specified)
 
 	*/
 	Probe int32
@@ -111,9 +111,13 @@ func (o *GetMonitorsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.R
 	r.SetTimeout(o.timeout)
 	var res []error
 
-	// path param probe
-	if err := r.SetPathParam("probe", swag.FormatInt32(o.Probe)); err != nil {
-		return err
+	// query param probe
+	qrProbe := o.Probe
+	qProbe := swag.FormatInt32(qrProbe)
+	if qProbe != "" {
+		if err := r.SetQueryParam("probe", qProbe); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

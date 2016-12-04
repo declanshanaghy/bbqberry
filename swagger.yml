@@ -11,7 +11,7 @@ consumes:
 produces:
   - application/json
 paths:
-  /temperatures/monitors/{probe}:
+  /temperatures/monitors:
     get:
       operationId: getMonitors
       tags:
@@ -19,8 +19,9 @@ paths:
       summary: "Get monitor settings for the requested probe"
       parameters:
         - name: probe
-          in: path
-          description: The termerature probe for which to retrieve configured monitors
+          in: query
+          description: The termerature probe for which to retrieve configured monitors (or all probes if the
+            given probe number is 0 or not specified)
           required: true
           type: integer
           format: int32
@@ -52,27 +53,12 @@ paths:
           format: int32
           default: 0
           minimum: 0
-          maximum: 4
+          maximum: 3
       responses:
         200:
           description: "Temperature was read successfully"
           schema:
             $ref: "#/definitions/TemperatureReading"
-        default:
-          description: Unexpected error
-          schema:
-            $ref: "#/definitions/Error"
-  /hello:
-    get:
-      operationId: hello
-      tags:
-        - Example
-      summary: "Example versioned hello world endpoint"
-      responses:
-        200:
-          description: "Sample hello world endpoint"
-          schema:
-            $ref: "#/definitions/Hello"
         default:
           description: Unexpected error
           schema:
@@ -163,14 +149,6 @@ definitions:
         minimum: 0
         maximum: 7
         default: 0
-  Hello:
-    type: object
-    required:
-      - message
-    properties:
-      message:
-        type: string
-        description: An example message
   Error:
     type: object
     required:

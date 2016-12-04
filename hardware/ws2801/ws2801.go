@@ -2,7 +2,6 @@ package ws2801
 
 import (
 	"fmt"
-	"image/color"
 
 	"github.com/golang/glog"
 	"github.com/kidoman/embd"
@@ -15,7 +14,6 @@ type WS2801 interface {
 	Off()
 	Update() error
 	SetPixelRGB(n int, r uint8, g uint8, b uint8) error
-	SetPixelRGBA(n int, color color.RGBA) error
 	SetPixelColor(n int, color int) error
 }
 
@@ -56,11 +54,6 @@ func (s *ws2801Strand) Update() error {
 	glog.V(3).Infof("action=Update nPixels=%d", s.GetNumPixels())
 	copy(s.data, s.pixels)
 	return s.bus.TransferAndReceiveData(s.data)
-}
-
-func (s *ws2801Strand) SetPixelRGBA(n int, color color.RGBA) error {
-	glog.V(3).Infof("action=SetPixelRGBA n=%d, color=%#06x", n, color)
-	return s.SetPixelRGB(n, color.R, color.G, color.B)
 }
 
 func (s *ws2801Strand) SetPixelColor(n int, color int) error {

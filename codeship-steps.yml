@@ -2,9 +2,9 @@
   service: builder
   steps:
   - name: Generate code, run tests & publish code coverage
-    command: make coverage
+    command: make generate unittest coveralls
   - name: Build Executable
-    command: make build
+    command: make generate build
 
 - type: push
   service: app
