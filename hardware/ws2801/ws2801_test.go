@@ -24,7 +24,7 @@ var _ = Describe("WS2801", func() {
 
 	AfterEach(func() {
 	})
-	
+
 	Describe("Basic test", func() {
 		Context("Of sanity", func() {
 			It("should return correct pixel count", func() {
