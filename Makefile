@@ -2,8 +2,6 @@
 
 include skel/Makefile
 
-APP_NAME = bbqberry
-
 mock:
 	mkdir -p tmp/vendor
 	rm -rf mocks && mkdir -p mocks/mock_embd
