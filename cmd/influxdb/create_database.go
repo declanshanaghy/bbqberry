@@ -25,12 +25,14 @@ func main() {
 	
 	c, err := influxdb.NewClient()
 	if err != nil {
-		panic(err)
+		fmt.Println(err, os.Stderr)
+		os.Exit(1)
 	}
 
 	r, err := influxdb.ExecuteQuery(c, "CREATE DATABASE " + influxdb.Cfg.Database)
 	if err != nil {
-		panic(err)
+		fmt.Println(err, os.Stderr)
+		os.Exit(1)
 	} else {
 		writeJSON(r, os.Stdout)
 	}

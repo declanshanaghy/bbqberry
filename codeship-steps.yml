@@ -1,10 +1,9 @@
 ---
-##- type: parallel
-#- type: serial
-#  service: builder
-#  steps:
-#  - name: Setup DB
-#    command: go run cmd/influxdb/create_database.go
+- type: serial
+  service: builder
+  steps:
+  - name: Setup DB
+    command: go run cmd/influxdb/create_database.go
 - type: serial
   service: builder
   steps:
