@@ -5,9 +5,9 @@ import (
 	"github.com/declanshanaghy/bbqberry/framework/log"
 	"github.com/declanshanaghy/bbqberry/models"
 	"fmt"
-	"github.com/declanshanaghy/bbqberry/influx"
+	"github.com/declanshanaghy/bbqberry/influxdb"
 	"github.com/declanshanaghy/bbqberry/framework/error"
-	"github.com/declanshanaghy/bbqberry/influx/example"
+	"github.com/declanshanaghy/bbqberry/influxdb/example"
 )
 
 // Health performs all internal health checks to ensure all systems are functioning
@@ -24,7 +24,7 @@ func Health() (m models.Health, err error) {
 	si.Version = &framework.Constants.Version
 	m.ServiceInfo = si
 
-	client, err := influx.NewDefaultClient()
+	client, err := influxdb.NewDefaultClient()
 	if err != nil {
 		e := new(models.Error)
 		code := errorcodes.ErrInfluxUnavailable
@@ -39,7 +39,7 @@ func Health() (m models.Health, err error) {
 		"version": si.Version,
 	}
 
-	_, err = influxexample.WriteExamplePoint(client, "health", tags, fields)
+	_, err = example.WriteExamplePoint(client, "health", tags, fields)
 	if err != nil {
 		e := new(models.Error)
 		code := errorcodes.ErrInfluxWrite
