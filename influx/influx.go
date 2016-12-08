@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	host     = "influx"
+	host     = "influxdb"
 	portHTTP = 8086
 	portUDP  = 8089
 	username = "bbqberry"
