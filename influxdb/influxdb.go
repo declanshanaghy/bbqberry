@@ -16,7 +16,7 @@ var defaultTimeout = time.Second
 func init() {
 	host := os.Getenv("INFLUXDB_HOST")
 	if host == "" {
-		host = "piberry"
+		host = "influxdb"
 	}
 	port := os.Getenv("INFLUXDB_PORT_HTTP")
 	if port == "" {
@@ -70,7 +70,7 @@ func NewClient() (*client.Client, error) {
 	duration, v, err := c.Ping()
 	log.Debugf("action=influx_ping t=%v version=%s err=%v", duration, v, err)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to %s: %v", Cfg, err)
+		return nil, fmt.Errorf("failed to connect to %s: %v", Cfg.Config.URL.String(), err.Error())
 	}
 	return c, nil
 }
@@ -97,7 +97,7 @@ func NewHTTPClient() (v2.Client, error) {
 		Addr: addr,
 		Username: Cfg.Config.Username,
 		Password: Cfg.Config.Password,
-		Timeout: defaultTimeout,
+		Timeout: defaultTimeout,		
 	})
 	if ( err != nil ) {
 		return nil, err
@@ -106,3 +106,23 @@ func NewHTTPClient() (v2.Client, error) {
 	log.Infof("action=NewHTTPClient addr=%s username=%s", addr, Cfg.Config.Username)
 	return c, nil
 }
+
+// const (
+// 	host     = "influx"
+// 	portHTTP = 8086
+// 	portUDP  = 8089
+// 	username = "bbqberry"
+// 	password = "piberry"
+
+// 	// DefaultDB is the default database to read and write data
+// 	DefaultDB = "explore"
+// )
+
+// // NewHTTPClient creates a new client for reading & writing data to influxDB over HTTP
+// func NewHTTPClient() (client.Client, error) {
+// 	return client.NewHTTPClient(client.HTTPConfig{
+// 		Addr:     fmt.Sprintf("http://%s:%d", host, portHTTP),
+// 		Username: username,
+// 		Password: password,
+// 	})
+// }
