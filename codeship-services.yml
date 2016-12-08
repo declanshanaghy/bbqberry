@@ -2,23 +2,21 @@ builder:
   build:
     image: declanshanaghy/bbqberry-builder
     dockerfile_path: Dockerfile-builder
-  cached: true
   encrypted_env_file: credentials.env.encrypted
   links:
   - influxdb
   volumes:
   - tmp/bin:/tmp/bin
 
-app:
-  build:
-    image: declanshanaghy/bbqberry
-    dockerfile_path: Dockerfile-app
-  cached: true
-  volumes_from:
-  - builder
-
 influxdb:
   image: influxdb
   ports:
   - "8083"
   - "8086"
+
+app:
+  build:
+    image: declanshanaghy/bbqberry
+    dockerfile_path: Dockerfile-app
+  volumes_from:
+  - builder
