@@ -6,15 +6,15 @@ import (
 	. "github.com/onsi/ginkgo"
 )
 
-type ginkgoTestReporter struct{}
+type GinkgoTestReporter struct{}
 
 
 // Fail causes the test to fail with the given formatted string reported as the failure reason
-func (g ginkgoTestReporter) Errorf(format string, args ...interface{}) {
+func (g GinkgoTestReporter) Errorf(format string, args ...interface{}) {
 	Fail(fmt.Sprintf(format, args))
 }
 
 // Fatalf causes the test to fail with the given formatted string reported as the failure reason
-func (g ginkgoTestReporter) Fatalf(format string, args ...interface{}) {
+func (g GinkgoTestReporter) Fatalf(format string, args ...interface{}) {
 	Fail(fmt.Sprintf(format, args))
 }

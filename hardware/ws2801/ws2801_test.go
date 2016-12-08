@@ -10,7 +10,7 @@ import (
 
 var _ = Describe("WS2801", func() {
 	var (
-		t      framework_test.ginkgoTestReporter
+		t      framework_test.GinkgoTestReporter
 		ctrl   *gomock.Controller
 		bus    *mock_embd.MockSPIBus
 		strand WS2801
