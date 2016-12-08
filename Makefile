@@ -2,6 +2,12 @@
 
 include skel/Makefile
 
+unittest_bbqberry: create_influxdb unittest
+	@echo "Done"
+
+create_influxdb:
+	go run cmd/influxdb/create_database.go
+
 mock:
 	mkdir -p tmp/vendor
 	rm -rf mocks && mkdir -p mocks/mock_embd

@@ -2,10 +2,8 @@
 - type: serial
   service: builder
   steps:
-  - name: Setup InfluxDB
-    command: go run cmd/influxdb/create_database.go
   - name: Generate code, run tests & publish code coverage
-    command: make generate unittest coveralls
+    command: make generate unittest_bbqberry coveralls
   - name: Build Executable
     command: make generate build
 
