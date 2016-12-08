@@ -34,32 +34,6 @@
 			"revisionTime": "2016-10-01T16:31:30Z"
 		},
 		{
-			"path": "github.com/declanshanaghy/bbqberry/models",
-			"revision": ""
-		},
-		{
-			"path": "github.com/declanshanaghy/bbqberry/restapi/operations",
-			"revision": ""
-		},
-		{
-			"path": "github.com/declanshanaghy/bbqberry/restapi/operations/example",
-			"revision": ""
-		},
-		{
-			"path": "github.com/declanshanaghy/bbqberry/restapi/operations/health",
-			"revision": ""
-		},
-		{
-			"path": "github.com/declanshanaghy/bbqberry/restapi/operations/temperature",
-			"revision": ""
-		},
-		{
-			"checksumSHA1": "7ovCTgUO7wS4OR4bB3sefoA+Fsw=",
-			"path": "github.com/declanshanaghy/bbqberry_old/influx/example",
-			"revision": "d6aaba730f76177775abacce645582e061580d3c",
-			"revisionTime": "2016-12-02T23:34:27Z"
-		},
-		{
 			"checksumSHA1": "JKoX/oamX88ZxXBGqZ1ZZHxdw64=",
 			"path": "github.com/docker/go-units",
 			"revision": "e30f1e79f3cd72542f2026ceec18d3bd67ab859c",
@@ -198,12 +172,6 @@
 			"revisionTime": "2016-12-01T20:08:10Z"
 		},
 		{
-			"checksumSHA1": "4dllF2WWw27delnxopNM/0HyBMU=",
-			"path": "github.com/influxdata/influxdb/cmd",
-			"revision": "6f027ac60e48a767087cc4903b4431ae2922886c",
-			"revisionTime": "2016-12-07T18:15:34Z"
-		},
-		{
 			"checksumSHA1": "MAhnPbRLf+w4npqMlx59H5nHez8=",
 			"path": "github.com/influxdata/influxdb/cmd/influx",
 			"revision": "6f027ac60e48a767087cc4903b4431ae2922886c",
@@ -268,13 +236,6 @@
 			"path": "github.com/mailru/easyjson/jwriter",
 			"revision": "159cdb893c982e3d1bc6450322fedd514f9c9de3",
 			"revisionTime": "2016-11-03T14:18:12Z"
-		},
-		{
-			"checksumSHA1": "ZFCFKJuPJrdSrrd8LjMeODR/mBY=",
-			"origin": "github.com/Polarishq/middleware/vendor/github.com/mgutz/ansi",
-			"path": "github.com/mgutz/ansi",
-			"revision": "ac55ccb6675ffe657523a0e7297dba04da67009b",
-			"revisionTime": "2016-11-24T01:52:13Z"
 		},
 		{
 			"checksumSHA1": "5VtqtkSPRsKoSgjgB126C8EMr7Q=",
@@ -467,13 +428,6 @@
 			"path": "github.com/tylerb/graceful",
 			"revision": "4df1190835320af7076dfcf27b3d071fd3612caf",
 			"revisionTime": "2016-11-17T16:53:25Z"
-		},
-		{
-			"checksumSHA1": "nWs4qqzFggPLM4TDN36TXSQC1B8=",
-			"origin": "github.com/Polarishq/middleware/vendor/github.com/x-cray/logrus-prefixed-formatter",
-			"path": "github.com/x-cray/logrus-prefixed-formatter",
-			"revision": "ac55ccb6675ffe657523a0e7297dba04da67009b",
-			"revisionTime": "2016-11-24T01:52:13Z"
 		},
 		{
 			"checksumSHA1": "VE+WBfxeMNC5a98uLXK2Iu80hOU=",
