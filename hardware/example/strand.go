@@ -1,7 +1,6 @@
 package example
 
 import (
-	"image/color"
 	"math/rand"
 	"time"
 
