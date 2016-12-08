@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "qKDBlB3Gte/9FYjZO7N2YAUT4VY=",
+			"path": "github.com/Polarishq/middleware/framework/log",
+			"revision": "209e37fc9e8670636b0373ac7011cc55f80903d2",
+			"revisionTime": "2016-12-07T01:19:44Z"
+		},
+		{
 			"checksumSHA1": "w8Ske8GudAzbg6MCB5qoy+A+/Gw=",
 			"path": "github.com/PuerkitoBio/purell",
 			"revision": "0bcb03f4b4d0a9428594752bd2a3b9aa0a9d4bd4",
@@ -180,10 +186,40 @@
 			"revisionTime": "2016-08-17T18:46:32Z"
 		},
 		{
+			"checksumSHA1": "Sml5LNx5VuFIyMAjSLlRzUR9Ylc=",
+			"path": "github.com/influxdata/influxdb/client",
+			"revision": "6f027ac60e48a767087cc4903b4431ae2922886c",
+			"revisionTime": "2016-12-07T18:15:34Z"
+		},
+		{
 			"checksumSHA1": "qP6FghLyXqo3tbvq1LCYvTOiwDk=",
 			"path": "github.com/influxdata/influxdb/client/v2",
 			"revision": "f7c686dbefbf116f79493739f3a9f6e26ef351b5",
 			"revisionTime": "2016-12-01T20:08:10Z"
+		},
+		{
+			"checksumSHA1": "4dllF2WWw27delnxopNM/0HyBMU=",
+			"path": "github.com/influxdata/influxdb/cmd",
+			"revision": "6f027ac60e48a767087cc4903b4431ae2922886c",
+			"revisionTime": "2016-12-07T18:15:34Z"
+		},
+		{
+			"checksumSHA1": "MAhnPbRLf+w4npqMlx59H5nHez8=",
+			"path": "github.com/influxdata/influxdb/cmd/influx",
+			"revision": "6f027ac60e48a767087cc4903b4431ae2922886c",
+			"revisionTime": "2016-12-07T18:15:34Z"
+		},
+		{
+			"checksumSHA1": "8HQwmiqQ45D6JN5Ug3XqRRaXFW8=",
+			"path": "github.com/influxdata/influxdb/cmd/influx/cli",
+			"revision": "6f027ac60e48a767087cc4903b4431ae2922886c",
+			"revisionTime": "2016-12-07T18:15:34Z"
+		},
+		{
+			"checksumSHA1": "fOlHRiTAfoHh8RVBAckUuglpkPU=",
+			"path": "github.com/influxdata/influxdb/importer/v8",
+			"revision": "6f027ac60e48a767087cc4903b4431ae2922886c",
+			"revisionTime": "2016-12-07T18:15:34Z"
 		},
 		{
 			"checksumSHA1": "9yxFKIPvPDYKC22MwjfD+q7b/98=",
@@ -421,6 +457,12 @@
 			"revisionTime": "2016-11-18T20:51:29Z"
 		},
 		{
+			"checksumSHA1": "qyhCKeUC8KlzUYM+etFNMqmgvik=",
+			"path": "github.com/peterh/liner",
+			"revision": "3c5f577f62ec95a012ea48a58dd4de3c48222a35",
+			"revisionTime": "2016-11-03T18:00:30Z"
+		},
+		{
 			"checksumSHA1": "7WFMoppeRY8IUu/SkOZyw5rKoJ8=",
 			"path": "github.com/tylerb/graceful",
 			"revision": "4df1190835320af7076dfcf27b3d071fd3612caf",
@@ -432,6 +474,12 @@
 			"path": "github.com/x-cray/logrus-prefixed-formatter",
 			"revision": "ac55ccb6675ffe657523a0e7297dba04da67009b",
 			"revisionTime": "2016-11-24T01:52:13Z"
+		},
+		{
+			"checksumSHA1": "VE+WBfxeMNC5a98uLXK2Iu80hOU=",
+			"path": "golang.org/x/crypto/ssh/terminal",
+			"revision": "95cb608f365d51e0e69abc646ec90c0e26fb427f",
+			"revisionTime": "2016-12-05T17:23:45Z"
 		},
 		{
 			"checksumSHA1": "88lxkrVVZyBqOBOFnNMBwEexiLY=",

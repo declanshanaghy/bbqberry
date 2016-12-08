@@ -24,7 +24,7 @@ func Health() (m models.Health, err error) {
 	si.Version = &framework.Constants.Version
 	m.ServiceInfo = si
 
-	client, err := influxdb.NewDefaultClient()
+	client, err := influxdb.NewHTTPClient()
 	if err != nil {
 		e := new(models.Error)
 		code := errorcodes.ErrInfluxUnavailable

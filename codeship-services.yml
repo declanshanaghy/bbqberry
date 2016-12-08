@@ -9,6 +9,12 @@ builder:
   volumes:
   - tmp/bin:/tmp/bin
 
+influxdb:
+  image: influxdb
+  ports:
+  - "8083"
+  - "8086"
+
 app:
   build:
     image: declanshanaghy/bbqberry
@@ -16,9 +22,3 @@ app:
   cached: true
   volumes_from:
   - builder
-
-influxdb:
-  image: influxdb
-  ports:
-  - "8083"
-  - "8086"
