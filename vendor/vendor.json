@@ -3,10 +3,26 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "pJrFhP85aFOxnWxkbxj/YK366aU=",
+			"path": "github.com/Polarishq/middleware/framework",
+			"revision": "7a3f497efc13140f6fb39364212debb7f44067fb",
+			"revisionTime": "2016-12-09T04:32:09Z"
+		},
+		{
 			"checksumSHA1": "qKDBlB3Gte/9FYjZO7N2YAUT4VY=",
 			"path": "github.com/Polarishq/middleware/framework/log",
-			"revision": "209e37fc9e8670636b0373ac7011cc55f80903d2",
-			"revisionTime": "2016-12-07T01:19:44Z"
+			"revision": "7a3f497efc13140f6fb39364212debb7f44067fb",
+			"revisionTime": "2016-12-09T04:32:09Z"
+		},
+		{
+			"checksumSHA1": "nVXtPsLnIZlCB8hkOJEo5MsVeuU=",
+			"path": "github.com/Polarishq/middleware/handlers",
+			"revision": "7a3f497efc13140f6fb39364212debb7f44067fb",
+			"revisionTime": "2016-12-09T04:32:09Z"
+		},
+		{
+			"path": "github.com/Polarishq/middleware/log",
+			"revision": ""
 		},
 		{
 			"checksumSHA1": "w8Ske8GudAzbg6MCB5qoy+A+/Gw=",
@@ -34,7 +50,31 @@
 			"revisionTime": "2016-10-01T16:31:30Z"
 		},
 		{
-			"checksumSHA1": "JKoX/oamX88ZxXBGqZ1ZZHxdw64=",
+			"path": "github.com/declanshanaghy/bbqberry/mocks/mock_embd",
+			"revision": ""
+		},
+		{
+			"path": "github.com/declanshanaghy/bbqberry/models",
+			"revision": ""
+		},
+		{
+			"path": "github.com/declanshanaghy/bbqberry/restapi/operations",
+			"revision": ""
+		},
+		{
+			"path": "github.com/declanshanaghy/bbqberry/restapi/operations/example",
+			"revision": ""
+		},
+		{
+			"path": "github.com/declanshanaghy/bbqberry/restapi/operations/health",
+			"revision": ""
+		},
+		{
+			"path": "github.com/declanshanaghy/bbqberry/restapi/operations/temperature",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "UUsA4pt7ylj/5W8yz36YyePHPKY=",
 			"path": "github.com/docker/go-units",
 			"revision": "e30f1e79f3cd72542f2026ceec18d3bd67ab859c",
 			"revisionTime": "2016-11-30T22:15:31Z"
@@ -78,12 +118,6 @@
 		{
 			"checksumSHA1": "LbE1Ybo73I5zOS3LDBYcPQOMKKA=",
 			"path": "github.com/go-openapi/runtime/client",
-			"revision": "14b161b40ece9dac8e244ab2fde2d209e108c6f5",
-			"revisionTime": "2016-11-24T20:43:25Z"
-		},
-		{
-			"checksumSHA1": "xx0S8sRKVcTU2ezgmcmEcPHqy8w=",
-			"path": "github.com/go-openapi/runtime/flagext",
 			"revision": "14b161b40ece9dac8e244ab2fde2d209e108c6f5",
 			"revisionTime": "2016-11-24T20:43:25Z"
 		},
@@ -200,12 +234,6 @@
 			"path": "github.com/influxdata/influxdb/pkg/escape",
 			"revision": "f7c686dbefbf116f79493739f3a9f6e26ef351b5",
 			"revisionTime": "2016-12-01T20:08:10Z"
-		},
-		{
-			"checksumSHA1": "Taa32/ZRgrCjrhCjAUEBcTrJYvs=",
-			"path": "github.com/jessevdk/go-flags",
-			"revision": "8bc97d602c3bfeb5fc6fc9b5a9c898f245495637",
-			"revisionTime": "2016-11-04T22:31:17Z"
 		},
 		{
 			"checksumSHA1": "SWUm1cRgLqjDizkHdJPKYOvWTWw=",
@@ -416,6 +444,12 @@
 			"path": "github.com/onsi/gomega/types",
 			"revision": "f1f0f388b31eca4e2cbe7a6dd8a3a1dfddda5b1c",
 			"revisionTime": "2016-11-18T20:51:29Z"
+		},
+		{
+			"checksumSHA1": "0LUw8QB735MsjiqDMLzf3x26g0o=",
+			"path": "github.com/peterbourgon/g2s",
+			"revision": "5767a0b2078638d14800683fd0fe425604883f63",
+			"revisionTime": "2016-07-22T08:57:17Z"
 		},
 		{
 			"checksumSHA1": "qyhCKeUC8KlzUYM+etFNMqmgvik=",

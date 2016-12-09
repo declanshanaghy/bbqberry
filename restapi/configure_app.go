@@ -9,32 +9,35 @@ import (
 	middleware "github.com/go-openapi/runtime/middleware"
 
 	"github.com/declanshanaghy/bbqberry/backend"
-	"github.com/declanshanaghy/bbqberry/framework"
-	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/Polarishq/middleware/framework"
+	"github.com/Polarishq/middleware/framework/log"
+	"github.com/Polarishq/middleware/handlers"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/restapi/operations"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
 	"github.com/go-openapi/swag"
+	// Unsure why this is suppressed
 	_ "github.com/docker/go-units"
+	// Unsure why this is suppressed
 	_ "github.com/tylerb/graceful"
 	
 )
 
-type CmdOptions struct {
+type cmdOptions struct {
 	LogFile   string `short:"l" long:"logfile" description:"Specify the log file" default:""`
 	Verbose   bool   `short:"v" long:"verbose" description:"Show verbose debug information"`
 	StaticDir string `short:"s" long:"static" description:"The path to the directory containing static resources" default:""`
 }
 
-var CmdOptionsValues CmdOptions // export for testing
+var cmdOptionsValues cmdOptions
 
 func configureFlags(api *operations.AppAPI) {
 	api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{
 		swag.CommandLineOptionsGroup{
 			ShortDescription: "BBQ Berry Server Flags",
 			LongDescription:  "BBQ Berry Server Flags",
-			Options:          &CmdOptionsValues,
+			Options:          &cmdOptionsValues,
 		},
 	}
 
@@ -43,9 +46,9 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
 
-	log.SetDebug(CmdOptionsValues.Verbose)
-	if CmdOptionsValues.LogFile != "" {
-		log.SetOutput(CmdOptionsValues.LogFile)
+	log.SetDebug(cmdOptionsValues.Verbose)
+	if cmdOptionsValues.LogFile != "" {
+		log.SetOutput(cmdOptionsValues.LogFile)
 	}
 	api.Logger = log.Infof
 
@@ -86,5 +89,7 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 // The middleware configuration happens before anything, this middleware also applies to serving the swagger.json document.
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
-	return framework.NewPanicHandler(framework.NewSwaggerUIHandler(handler, CmdOptionsValues.StaticDir))
-}
+	return handlers.NewPanicHandler(
+		handlers.NewLoggingHandler(
+			handlers.NewSwaggerUIHandler(cmdOptionsValues.StaticDir, handler)))
+}	

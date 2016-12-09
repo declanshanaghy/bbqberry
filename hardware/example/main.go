@@ -4,8 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/declanshanaghy/bbqberry/framework"
-	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/kidoman/embd"
 )
@@ -50,6 +49,11 @@ func processor(w *sync.WaitGroup, temp <-chan *hardware.TemperatureReading) {
 	w.Done()
 }
 
+// Closer provides an interface to receive a callback when the service is shutting down
+type Closer interface {
+	Close()
+}
+
 type closer struct {
 	w     *sync.WaitGroup
 	bus0  embd.SPIBus
@@ -66,7 +70,7 @@ func (c *closer) Close() {
 
 // ReaderWriterExample provides an example of how to read temperature values from the hardware and communicate them
 // to a separate goroutine for processing
-func ReaderWriterExample() framework.Closer {
+func ReaderWriterExample() Closer {
 	var w sync.WaitGroup
 	w.Add(2)
 

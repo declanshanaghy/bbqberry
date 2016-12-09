@@ -2,7 +2,7 @@ package backend
 
 import (
 	"github.com/declanshanaghy/bbqberry/framework"
-	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/models"
 	"fmt"
 	"github.com/declanshanaghy/bbqberry/framework/error"

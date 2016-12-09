@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/hardware/ws2801"
 	"github.com/kidoman/embd"
 )
