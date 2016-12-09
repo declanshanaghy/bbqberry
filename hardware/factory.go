@@ -2,9 +2,10 @@ package hardware
 
 import (
 	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/declanshanaghy/bbqberry/mocks/mock_embd"
 	"github.com/kidoman/embd"
 	// Enable RaspberryPi features by importing the embd host definitions
-	_ "github.com/kidoman/embd/host/rpi"
+	// _ "github.com/kidoman/embd/host/rpi"
 )
 
 func init() {
@@ -48,5 +49,6 @@ func NewTemperatureReader() TemperatureArray {
 
 func newSPIBus(channel byte) embd.SPIBus {
 	log.Infof("action=NewSPIBus channel=%d", channel)
-	return embd.NewSPIBus(embd.SPIMode0, channel, 1000000, 8, 0)
+	return &mock_embd.MockSPIBus{}
+	// return embd.NewSPIBus(embd.SPIMode0, channel, 1000000, 8, 0)
 }
