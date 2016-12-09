@@ -50,18 +50,6 @@
 			"revisionTime": "2016-10-01T16:31:30Z"
 		},
 		{
-			"checksumSHA1": "WRu+mhZ2PfQu27qRr69HVGjtN4Q=",
-			"path": "github.com/davecgh/go-spew/spew",
-			"revision": "346938d642f2ec3594ed81d874461961cd0faa76",
-			"revisionTime": "2016-10-29T20:57:26Z"
-		},
-		{
-			"checksumSHA1": "a2yC46a1qsJomgY6rb+FkTFiqmE=",
-			"path": "github.com/davecgh/go-spew/spew/testdata",
-			"revision": "346938d642f2ec3594ed81d874461961cd0faa76",
-			"revisionTime": "2016-10-29T20:57:26Z"
-		},
-		{
 			"path": "github.com/declanshanaghy/bbqberry/mocks/mock_embd",
 			"revision": ""
 		},
@@ -130,12 +118,6 @@
 		{
 			"checksumSHA1": "LbE1Ybo73I5zOS3LDBYcPQOMKKA=",
 			"path": "github.com/go-openapi/runtime/client",
-			"revision": "14b161b40ece9dac8e244ab2fde2d209e108c6f5",
-			"revisionTime": "2016-11-24T20:43:25Z"
-		},
-		{
-			"checksumSHA1": "xx0S8sRKVcTU2ezgmcmEcPHqy8w=",
-			"path": "github.com/go-openapi/runtime/flagext",
 			"revision": "14b161b40ece9dac8e244ab2fde2d209e108c6f5",
 			"revisionTime": "2016-11-24T20:43:25Z"
 		},
@@ -254,12 +236,6 @@
 			"revisionTime": "2016-12-01T20:08:10Z"
 		},
 		{
-			"checksumSHA1": "Taa32/ZRgrCjrhCjAUEBcTrJYvs=",
-			"path": "github.com/jessevdk/go-flags",
-			"revision": "8bc97d602c3bfeb5fc6fc9b5a9c898f245495637",
-			"revisionTime": "2016-11-04T22:31:17Z"
-		},
-		{
 			"checksumSHA1": "SWUm1cRgLqjDizkHdJPKYOvWTWw=",
 			"path": "github.com/kidoman/embd",
 			"revision": "adc3d473054c5f066be48c9459107f70021c34a4",
@@ -268,18 +244,6 @@
 		{
 			"checksumSHA1": "e5gf8mcr1uyJMkGEg6LxkcNY2B8=",
 			"path": "github.com/kidoman/embd/convertors/mcp3008",
-			"revision": "adc3d473054c5f066be48c9459107f70021c34a4",
-			"revisionTime": "2016-09-25T18:48:02Z"
-		},
-		{
-			"checksumSHA1": "1daVj5O7JvIQgSiIF1mSwOnb7Ow=",
-			"path": "github.com/kidoman/embd/host/generic",
-			"revision": "adc3d473054c5f066be48c9459107f70021c34a4",
-			"revisionTime": "2016-09-25T18:48:02Z"
-		},
-		{
-			"checksumSHA1": "kc8LfZL+cqLUxUpY+lxAJgxIWZg=",
-			"path": "github.com/kidoman/embd/host/rpi",
 			"revision": "adc3d473054c5f066be48c9459107f70021c34a4",
 			"revisionTime": "2016-09-25T18:48:02Z"
 		},
