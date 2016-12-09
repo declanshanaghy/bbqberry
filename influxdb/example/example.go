@@ -3,7 +3,7 @@ package example
 import (
 	"time"
 
-	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/influxdb"
 	"github.com/influxdata/influxdb/client/v2"
 )

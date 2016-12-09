@@ -1,7 +1,7 @@
 package hardware
 
 import (
-	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/mocks/mock_embd"
 	"github.com/kidoman/embd"
 	// Enable RaspberryPi features by importing the embd host definitions

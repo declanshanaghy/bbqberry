@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/declanshanaghy/bbqberry/framework"
-	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/kidoman/embd"
 )

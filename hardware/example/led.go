@@ -5,7 +5,7 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/declanshanaghy/bbqberry/framework/log"
+	"github.com/Polarishq/middleware/framework/log"
 	"github.com/kidoman/embd"
 )
 

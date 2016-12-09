@@ -3,10 +3,26 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "pJrFhP85aFOxnWxkbxj/YK366aU=",
+			"path": "github.com/Polarishq/middleware/framework",
+			"revision": "7a3f497efc13140f6fb39364212debb7f44067fb",
+			"revisionTime": "2016-12-09T04:32:09Z"
+		},
+		{
 			"checksumSHA1": "qKDBlB3Gte/9FYjZO7N2YAUT4VY=",
 			"path": "github.com/Polarishq/middleware/framework/log",
-			"revision": "209e37fc9e8670636b0373ac7011cc55f80903d2",
-			"revisionTime": "2016-12-07T01:19:44Z"
+			"revision": "7a3f497efc13140f6fb39364212debb7f44067fb",
+			"revisionTime": "2016-12-09T04:32:09Z"
+		},
+		{
+			"checksumSHA1": "nVXtPsLnIZlCB8hkOJEo5MsVeuU=",
+			"path": "github.com/Polarishq/middleware/handlers",
+			"revision": "7a3f497efc13140f6fb39364212debb7f44067fb",
+			"revisionTime": "2016-12-09T04:32:09Z"
+		},
+		{
+			"path": "github.com/Polarishq/middleware/log",
+			"revision": ""
 		},
 		{
 			"checksumSHA1": "w8Ske8GudAzbg6MCB5qoy+A+/Gw=",
@@ -464,6 +480,12 @@
 			"path": "github.com/onsi/gomega/types",
 			"revision": "f1f0f388b31eca4e2cbe7a6dd8a3a1dfddda5b1c",
 			"revisionTime": "2016-11-18T20:51:29Z"
+		},
+		{
+			"checksumSHA1": "0LUw8QB735MsjiqDMLzf3x26g0o=",
+			"path": "github.com/peterbourgon/g2s",
+			"revision": "5767a0b2078638d14800683fd0fe425604883f63",
+			"revisionTime": "2016-07-22T08:57:17Z"
 		},
 		{
 			"checksumSHA1": "qyhCKeUC8KlzUYM+etFNMqmgvik=",
