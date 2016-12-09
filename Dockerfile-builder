@@ -1,5 +1,6 @@
 # Start from the latest PolarisHQ skel-builder image
 FROM polarishq/skel-builder
+RUN go get github.com/docker/go-units
 
 RUN go get -u github.com/influxdata/influxdb/cmd/influx
 
