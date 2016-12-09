@@ -58,10 +58,11 @@ func (s *temperatureArray) GetTemperatureReading(probe int32) (*TemperatureReadi
 	}
 
 	log.Debugf("action=GetTemp probe=%d", probe)
-	v, err := s.adc.AnalogValueAt(int(probe))
-	if err != nil {
-		panic(err)
-	}
+	// v, err := s.adc.AnalogValueAt(int(probe))
+	// if err != nil {
+	// 	panic(err)
+	// }
+	v := 2
 	k, c, f := convertVoltToTemp(v)
 	return &TemperatureReading{
 		Probe:      probe,
