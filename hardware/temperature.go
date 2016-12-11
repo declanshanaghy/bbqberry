@@ -22,7 +22,7 @@ type TemperatureArray interface {
 
 // TemperatureReading represents a single point temperature reading in various scales
 type TemperatureReading struct {
-	Probe                       int32
+	Probe, Analog               int32
 	Time                        time.Time
 	Kelvin, Celsius, Fahrenheit float32
 }
@@ -58,15 +58,15 @@ func (s *temperatureArray) GetTemperatureReading(probe int32) (*TemperatureReadi
 	}
 
 	log.Debugf("action=GetTemp probe=%d", probe)
-	// v, err := s.adc.AnalogValueAt(int(probe))
-	// if err != nil {
-	// 	panic(err)
-	// }
-	v := 2
+	v, err := s.adc.AnalogValueAt(int(probe))
+	if err != nil {
+	 	return nil, err
+	}	
 	k, c, f := convertVoltToTemp(v)
 	return &TemperatureReading{
 		Probe:      probe,
 		Time:       time.Now(),
+		Analog:	    int32(v),
 		Kelvin:     float32(k),
 		Celsius:    float32(c),
 		Fahrenheit: float32(f),

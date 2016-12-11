@@ -37,6 +37,7 @@ func GetTemperatureProbeReadings(params *temperature.GetProbeReadingsParams) (m 
 		z := models.TemperatureReading{
 			Time:       &t,
 			Probe:      &reading.Probe,
+			Analog:     &reading.Analog,
 			Kelvin:     &reading.Kelvin,
 			Celsius:    &reading.Celsius,
 			Fahrenheit: &reading.Fahrenheit,
