@@ -60,13 +60,13 @@ func (s *temperatureArray) GetTemperatureReading(probe int32) (*TemperatureReadi
 	log.Debugf("action=GetTemp probe=%d", probe)
 	v, err := s.adc.AnalogValueAt(int(probe))
 	if err != nil {
-	 	return nil, err
-	}	
+		return nil, err
+	}
 	k, c, f := convertVoltToTemp(v)
 	return &TemperatureReading{
 		Probe:      probe,
 		Time:       time.Now(),
-		Analog:	    int32(v),
+		Analog:     int32(v),
 		Kelvin:     float32(k),
 		Celsius:    float32(c),
 		Fahrenheit: float32(f),

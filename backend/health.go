@@ -1,12 +1,13 @@
 package backend
 
 import (
-	"github.com/declanshanaghy/bbqberry/framework"
-	"github.com/Polarishq/middleware/framework/log"
-	"github.com/declanshanaghy/bbqberry/models"
 	"fmt"
+
+	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/framework/error"
 	"github.com/declanshanaghy/bbqberry/influxdb/util"
+	"github.com/declanshanaghy/bbqberry/models"
 )
 
 // Health performs all internal health checks to ensure all systems are functioning
