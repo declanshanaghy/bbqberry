@@ -58,7 +58,7 @@ func RedGreenBlueRandom(nPixels int, bus embd.SPIBus) {
 	defer strand0.Close()
 
 	log.Infof("action=RedGreenBlueRandom nPixels=%d", strand0.GetNumPixels())
-	
+
 	for i := 0; i < strand0.GetNumPixels(); i++ {
 		strand0.SetPixelRGB(i, 0xFF, 0x00, 0x00)
 	}

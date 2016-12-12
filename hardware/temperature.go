@@ -86,7 +86,7 @@ func newTemperatureReading(probe int32, v int) *TemperatureReading {
 	return &TemperatureReading{
 		Probe:      probe,
 		Time:       time.Now(),
-		Analog:	    int32(v),
+		Analog:     int32(v),
 		Kelvin:     float32(k),
 		Celsius:    float32(c),
 		Fahrenheit: float32(f),
