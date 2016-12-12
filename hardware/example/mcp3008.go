@@ -46,7 +46,7 @@ func main() {
 		}
 		avg := tot / len(readings)
 
-		calculateTemperature(1023 - avg)
+		calculateTemperature(avg)
 		// fmt.Printf("a=%v, f=%0.2f\n", avg, f)
 
 		time.Sleep(1 * time.Second)
@@ -54,6 +54,8 @@ func main() {
 }
 
 func calculateTemperature(value int) (float64, float64, float64) {
+	// iBBQ probe is 100.8K at 25c
+	
     volts := (float64(value) * 3.3) / 1024 // calculate the voltage
     ohms := ((1/volts)*3300)-1000 // calculate the ohms of the thermististor
 
