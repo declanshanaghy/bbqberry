@@ -4,12 +4,12 @@
 package main
 
 import (
-	"fmt"
 	"time"
 	"math"
 
 	"github.com/kidoman/embd"
 	"github.com/kidoman/embd/convertors/mcp3008"
+	"github.com/Polarishq/middleware/framework/log"
 	_ "github.com/kidoman/embd/host/rpi"
 )
 
@@ -20,31 +20,7 @@ const (
 	delay   = 0
 )
 
-// y = mx+b
-// b = y - mx
-// 10K readings
-// const (
-// 	x1_temp = 40.0
-// 	y1_a	= 952.0
-// 	x2_temp = 153.0
-// 	y2_a	= 893.0
-// )
-
-// 1K readings
-const (
-	x1_temp = 42.0
-	y1_a	= 1020.0
-	x2_temp = 183.0
-	y2_a	= 1005.0
-)
-
 func main() {
-	m := (y2_a - y1_a) / (x2_temp - x1_temp)
-	b := y2_a - m * x2_temp
-
-	fmt.Printf("(%v, %v) --> (%v, %v)\n", x1_temp, y1_a, x2_temp, y2_a)
-	fmt.Printf("m=%v, b=%v\n", m, b)
-
 	if err := embd.InitSPI(); err != nil {
 		panic(err)
 	}
@@ -70,36 +46,16 @@ func main() {
 		}
 		avg := tot / len(readings)
 
-		tempCalc(1023 - avg)
+		calculateTemperature(1023 - avg)
 		// fmt.Printf("a=%v, f=%0.2f\n", avg, f)
-
-		// y = mx+b
-		// t := m * float64(avg) + b
-		// k, c, f := convertVoltToTemp(int(avg))
-		// fmt.Printf("a=%v, f=%0.2f, c=%0.2f, k=%0.2f\n", avg, f, c, k)
 
 		time.Sleep(1 * time.Second)
 	}
 }
 
-func convertVoltToTemp(volt int) (k, c, f float64) {
-	// get the Kelvin temperature
-	k = math.Log(10240000.0/float64(volt) - 10000)
-	k = 1 / (0.001129148 + (0.000234125 * k) + (0.0000000876741 * k * k * k))
-
-	// convert to Celsius and round to 1 decimal place
-	c = k - 273.15
-
-	// get the Fahrenheit temperature
-	f = (c * 1.8) + 32
-
-	// return all three temperature values
-	return
-}
-
-func tempCalc(value int) float64 {
-    volts := (float64(value) * 5.0) / 1024 // calculate the voltage
-    ohms := ((1/volts)*5000)-1000 // calculate the ohms of the thermististor
+func calculateTemperature(value int) (float64, float64, float64) {
+    volts := (float64(value) * 3.3) / 1024 // calculate the voltage
+    ohms := ((1/volts)*3300)-1000 // calculate the ohms of the thermististor
 
     lnohm := math.Log1p(ohms) // take ln(ohms)
 
@@ -120,14 +76,14 @@ func tempCalc(value int) float64 {
     c2 := c*lnohm // c[ln(ohm)]
     t2 := math.Pow(c2,3) // c[ln(ohm)]^3
 
-    temp := 1/(a + t1 + t2) // calculate temperature
-    tempc := temp - 273.15 - 4 //K to C
+    tempk := 1/(a + t1 + t2) // calculate temperature
+    tempc := tempk - 273.15 - 4 //K to C
     tempf := tempc*9/5 + 32
     // the -4 is error correction for bad python math
 
     // print out info
-    fmt.Printf("%4d/1023 => %5.3f V => %4.1f ohms  => %4.1f K => %4.1f C  => %4.1f F\n", value, volts, ohms, temp, tempc, tempf)
+    log.Infof("%4d/1023 => %5.3f V => %4.1f ohms  => %4.1f K => %4.1f C  => %4.1f F\n", value, volts, ohms, tempk, tempc, tempf)
 
-    return tempf	
+    return tempk, tempc, tempf	
 }
 	
