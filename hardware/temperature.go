@@ -14,6 +14,7 @@ import (
 type TemperatureArray interface {
 	// GetTemperatureReading the tempearature from the requested probe and returns a TemperatureReading object
 	GetTemperatureReading(probe int32) (*TemperatureReading, error)
+	//GetAverageTemperatureReading(probe int32, samples n) (*TemperatureReading, error)
 	// GetNumProbes returns the number of configured temperature probes
 	GetNumProbes() int32
 	// Close closes communication with the underlying hardware
@@ -52,16 +53,35 @@ func (s *temperatureArray) GetNumProbes() int32 {
 	return s.numProbes
 }
 
-func (s *temperatureArray) GetTemperatureReading(probe int32) (*TemperatureReading, error) {
+func (s *temperatureArray) errorCheckProbeNumber(probe int32) error {
 	if probe < 1 || probe > s.numProbes {
-		return nil, fmt.Errorf("Invalid probe: %d. Must be between 1 and %d", probe, s.numProbes)
+		return fmt.Errorf("Invalid probe: %d. Must be between 1 and %d", probe, s.numProbes)
 	}
+	return nil
+}
 
-	log.Debugf("action=GetTemp probe=%d", probe)
-	v, err := s.adc.AnalogValueAt(int(probe))
+func (s *temperatureArray) readProbe(probe int32) (int, error) {
+	if err := s.errorCheckProbeNumber(probe); err != nil {
+		return 0, err
+	}
+	v, err := s.adc.AnalogValueAt(int(probe-1))
+	log.Infof("action=readProbe probe=%v v=%v", probe, v)
+	return v, err
+}
+
+func (s *temperatureArray) GetAverageTemperatureReading(probe int32, samples int) (*TemperatureReading, error) {
+	return nil, nil
+}
+
+func (s *temperatureArray) GetTemperatureReading(probe int32) (*TemperatureReading, error) {
+	v, err := s.readProbe(probe)
 	if err != nil {
-	 	return nil, err
-	}	
+		return nil, err
+	}
+	return newTemperatureReading(probe, v), nil
+}
+
+func newTemperatureReading(probe int32, v int) *TemperatureReading {
 	k, c, f := convertVoltToTemp(v)
 	return &TemperatureReading{
 		Probe:      probe,
@@ -70,10 +90,15 @@ func (s *temperatureArray) GetTemperatureReading(probe int32) (*TemperatureReadi
 		Kelvin:     float32(k),
 		Celsius:    float32(c),
 		Fahrenheit: float32(f),
-	}, nil
+	}
 }
 
 func convertVoltToTemp(volt int) (k, c, f float64) {
+	// y = -400 x + 2.029000e+05
+	// y := -400 * volt + 202900
+	// y := -0.0025 * float64(volt) + 2029
+	// log.Infof("action=convertVoltToTemp volt=%v y=%v", volt, y)
+
 	// get the Kelvin temperature
 	k = math.Log(10240000.0/float64(volt) - 10000)
 	k = 1 / (0.001129148 + (0.000234125 * k) + (0.0000000876741 * k * k * k))
