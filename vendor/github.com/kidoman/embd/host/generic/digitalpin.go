@@ -274,12 +274,14 @@ func (p *digitalPin) setEdge(edge embd.Edge) error {
 }
 
 func (p *digitalPin) Watch(edge embd.Edge, handler func(embd.DigitalPin)) error {
-	if err := p.setEdge(edge); err != nil {
-		return err
-	}
-	return registerInterrupt(p, handler)
+	return errors.New("Watch disabled due to lack of interrupt support on Mac")
+// 	if err := p.setEdge(edge); err != nil {
+// 		return err
+// 	}
+// 	return registerInterrupt(p, handler)
 }
 
 func (p *digitalPin) StopWatching() error {
-	return unregisterInterrupt(p)
+	return errors.New("StopWatching disabled due to lack of interrupt support on Mac")
+// 	return unregisterInterrupt(p)
 }

@@ -1,14 +1,16 @@
-package ws2801
+package ws2801_test
 
 import (
 	"github.com/declanshanaghy/bbqberry/framework_test"
+	"github.com/declanshanaghy/bbqberry/hardware"
+	. "github.com/declanshanaghy/bbqberry/hardware/ws2801"
 	"github.com/declanshanaghy/bbqberry/mocks/mock_embd"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("WS2801", func() {
+var _ = Describe("WS2801s", func() {
 	var (
 		t      framework_test.GinkgoTestReporter
 		ctrl   *gomock.Controller
@@ -19,17 +21,22 @@ var _ = Describe("WS2801", func() {
 	BeforeEach(func() {
 		ctrl = gomock.NewController(t)
 		bus = mock_embd.NewMockSPIBus(ctrl)
-		strand = NewWS2801(10, bus)
+
+		hardware.Mock = true
+		hardware.MockBus = bus
+
+		strand = hardware.NewStrandController()
 	})
 
 	AfterEach(func() {
+		ctrl.Finish()
 	})
 
 	Describe("Basic test", func() {
 		Context("Of sanity", func() {
 			It("should return correct pixel count", func() {
 				numPixels := strand.GetNumPixels()
-				Expect(10).To(Equal(numPixels))
+				Expect(hardware.HardwareConfig.NumLEDPixels).To(Equal(numPixels))
 			})
 			It("should fail on exceeding max pixel count", func() {
 				numPixels := strand.GetNumPixels()
@@ -51,5 +58,16 @@ var _ = Describe("WS2801", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
+		// Context("of strand update", func() {
+		// 	It("should succeeds", func() {
+		// 		data := make([]uint8, strand.GetNumPixels()*3)
+		// 		bus.EXPECT().TransferAndReceiveData(data)
+
+		// 		err := strand.SetPixelColor(0, RED)
+		// 		Expect(err).ToNot(HaveOccurred())
+		// 		err = strand.Update()
+		// 		Expect(err).ToNot(HaveOccurred())
+		// 	})
+		// })
 	})
 })

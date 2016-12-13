@@ -122,6 +122,7 @@ definitions:
     type: object
     required:
       - analog
+      - voltage
       - kelvin
       - celsius
       - fahrenheit
@@ -149,6 +150,16 @@ definitions:
         format: int32
         minimum: 0
         maximum: 1023
+      voltage:
+        type: number
+        format: float
+        minimum: 0
+        maximum: 3.3
+      resistance:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 1000000
       probe:
         type: integer
         format: int32

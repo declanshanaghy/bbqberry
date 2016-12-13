@@ -4,12 +4,13 @@
 package main
 
 import (
-	"time"
 	"math"
+	"time"
 
+	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/kidoman/embd"
 	"github.com/kidoman/embd/convertors/mcp3008"
-	"github.com/Polarishq/middleware/framework/log"
 	_ "github.com/kidoman/embd/host/rpi"
 )
 
@@ -33,7 +34,7 @@ func main() {
 	readings := [1000]int{}
 
 	for true {
-		for i, _ := range readings {
+		for i := range readings {
 			v, err := adc.AnalogValueAt(0)
 			if err != nil {
 				panic(err)
@@ -46,46 +47,37 @@ func main() {
 		}
 		avg := tot / len(readings)
 
-		calculateTemperature(avg)
-		// fmt.Printf("a=%v, f=%0.2f\n", avg, f)
+		tempK, tempC, tempF, voltage, resistance := SteinhartHart(int32(avg))
+		log.Infof("A=%v, V=%v, R=%v, K=%v, C=%v, F=%v", avg, voltage, resistance, tempK, tempC, tempF)
 
 		time.Sleep(1 * time.Second)
 	}
 }
 
-func calculateTemperature(value int) (float64, float64, float64) {
+// SteinhartHart calculates temperature from the given analog value using the Steinhart Hart formula
+func SteinhartHart(analog int32) (tempK float32, tempC float32, tempF float32, voltage float32, resistance int32) {
 	// iBBQ probe is 100.8K at 25c
-	
-    volts := (float64(value) * 3.3) / 1024 // calculate the voltage
-    ohms := ((1/volts)*3300)-1000 // calculate the ohms of the thermististor
 
-    lnohm := math.Log1p(ohms) // take ln(ohms)
+	volts := (float64(analog) * 3.3) / 1024 // calculate the voltage
+	voltage = float32(volts)
+	ohms := ((1 / volts) * 3300) - 1000 // calculate the resistance of the thermististor
+	resistance = int32(ohms)
 
-    // a, b, & c values from http://www.thermistor.com/calculators.php
-    // using curve R (-6.2%/C @ 25C) Mil Ratio X
-    // a =  0.002197222470870
-    // b =  0.000161097632222
-    // c =  0.000000125008328
+	lnohm := math.Log1p(ohms) // take ln(ohms)
 
-    a :=  0.000570569668444 
-    b :=  0.000239344111326 
-    c :=  0.000000047282773 
+	a := framework.Constants.SteinhartHart.A
+	b := framework.Constants.SteinhartHart.B
+	c := framework.Constants.SteinhartHart.C
 
-    // Steinhart Hart Equation
-    // T = 1/(a + b[ln(ohm)] + c[ln(ohm)]^3)
+	// Steinhart Hart Equation
+	// T = 1/(a + b[ln(ohm)] + c[ln(ohm)]^3)
+	t1 := (b * lnohm)     // b[ln(ohm)]
+	c2 := c * lnohm       // c[ln(ohm)]
+	t2 := math.Pow(c2, 3) // c[ln(ohm)]^3
 
-    t1 := (b*lnohm) // b[ln(ohm)]
-    c2 := c*lnohm // c[ln(ohm)]
-    t2 := math.Pow(c2,3) // c[ln(ohm)]^3
+	tempK = float32(1 / (a + t1 + t2)) // Calculate temperature in Kelvin
+	tempC = tempK - 273.15 - 4         // K to C (the -4 is error correction for bad python math)
+	tempF = tempC*9/5 + 32             // Fahrenheit
 
-    tempk := 1/(a + t1 + t2) // calculate temperature
-    tempc := tempk - 273.15 - 4 //K to C
-    tempf := tempc*9/5 + 32
-    // the -4 is error correction for bad python math
-
-    // print out info
-    log.Infof("%4d/1023 => %5.3f V => %4.1f ohms  => %4.1f K => %4.1f C  => %4.1f F\n", value, volts, ohms, tempk, tempc, tempf)
-
-    return tempk, tempc, tempf	
+	return
 }
-	
