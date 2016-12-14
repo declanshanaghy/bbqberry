@@ -1,8 +1,6 @@
 package backend
 
 import (
-	"fmt"
-
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/framework/errorcodes"

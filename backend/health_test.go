@@ -46,7 +46,7 @@ var _ = Describe("Health API", func() {
 			influxdb.LoadConfig()
 		})
 
-		It("should return healthy", func() {
+		It("should fail writing to InfluxDB", func() {
 			health, err := Health()
 
 			Expect(err).ShouldNot(HaveOccurred(), "Health check returned an error")
@@ -63,7 +63,7 @@ var _ = Describe("Health API", func() {
 
 			code := errorcodes.ErrInfluxWrite
 			e := models.Error{
-				Code: &code,
+				Code:    &code,
 				Message: errorcodes.GetText(code),
 			}
 			h.Error = &e
