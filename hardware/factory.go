@@ -5,8 +5,8 @@ import (
 	"github.com/declanshanaghy/bbqberry/hardware/ws2801"
 	"github.com/declanshanaghy/bbqberry/stubs/stubembd"
 	"github.com/kidoman/embd"
-	// Enable RaspberryPi features by importing the embd host definitions
 	"github.com/declanshanaghy/bbqberry/framework"
+	// Enable RaspberryPi features by importing the embd host definitions
 	_ "github.com/kidoman/embd/host/rpi"
 )
 
