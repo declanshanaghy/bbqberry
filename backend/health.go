@@ -5,7 +5,7 @@ import (
 
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/framework"
-	"github.com/declanshanaghy/bbqberry/framework/error"
+	"github.com/declanshanaghy/bbqberry/framework/errorcodes"
 	"github.com/declanshanaghy/bbqberry/influxdb/util"
 	"github.com/declanshanaghy/bbqberry/models"
 )

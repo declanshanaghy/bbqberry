@@ -5,6 +5,7 @@ import (
 
 	. "github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/framework"
+	"github.com/declanshanaghy/bbqberry/framework/errorcodes"
 	"github.com/declanshanaghy/bbqberry/influxdb"
 	"github.com/declanshanaghy/bbqberry/models"
 	. "github.com/onsi/ginkgo"
@@ -50,7 +51,7 @@ var _ = Describe("Health API", func() {
 
 			Expect(err).ShouldNot(HaveOccurred(), "Health check returned an error")
 
-			healthy := true
+			healthy := false
 			si := models.ServiceInfo{
 				Name:    &framework.Constants.ServiceName,
 				Version: &framework.Constants.Version,
@@ -59,6 +60,15 @@ var _ = Describe("Health API", func() {
 				Healthy:     &healthy,
 				ServiceInfo: &si,
 			}
+
+			code := errorcodes.ErrInfluxWrite
+			e := models.Error{
+				Code: &code,
+				Message: "An error occurred writing data to influxdb Post http://nonexistent:8086/write?" + 
+					"consistency=&db=no_name_given&precision=s&rp=: net/http: request canceled while waiting for " +
+					"connection (Client.Timeout exceeded while awaiting headers)", 
+			}
+			h.Error = &e
 
 			Expect(h).To(Equal(health))
 		})
