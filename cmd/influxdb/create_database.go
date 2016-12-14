@@ -10,19 +10,6 @@ import (
 )
 
 func main() {
-	//c := cli.New("unknown")
-	//c.Host = influxdb.Cfg.Host
-	//c.Port, _ = strconv.Atoi(influxdb.Cfg.Port)
-	//c.ClientConfig = influxdb.Cfg.Config
-	//c.Database = influxdb.Cfg.Database
-	//c.Ssl = false
-	//c.Format = "json"
-	//c.Pretty = true
-	//
-	//if err := c.ExecuteQuery("CREATE DATABASE " + influxdb.Cfg.Database); err != nil {
-	//	panic(err)
-	//}
-	
 	c, err := influxdb.NewClient()
 	if err != nil {
 		fmt.Println(err, os.Stderr)

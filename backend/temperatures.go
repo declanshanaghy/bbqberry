@@ -4,7 +4,6 @@ import (
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/models"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
-	"github.com/go-openapi/strfmt"
 )
 
 // GetTemperatureProbeReadings reads the current sensor values from the onboard temperature sensors
@@ -28,20 +27,13 @@ func GetTemperatureProbeReadings(params *temperature.GetProbeReadingsParams) (m 
 
 	for i := range probes {
 		probeNumber := int32(probes[i])
-		reading, err := tReader.GetTemperatureReading(probeNumber)
+		reading := models.TemperatureReading{}
+		err := tReader.GetTemperatureReading(probeNumber, &reading)
 		if err != nil {
 			return nil, err
 		}
 
-		t := strfmt.DateTime(reading.Time)
-		z := models.TemperatureReading{
-			Time:       &t,
-			Probe:      &reading.Probe,
-			Kelvin:     &reading.Kelvin,
-			Celsius:    &reading.Celsius,
-			Fahrenheit: &reading.Fahrenheit,
-		}
-		m = append(m, &z)
+		m = append(m, &reading)
 	}
 
 	return m, err

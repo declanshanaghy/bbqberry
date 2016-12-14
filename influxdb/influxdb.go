@@ -1,14 +1,15 @@
 package influxdb
 
 import (
-	"github.com/influxdata/influxdb/client"
-	v2 "github.com/influxdata/influxdb/client/v2"
-	"os"
+	"fmt"
 	"net"
+	"os"
 	"strconv"
 	"time"
-	"fmt"
+
 	"github.com/Polarishq/middleware/framework/log"
+	"github.com/influxdata/influxdb/client"
+	v2 "github.com/influxdata/influxdb/client/v2"
 )
 
 var defaultTimeout = time.Second
@@ -26,38 +27,37 @@ func init() {
 	password := os.Getenv("INFLUXDB_PASSWORD")
 	database := os.Getenv("INFLUXDB")
 	if database == "" {
-		database = "influxdb"
+		database = "no_name_given"
 	}
-	
+
 	addr := net.JoinHostPort(host, port)
 	URL, err := client.ParseConnectionString(addr, false)
 	if err != nil {
 		panic(err)
 	}
-	
+
 	cc := client.Config{
 		Username: username,
 		Password: password,
-		URL: URL,
-		Timeout: defaultTimeout,
+		URL:      URL,
+		Timeout:  defaultTimeout,
 	}
 	Cfg = clientConfig{
 		Database: database,
-		Host: host,
-		Port: port,
+		Host:     host,
+		Port:     port,
 	}
 	Cfg.Config = cc
 }
 
-
 type clientConfig struct {
 	client.Config
-	
+
 	Database string
-	Host string
-	Port string
+	Host     string
+	Port     string
 }
- 
+
 // Cfg holds settings to communicate with influxdb
 var Cfg clientConfig
 
@@ -87,23 +87,22 @@ func ExecuteQuery(c *client.Client, query string) (*client.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	return response,  nil
+	return response, nil
 }
 
 // NewHTTPClient creates a new client for reading & writing data to influxDB over HTTP
 func NewHTTPClient() (v2.Client, error) {
 	addr := Cfg.Config.URL.String()
 	c, err := v2.NewHTTPClient(v2.HTTPConfig{
-		Addr: addr,
+		Addr:     addr,
 		Username: Cfg.Config.Username,
 		Password: Cfg.Config.Password,
-		Timeout: defaultTimeout,		
+		Timeout:  defaultTimeout,
 	})
-	if ( err != nil ) {
+	if err != nil {
 		return nil, err
 	}
-	
+
 	log.Infof("action=NewHTTPClient addr=%s username=%s", addr, Cfg.Config.Username)
 	return c, nil
 }
-

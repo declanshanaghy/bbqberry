@@ -17,7 +17,7 @@ type LoggingHandler struct {
 
 // NewLoggingHandler creates a middleware handler which logs all requests and responses
 func NewLoggingHandler(handler http.Handler) *LoggingHandler {
-	return &LoggingHandler{handler: handler, captureBody: true /* changeme */}
+	return &LoggingHandler{handler: handler, captureBody: false /* changeme */}
 }
 
 type loggingResponseWriter struct {
