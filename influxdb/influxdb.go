@@ -13,6 +13,7 @@ import (
 )
 
 var defaultTimeout = time.Second
+
 // Cfg holds settings to communicate with influxdb
 var Cfg clientConfig
 

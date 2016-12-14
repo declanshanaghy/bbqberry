@@ -6,8 +6,8 @@ import (
 	"github.com/declanshanaghy/bbqberry/stubs/stubembd"
 	"github.com/kidoman/embd"
 	// Enable RaspberryPi features by importing the embd host definitions
-	_ "github.com/kidoman/embd/host/rpi"
 	"github.com/declanshanaghy/bbqberry/framework"
+	_ "github.com/kidoman/embd/host/rpi"
 )
 
 // StubBus can be set to a mock object for testing purposes
