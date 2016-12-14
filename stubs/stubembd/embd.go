@@ -2,8 +2,8 @@ package stubembd
 
 // StubSPIBus provides a stub of embd.SPIBus
 type StubSPIBus struct {
-	CloseCallCount, ReceiveByteCallCount, ReceiveDataCallCount, 
-	TransferAndReceiveByteCallCount, TransferAndReceiveDataCallCount, WriteCallCount int		
+	CloseCallCount, ReceiveByteCallCount, ReceiveDataCallCount,
+	TransferAndReceiveByteCallCount, TransferAndReceiveDataCallCount, WriteCallCount int
 }
 
 // ResetCallCounts resets the call counts of all embd.SPIBus interface methods
