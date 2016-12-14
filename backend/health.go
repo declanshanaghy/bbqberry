@@ -26,10 +26,11 @@ func Health() (m models.Health, err error) {
 
 	_, err = util.WriteHealthCheck()
 	if err != nil {
+		log.Error(err)
 		e := new(models.Error)
 		code := errorcodes.ErrInfluxWrite
 		e.Code = &code
-		e.Message = fmt.Sprintf("%s %s", errorcodes.GetText(*e.Code), err)
+		e.Message = errorcodes.GetText(*e.Code)
 		m.Error = e
 		return m, nil
 	}

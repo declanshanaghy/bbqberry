@@ -64,9 +64,7 @@ var _ = Describe("Health API", func() {
 			code := errorcodes.ErrInfluxWrite
 			e := models.Error{
 				Code: &code,
-				Message: "An error occurred writing data to influxdb Post http://nonexistent:8086/write?" +
-					"consistency=&db=no_name_given&precision=s&rp=: net/http: request canceled while waiting for " +
-					"connection (Client.Timeout exceeded while awaiting headers)",
+				Message: errorcodes.GetText(code),
 			}
 			h.Error = &e
 
