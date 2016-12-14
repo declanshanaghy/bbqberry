@@ -2,11 +2,12 @@ package util
 
 import (
 	// "github.com/influxdata/influxdb/client"
-	"github.com/influxdata/influxdb/client/v2"
 	"time"
+
+	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/influxdb"
-	"github.com/Polarishq/middleware/framework/log"
+	"github.com/influxdata/influxdb/client/v2"
 )
 
 // WriteHealthCheck writes a health check metric for the service into influxdb
@@ -29,7 +30,6 @@ func WriteHealthCheck() (*client.Point, error) {
 	fields := map[string]interface{}{
 		"version": framework.Constants.Version,
 	}
-
 
 	pt, err := client.NewPoint("health", tags, fields, time.Now())
 	if err != nil {
