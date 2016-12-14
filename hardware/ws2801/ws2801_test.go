@@ -1,35 +1,24 @@
 package ws2801_test
 
 import (
-	"github.com/declanshanaghy/bbqberry/framework_test"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	. "github.com/declanshanaghy/bbqberry/hardware/ws2801"
-	"github.com/declanshanaghy/bbqberry/mocks/mock_embd"
-	"github.com/golang/mock/gomock"
+	"github.com/declanshanaghy/bbqberry/stubs/stubembd"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("WS2801s", func() {
 	var (
-		t      framework_test.GinkgoTestReporter
-		ctrl   *gomock.Controller
-		bus    *mock_embd.MockSPIBus
+		bus    *stubembd.StubSPIBus
 		strand WS2801
 	)
 
 	BeforeEach(func() {
-		ctrl = gomock.NewController(t)
-		bus = mock_embd.NewMockSPIBus(ctrl)
-
-		hardware.Mock = true
-		hardware.MockBus = bus
+		bus = stubembd.NewStubSPIBus()
+		hardware.StubBus = bus
 
 		strand = hardware.NewStrandController()
-	})
-
-	AfterEach(func() {
-		ctrl.Finish()
 	})
 
 	Describe("Basic test", func() {

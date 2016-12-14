@@ -1,6 +1,15 @@
 package framework
 
+import (
+	"os"
+)
+
 func init() {
+	stub := false
+	if os.Getenv("STUB") != "" {
+		stub = true
+	}
+
 	Constants = constants{
 		ServiceName: "bbqberry",
 		Version:     "v1",
@@ -24,6 +33,7 @@ func init() {
 			// B: 0.000238220028939,					//(WORKS)
 			// C: 0.000000031739980,
 		},
+		Stub: stub,
 	}
 }
 
@@ -33,9 +43,10 @@ type steinhartHart struct {
 }
 
 type constants struct {
-	ServiceName   string
-	Version       string
-	SteinhartHart steinhartHart
+	ServiceName   	string
+	Version       	string
+	SteinhartHart	steinhartHart
+	Stub			bool
 }
 
 // Constants contains static information about the running service

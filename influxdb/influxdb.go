@@ -27,7 +27,7 @@ func init() {
 	password := os.Getenv("INFLUXDB_PASSWORD")
 	database := os.Getenv("INFLUXDB")
 	if database == "" {
-		database = "influxdb"
+		database = "no_name_given"
 	}
 
 	addr := net.JoinHostPort(host, port)

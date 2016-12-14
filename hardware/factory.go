@@ -3,17 +3,15 @@ package hardware
 import (
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/hardware/ws2801"
-	"github.com/declanshanaghy/bbqberry/mocks/mock_embd"
+	"github.com/declanshanaghy/bbqberry/stubs/stubembd"
 	"github.com/kidoman/embd"
 	// Enable RaspberryPi features by importing the embd host definitions
 	_ "github.com/kidoman/embd/host/rpi"
+	"github.com/declanshanaghy/bbqberry/framework"
 )
 
-// Mock should be set to true to enable mocking the various hardware interfaces
-var Mock = false
-
-// MockBus can be set to a mock object for testing purposes
-var MockBus *mock_embd.MockSPIBus
+// StubBus can be set to a mock object for testing purposes
+var StubBus *stubembd.StubSPIBus
 
 func init() {
 	HardwareConfig = hardwareConfig{
@@ -57,9 +55,9 @@ func NewTemperatureReader() TemperatureArray {
 }
 
 func newSPIBus(channel byte) embd.SPIBus {
-	if Mock {
-		log.Warningf("action=NewSPIBus channel=%d MOCKED", channel)
-		return MockBus
+	if framework.Constants.Stub {
+		log.Warningf("action=NewSPIBus channel=%d STUBBED", channel)
+		return StubBus
 	}
 	log.Infof("action=NewSPIBus channel=%d", channel)
 	return embd.NewSPIBus(embd.SPIMode0, channel, 1000000, 8, 0)
