@@ -7,11 +7,12 @@ import (
 	errors "github.com/go-openapi/errors"
 	runtime "github.com/go-openapi/runtime"
 	middleware "github.com/go-openapi/runtime/middleware"
+	graceful "github.com/tylerb/graceful"
 
-	"github.com/declanshanaghy/bbqberry/backend"
 	"github.com/Polarishq/middleware/framework"
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/Polarishq/middleware/handlers"
+	"github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/restapi/operations"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
@@ -21,7 +22,6 @@ import (
 	_ "github.com/docker/go-units"
 	// Unsure why this is suppressed
 	_ "github.com/tylerb/graceful"
-	
 )
 
 type cmdOptions struct {
@@ -34,7 +34,7 @@ var cmdOptionsValues cmdOptions
 
 func configureFlags(api *operations.AppAPI) {
 	api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{
-		swag.CommandLineOptionsGroup{
+		{
 			ShortDescription: "BBQ Berry Server Flags",
 			LongDescription:  "BBQ Berry Server Flags",
 			Options:          &cmdOptionsValues,
@@ -81,6 +81,13 @@ func configureTLS(tlsConfig *tls.Config) {
 	// Make all necessary changes to the TLS configuration here.
 }
 
+// As soon as server is initialized but not run yet, this function will be called.
+// If you need to modify a config, store server instance to stop it individually later, this is the place.
+// This function can be called multiple times, depending on the number of serving schemes.
+// scheme value will be set accordingly: "http", "https" or "unix"
+func configureServer(s *graceful.Server, scheme string) {
+}
+
 // The middleware configuration is for the handler executors. These do not apply to the swagger.json document.
 // The middleware executes after routing but before authentication, binding and validation
 func setupMiddlewares(handler http.Handler) http.Handler {
@@ -93,4 +100,4 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 	return handlers.NewPanicHandler(
 		handlers.NewLoggingHandler(
 			handlers.NewSwaggerUIHandler(cmdOptionsValues.StaticDir, handler)))
-}	
+}

@@ -43,10 +43,10 @@ type steinhartHart struct {
 }
 
 type constants struct {
-	ServiceName   	string
-	Version       	string
-	SteinhartHart	steinhartHart
-	Stub			bool
+	ServiceName   string
+	Version       string
+	SteinhartHart steinhartHart
+	Stub          bool
 }
 
 // Constants contains static information about the running service

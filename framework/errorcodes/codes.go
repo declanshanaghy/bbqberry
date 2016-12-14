@@ -9,7 +9,7 @@ const (
 
 var messages = map[int32]string{
 	ErrInfluxUnavailable: "Unable to initialize connection to InfluxDB server",
-	ErrInfluxWrite:       "An error occurred writing data to influxdb",
+	ErrInfluxWrite:       "An error occurred writing data to InfluxDB",
 }
 
 /*

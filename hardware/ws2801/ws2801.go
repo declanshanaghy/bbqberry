@@ -10,8 +10,8 @@ import (
 // WS2801 privdes an interface for communicating with an LED strip which uses the WS2801 chip
 type WS2801 interface {
 	GetNumPixels() int
-	Close()
-	Off()
+	Close() error
+	Off() error
 	Update() error
 	SetPixelRGB(n int, r uint8, g uint8, b uint8) error
 	SetPixelColor(n int, color int) error
@@ -36,18 +36,18 @@ func (s *ws2801Strand) GetNumPixels() int {
 	return len(s.pixels) / 3
 }
 
-func (s *ws2801Strand) Off() {
+func (s *ws2801Strand) Off() error {
 	glog.Info("action=Off nPixels=%d", s.GetNumPixels())
 	for i := 0; i < s.GetNumPixels(); i++ {
 		s.SetPixelColor(i, 0)
 	}
-	s.Update()
+	return s.Update()
 }
 
-func (s *ws2801Strand) Close() {
+func (s *ws2801Strand) Close() error {
 	glog.Info("action=Close nPixels=%d", s.GetNumPixels())
 	s.Off()
-	s.bus.Close()
+	return s.bus.Close()
 }
 
 func (s *ws2801Strand) Update() error {

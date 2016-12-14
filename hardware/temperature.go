@@ -30,6 +30,8 @@ type temperatureArray struct {
 	adc       *mcp3008.MCP3008
 }
 
+var fakeTemps = make(map[int32]int, 0)
+
 // NewTemperatureArray constructs a concrete implementation of
 // TemperatureArray which can communicate with the underlying hardware
 func NewTemperatureArray(numProbes int32, bus embd.SPIBus) TemperatureArray {
@@ -57,10 +59,24 @@ func (s *temperatureArray) errorCheckProbeNumber(probe int32) error {
 }
 
 func (s *temperatureArray) readProbe(probe int32) (int32, error) {
+	var v int
+	var err error
+
 	if err := s.errorCheckProbeNumber(probe); err != nil {
 		return 0, err
 	}
-	v, err := s.adc.AnalogValueAt(int(probe - 1))
+	if framework.Constants.Stub {
+		v = fakeTemps[probe] + 1
+		if v == 1024 {
+			v = 0
+		}
+		fakeTemps[probe] = v
+	} else {
+		v, err = s.adc.AnalogValueAt(int(probe - 1))
+		if err != nil {
+			return 0, err
+		}
+	}
 	log.Infof("action=readProbe probe=%v v=%v", probe, v)
 	return int32(v), err
 }

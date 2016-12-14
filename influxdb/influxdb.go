@@ -14,7 +14,23 @@ import (
 
 var defaultTimeout = time.Second
 
+// Cfg holds settings to communicate with influxdb
+var Cfg clientConfig
+
+type clientConfig struct {
+	client.Config
+
+	Database string
+	Host     string
+	Port     string
+}
+
 func init() {
+	LoadConfig()
+}
+
+// LoadConfig loads the influxdb connection settings
+func LoadConfig() {
 	host := os.Getenv("INFLUXDB_HOST")
 	if host == "" {
 		host = "influxdb"
@@ -49,17 +65,6 @@ func init() {
 	}
 	Cfg.Config = cc
 }
-
-type clientConfig struct {
-	client.Config
-
-	Database string
-	Host     string
-	Port     string
-}
-
-// Cfg holds settings to communicate with influxdb
-var Cfg clientConfig
 
 // NewClient creates a new raw InfluxDB client
 func NewClient() (*client.Client, error) {
