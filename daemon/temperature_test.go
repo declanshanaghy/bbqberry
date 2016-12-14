@@ -19,7 +19,7 @@ var _ = Describe("Temperature Daemon", func() {
 	})
 
 	Context("sanity checks", func() {
-        // quitChan := make(chan bool)
-        // CollectAndLogTermperatureMetrics(quitChan)
-    })
+		// quitChan := make(chan bool)
+		// CollectAndLogTermperatureMetrics(quitChan)
+	})
 })

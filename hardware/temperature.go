@@ -9,9 +9,9 @@ import (
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/models"
 	"github.com/go-openapi/strfmt"
+	"github.com/golang/glog"
 	"github.com/kidoman/embd"
 	"github.com/kidoman/embd/convertors/mcp3008"
-	"github.com/golang/glog"
 )
 
 // TemperatureArray provides an interface to read temperature values from the physical
