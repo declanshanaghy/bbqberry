@@ -11,6 +11,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/kidoman/embd"
 	"github.com/kidoman/embd/convertors/mcp3008"
+	"github.com/golang/glog"
 )
 
 // TemperatureArray provides an interface to read temperature values from the physical
@@ -32,9 +33,9 @@ type temperatureArray struct {
 
 var fakeTemps = make(map[int32]int, 0)
 
-// NewTemperatureArray constructs a concrete implementation of
+// newTemperatureArray constructs a concrete implementation of
 // TemperatureArray which can communicate with the underlying hardware
-func NewTemperatureArray(numProbes int32, bus embd.SPIBus) TemperatureArray {
+func newTemperatureArray(numProbes int32, bus embd.SPIBus) TemperatureArray {
 	return &temperatureArray{
 		numProbes: numProbes,
 		bus:       bus,
@@ -77,7 +78,7 @@ func (s *temperatureArray) readProbe(probe int32) (int32, error) {
 			return 0, err
 		}
 	}
-	log.Infof("action=readProbe probe=%v v=%v", probe, v)
+	glog.V(4).Infof("action=readProbe probe=%v v=%v", probe, v)
 	return int32(v), err
 }
 

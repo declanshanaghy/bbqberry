@@ -17,12 +17,17 @@ import (
 	"github.com/declanshanaghy/bbqberry/restapi/operations"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
+	"github.com/declanshanaghy/bbqberry/daemon"
 	"github.com/go-openapi/swag"
 	// Unsure why this is suppressed
 	_ "github.com/docker/go-units"
 	// Unsure why this is suppressed
 	_ "github.com/tylerb/graceful"
+	"sync"
 )
+
+var quitChan chan bool
+var quitGrp sync.WaitGroup
 
 type cmdOptions struct {
 	LogFile   string `short:"l" long:"logfile" description:"Specify the log file" default:""`
@@ -70,10 +75,19 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 
 	hardware.Startup()
 	api.ServerShutdown = func() {
-		hardware.Shutdown()
+		globalShutdown()
 	}
 
 	return setupGlobalMiddleware(api.Serve(setupMiddlewares))
+}
+
+func globalShutdown() {
+	log.Info("action=globalShutdown")
+	quitChan <- true
+	close(quitChan)
+	hardware.Shutdown()
+
+	quitGrp.Wait()
 }
 
 // The TLS configuration before HTTPS server starts.
@@ -86,6 +100,12 @@ func configureTLS(tlsConfig *tls.Config) {
 // This function can be called multiple times, depending on the number of serving schemes.
 // scheme value will be set accordingly: "http", "https" or "unix"
 func configureServer(s *graceful.Server, scheme string) {
+	if scheme == "http" {
+		log.Info("action=configureServer")
+		// quitChan = make(chan bool)
+		quitGrp.Add(1)
+		go daemon.CollectAndLogTermperatureMetrics(quitChan)
+	}
 }
 
 // The middleware configuration is for the handler executors. These do not apply to the swagger.json document.

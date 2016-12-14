@@ -1,4 +1,4 @@
-package ws2801_test
+package hardware_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -9,5 +9,5 @@ import (
 
 func TestWS2801(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "WS2801 Suite")
+	RunSpecs(t, "Hardware Suite")
 }

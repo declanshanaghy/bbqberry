@@ -3,7 +3,6 @@ package hardware
 import (
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/framework"
-	"github.com/declanshanaghy/bbqberry/hardware/ws2801"
 	"github.com/declanshanaghy/bbqberry/stubs/stubembd"
 	"github.com/kidoman/embd"
 	// Enable RaspberryPi features by importing the embd host definitions
@@ -43,15 +42,15 @@ func Shutdown() {
 }
 
 // NewStrandController provides an abstracted interface to the LED strands
-func NewStrandController() ws2801.WS2801 {
+func NewStrandController() WS2801 {
 	bus := newSPIBus(0)
-	return ws2801.NewWS2801(HardwareConfig.NumLEDPixels, bus)
+	return newWS2801(HardwareConfig.NumLEDPixels, bus)
 }
 
 // NewTemperatureReader provides an abstracted interface to the temperature probes
 func NewTemperatureReader() TemperatureArray {
 	bus := newSPIBus(1)
-	return NewTemperatureArray(HardwareConfig.NumTemperatureProbes, bus)
+	return newTemperatureArray(HardwareConfig.NumTemperatureProbes, bus)
 }
 
 func newSPIBus(channel byte) embd.SPIBus {

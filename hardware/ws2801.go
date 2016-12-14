@@ -1,4 +1,4 @@
-package ws2801
+package hardware
 
 import (
 	"fmt"
@@ -23,8 +23,8 @@ type ws2801Strand struct {
 	data   []uint8
 }
 
-// NewWS2801 creates a new object capable of communicating with a WS2801 LED strip
-func NewWS2801(nPixels int, bus embd.SPIBus) WS2801 {
+// newWS2801 creates a new object capable of communicating with a WS2801 LED strip
+func newWS2801(nPixels int, bus embd.SPIBus) WS2801 {
 	return &ws2801Strand{
 		bus:    bus,
 		pixels: make([]uint8, nPixels*3),

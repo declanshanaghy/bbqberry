@@ -1,8 +1,8 @@
-package ws2801_test
+package hardware_test
 
 import (
 	"github.com/declanshanaghy/bbqberry/hardware"
-	. "github.com/declanshanaghy/bbqberry/hardware/ws2801"
+	. "github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/stubs/stubembd"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

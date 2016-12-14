@@ -1,4 +1,4 @@
-package ws2801
+package hardware
 
 const (
 	// RED is a pure red integer representation
