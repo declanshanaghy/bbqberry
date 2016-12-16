@@ -13,11 +13,11 @@ import (
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/Polarishq/middleware/handlers"
 	"github.com/declanshanaghy/bbqberry/backend"
+	"github.com/declanshanaghy/bbqberry/daemon"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/restapi/operations"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
-	"github.com/declanshanaghy/bbqberry/daemon"
 	"github.com/go-openapi/swag"
 	// Unsure why this is suppressed
 	_ "github.com/docker/go-units"
@@ -26,8 +26,19 @@ import (
 	"sync"
 )
 
-var quitChan chan bool
-var quitGrp sync.WaitGroup
+type backgroundProcessors struct {
+	temperatureLogger chan bool
+	processors        sync.WaitGroup
+}
+
+func init() {
+	background = backgroundProcessors{
+		temperatureLogger: make(chan bool),
+		processors:        sync.WaitGroup{},
+	}
+}
+
+var background backgroundProcessors
 
 type cmdOptions struct {
 	LogFile   string `short:"l" long:"logfile" description:"Specify the log file" default:""`
@@ -38,6 +49,7 @@ type cmdOptions struct {
 var cmdOptionsValues cmdOptions
 
 func configureFlags(api *operations.AppAPI) {
+	log.Info("action=start")
 	api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{
 		{
 			ShortDescription: "BBQ Berry Server Flags",
@@ -45,9 +57,10 @@ func configureFlags(api *operations.AppAPI) {
 			Options:          &cmdOptionsValues,
 		},
 	}
-
 }
+
 func configureAPI(api *operations.AppAPI) http.Handler {
+	log.Info("action=start")
 	// configure the api here
 	api.ServeError = errors.ServeError
 
@@ -82,16 +95,18 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 }
 
 func globalShutdown() {
-	log.Info("action=globalShutdown")
-	quitChan <- true
-	close(quitChan)
-	hardware.Shutdown()
+	log.Info("action=start")
 
-	quitGrp.Wait()
+	close(background.temperatureLogger)
+	background.processors.Wait()
+
+	hardware.Shutdown()
+	log.Info("action=done")
 }
 
 // The TLS configuration before HTTPS server starts.
 func configureTLS(tlsConfig *tls.Config) {
+	log.Info("action=start")
 	// Make all necessary changes to the TLS configuration here.
 }
 
@@ -100,23 +115,25 @@ func configureTLS(tlsConfig *tls.Config) {
 // This function can be called multiple times, depending on the number of serving schemes.
 // scheme value will be set accordingly: "http", "https" or "unix"
 func configureServer(s *graceful.Server, scheme string) {
+	log.Infof("action=start scheme=%s", scheme)
+
 	if scheme == "http" {
-		log.Info("action=configureServer")
-		// quitChan = make(chan bool)
-		quitGrp.Add(1)
-		go daemon.CollectAndLogTermperatureMetrics(quitChan)
+		go daemon.CollectAndLogTermperatureMetrics(background.temperatureLogger, &background.processors)
+		background.processors.Add(1)
 	}
 }
 
 // The middleware configuration is for the handler executors. These do not apply to the swagger.json document.
 // The middleware executes after routing but before authentication, binding and validation
 func setupMiddlewares(handler http.Handler) http.Handler {
+	log.Info("action=start")
 	return handler
 }
 
 // The middleware configuration happens before anything, this middleware also applies to serving the swagger.json document.
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
+	log.Info("action=start")
 	return handlers.NewPanicHandler(
 		handlers.NewLoggingHandler(
 			handlers.NewSwaggerUIHandler(cmdOptionsValues.StaticDir, handler)))

@@ -14,24 +14,40 @@ func init() {
 		ServiceName: "bbqberry",
 		Version:     "v1",
 		SteinhartHart: steinhartHart{
-			// From http://www.thinksrs.com/downloads/programs/Therm%20Calc/NTCCalibrator/NTCcalculator.htm
-			// A=64, V=0.20625, R=15000, K=0.00036978864, C=-277.14963, F=-466.86932
-			// A: 0.9114243730,
-			// B: 1.915917966,
-			// C: 1.445400011,
+			// iDevices iGrill2 Probe
+			// Lower		-50
+			// Upper		150
+			// Resistance	102700
+			// // Curve		R (-6.2%/C @ 25C) Mil Ratio X	
+			A: 0.001489592596173,
+			B: 0.000152030416280,
+			C: 0.000000071232470,
 			//
+			// Lower		-50
+			// Upper		150
+			// Resistance	102700
+			// // Curve		Z/D (-4.4%/C @ 25C) Mil Ratio B	
+			// A: 0.000599183607286,
+			// B: 0.000229721026267,
+			// C: 0.000000067919036,
+			// 
 			// From http://www.thermistor.com/calculators.php
-			// Z/D (-4.4%/C @ 25C) Mil Ratio B 	99.6K	(iGrill 2 Probe)
-			A: 0.000535683116684,
-			B: 0.000240497428160, //(DOES NOT WORK)
-			C: 0.000000039680880,
-			//
-			// From http://www.thermistor.com/calculators.php
-			// Z/D (-4.4%/C @ 25C) Mil Ratio B 	968K	(PR-002 Ambient)
-			// A=78, V=0.25136718, R=12128, K=446.0333, C=168.8833, F=335.98993		(Actual ~330)
-			// A: 0.000001913640634,
-			// B: 0.000238220028939,					//(WORKS)
-			// C: 0.000000031739980,
+			// Home Circles Grill Probe
+			// Lower				-50
+			// Upper				150
+			// Resistance at 25c	197000
+			// Curve				Z/D (-4.4%/C @ 25C) Mil Ratio B
+			// A: 0.000455101186551,
+			// B: 0.000228288824313,
+			// C: 0.000000064208459,
+			//			
+			// Lower				-50
+			// Upper				150
+			// Resistance at 25c	204000
+			// Curve				R (-6.2%/C @ 25C) Mil Ratio X
+			// A: 0.001390360423839,
+			// B: 0.000150560390246,
+			// C: 0.000000067049772,			
 		},
 		Stub: stub,
 	}
@@ -40,6 +56,7 @@ func init() {
 // SteinhartHart holds the co-efficients for the SteinhartHart temperature calculations
 type steinhartHart struct {
 	A, B, C float64
+	Rn float32
 }
 
 type constants struct {
