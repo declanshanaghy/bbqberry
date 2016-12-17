@@ -31,7 +31,7 @@ func main() {
 	defer spiBus.Close()
 
 	adc := mcp3008.New(mcp3008.SingleMode, spiBus)
-	readings := [1000]int{}
+	readings := [10000]int{}
 
 	for true {
 		for i := range readings {
@@ -48,26 +48,26 @@ func main() {
 		analog := float32(tot) / float32(len(readings))
 
 		/*
-		Voltage divider configuration
-				vcc	(3.3v)
-				^
-				|
-				r1	(thermistor)
-				|
-				|------> vOut
-				|
-				r2	(1k)
-				|
-				-
-				gnd	(0v)
+			Voltage divider configuration
+					vcc	(3.3v)
+					^
+					|
+					r1	(thermistor)
+					|
+					|------> vOut
+					|
+					r2	(1k)
+					|
+					-
+					gnd	(0v)
 		*/
 		vcc := float32(3.3)
-		maxA := float32(1024.0)
+		maxA := float32(1023.0)
 		vPerA := vcc / maxA
-		r2 := float32(10000.0)
+		r2 := float32(1000.0)
 		vOut := analog * vPerA
 
-		r1 := ((vcc * r2) / vOut) - r2 
+		r1 := ((vcc * r2) / vOut) - r2
 		// log.Infof("A=%0.5f, V=%0.5f, R1=%0.5f", analog, vOut, r1)
 
 		tempK := SteinhartHart(r1)
@@ -79,13 +79,13 @@ func main() {
 }
 
 func convertK(tempK float32) (tempC float32, tempF float32) {
-	tempC = tempK - 273.15			// K to C
-	tempF = tempC * 1.8 + 32		// Fahrenheit
+	tempC = tempK - 273.15 // K to C
+	tempF = tempC*1.8 + 32 // Fahrenheit
 	return
 }
 
 // SteinhartHart calculates temperature from the given analog value using the Steinhart Hart formula
-func SteinhartHart (resistance float32) (tempK float32) {
+func SteinhartHart(resistance float32) (tempK float32) {
 	a := framework.Constants.SteinhartHart.A
 	b := framework.Constants.SteinhartHart.B
 	c := framework.Constants.SteinhartHart.C

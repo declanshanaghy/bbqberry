@@ -91,7 +91,7 @@ func (s *temperatureArray) GetTemperatureReading(probe int32, reading *models.Te
 
 	time := strfmt.DateTime(time.Now())
 	reading.Probe = &probe
-	reading.Time = &time
+	reading.DateTime = &time
 	reading.Analog = &a
 	reading.Voltage = &v
 	reading.Resistance = &o
