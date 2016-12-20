@@ -3,14 +3,15 @@ package backend_test
 import (
 	"fmt"
 
+	"time"
+
 	. "github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
 	"github.com/declanshanaghy/bbqberry/stubs/stubembd"
+	"github.com/go-openapi/strfmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/go-openapi/strfmt"
-	"time"
 )
 
 var _ = Describe("Termperatures API", func() {

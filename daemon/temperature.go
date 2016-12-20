@@ -6,8 +6,8 @@ import "github.com/declanshanaghy/bbqberry/models"
 import "github.com/Polarishq/middleware/framework/log"
 import "sync"
 
-// CollectAndLogTermperatureMetrics executes a continuous loop reading temperature sensors and logging to InfluxDB
-func CollectAndLogTermperatureMetrics(run <-chan bool, wg *sync.WaitGroup) {
+// CollectAndLogTemperatureMetrics executes a continuous loop reading temperature sensors and logging to InfluxDB
+func collectAndLogTemperatureMetrics(run <-chan bool, wg *sync.WaitGroup) {
 	log.Info("action=start")
 	defer wg.Done()
 

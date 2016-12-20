@@ -15,7 +15,7 @@ func init() {
 		Version:     "v1",
 		SteinhartHart: steinhartHart{
 			// From http://www.thermistor.com/calculators.php
-			// 
+			//
 			// iDevices iGrill2 Probe
 			// Lower		-50
 			// Upper		150
@@ -49,7 +49,7 @@ func init() {
 			// A: 0.000419836753426,
 			// B: 0.000227935261483,
 			// C: 0.000000063356527,
-			// 
+			//
 			// Lower				-50
 			// Upper				150
 			// Resistance at 25c	204000

@@ -23,22 +23,13 @@ import (
 	_ "github.com/docker/go-units"
 	// Unsure why this is suppressed
 	_ "github.com/tylerb/graceful"
-	"sync"
 )
 
-type backgroundProcessors struct {
-	temperatureLogger chan bool
-	processors        sync.WaitGroup
-}
+var commander	*daemon.Commander
 
 func init() {
-	background = backgroundProcessors{
-		temperatureLogger: make(chan bool),
-		processors:        sync.WaitGroup{},
-	}
+	commander = daemon.NewCommander()
 }
-
-var background backgroundProcessors
 
 type cmdOptions struct {
 	LogFile   string `short:"l" long:"logfile" description:"Specify the log file" default:""`
@@ -97,16 +88,17 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 func globalShutdown() {
 	log.Info("action=start")
 
-	close(background.temperatureLogger)
-	background.processors.Wait()
-
+	if err := commander.Exit(); err != nil {
+		log.Error(err.Error())
+	}
+		
 	hardware.Shutdown()
+
 	log.Info("action=done")
 }
 
 // The TLS configuration before HTTPS server starts.
 func configureTLS(tlsConfig *tls.Config) {
-	log.Info("action=start")
 	// Make all necessary changes to the TLS configuration here.
 }
 
@@ -118,15 +110,15 @@ func configureServer(s *graceful.Server, scheme string) {
 	log.Infof("action=start scheme=%s", scheme)
 
 	if scheme == "http" {
-		go daemon.CollectAndLogTermperatureMetrics(background.temperatureLogger, &background.processors)
-		background.processors.Add(1)
+		go commander.Run()
 	}
+
+	log.Infof("action=done scheme=%s", scheme)
 }
 
 // The middleware configuration is for the handler executors. These do not apply to the swagger.json document.
 // The middleware executes after routing but before authentication, binding and validation
 func setupMiddlewares(handler http.Handler) http.Handler {
-	log.Info("action=start")
 	return handler
 }
 
@@ -134,6 +126,7 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
 	log.Info("action=start")
+	defer log.Info("action=done")
 	return handlers.NewPanicHandler(
 		handlers.NewLoggingHandler(
 			handlers.NewSwaggerUIHandler(cmdOptionsValues.StaticDir, handler)))
