@@ -1,73 +1,57 @@
 package daemon
 
 import (
-	"errors"
-	"sync"
-	"time"
-
 	"github.com/Polarishq/middleware/framework/log"
+	"time"
 )
 
-// Commander exposes command, control and state of all background processes
+// Commander is the main controller of all background goroutines
 type Commander struct {
-	running bool
-	ch      chan bool
-	wg      *sync.WaitGroup
+	runner
+	ticks int
 }
 
-// NewCommander creates a new Commander instance which can be used to query and control background processes
+// NewCommander creates a new Commander instance which can be
+// used to query and control all background processes.
 // e.g: Temperature logger, temperature monitor
 func NewCommander() *Commander {
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-
-	return &Commander{
-		running: false,
-		ch:      make(chan bool),
-		wg:      wg,
-	}
+	log.Debug("action=start")
+	defer log.Debug("action=done")
+	return &Commander{}
 }
 
-// Run starts the Commander main loop which maintains control of all child goroutines.
-// It should be called in a goroutine itself. Calling Exit will cause this method to exit
-func (cmdr *Commander) Run() error {
-	if cmdr.running {
-		return errors.New("Commander is already running")
-	}
-
-	log.Info("action=start")
-	defer cmdr.wg.Done()
-	defer log.Info("action=done")
-
-	t := time.NewTicker(time.Second * 1)
-	cmdr.running = true
-
-	for cmdr.running {
-		select {
-		case cmdr.running = <-cmdr.ch:
-			log.Infof("action=rx running=%t", cmdr.running)
-		case <-t.C:
-			log.Debugf("action=timeout")
-		}
-	}
-
-	t.Stop()
-	return nil
+// StartBackground starts the commander in the background
+func (cmdr *Commander) StartBackground() error {
+	log.Debug("action=start")
+	defer log.Debug("action=done")
+	return cmdr.startBackground(cmdr)
 }
 
-// Exit causes the Run method to return
-func (cmdr *Commander) Exit() error {
-	log.Info("action=start")
-	defer log.Info("action=done")
+func (cmdr *Commander) getPeriod() time.Duration {
+	return time.Second
+}
 
-	if !cmdr.running {
-		return errors.New("Commander is not running")
+// Start performs initialization before the first tick
+func (cmdr *Commander) start() {
+	log.Warning("action=Tick")
+	defer log.Warning("action=Tick")
+}
+
+// Stop performs cleanup when the goroutine is exiting
+func (cmdr *Commander) stop() {
+	log.Warning("action=Tick")
+	defer log.Warning("action=Tick")
+}
+
+// Tick executes on a ticker schedule
+func (cmdr *Commander) tick() bool {
+	log.Warning("action=Tick")
+	defer log.Warning("action=Tick")
+
+	cmdr.ticks++
+	if cmdr.ticks >= 5 {
+		return false
 	}
 
-	// Close the run channel which will cause Run to exit
-	close(cmdr.ch)
-
-	// Wait for Run to actually exit
-	cmdr.wg.Wait()
-	return nil
+	return true
 }

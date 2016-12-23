@@ -1,46 +1,67 @@
 package daemon
 
-import "time"
-import "github.com/declanshanaghy/bbqberry/hardware"
-import "github.com/declanshanaghy/bbqberry/models"
-import "github.com/Polarishq/middleware/framework/log"
-import "sync"
+import (
+	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/hardware"
+	"github.com/declanshanaghy/bbqberry/models"
+	"time"
+)
 
-// CollectAndLogTemperatureMetrics executes a continuous loop reading temperature sensors and logging to InfluxDB
-func collectAndLogTemperatureMetrics(run <-chan bool, wg *sync.WaitGroup) {
-	log.Info("action=start")
-	defer wg.Done()
-
-	t := time.NewTicker(time.Second * 10)
-	temp := hardware.NewTemperatureReader()
-	loop := true
-
-	// Log immediately then enter the loop
-	collectTemperatureMetrics(temp)
-
-	for loop {
-		select {
-		case loop = <-run:
-			log.Infof("action=rx loop=%t", loop)
-		case <-t.C:
-			log.Debugf("action=timeout")
-			readings := collectTemperatureMetrics(temp)
-			logTemperatureMetrics(readings)
-		}
-	}
-
-	t.Stop()
-	temp.Close()
-	log.Info("action=done")
+// temperatureLogger collects and logs temperature metrics
+type temperatureLogger struct {
+	runner
+	temp hardware.TemperatureArray
 }
 
-func collectTemperatureMetrics(temp hardware.TemperatureArray) *models.TemperatureReadings {
-	log.Infof("action=start numProbes=%d", temp.GetNumProbes())
+// NewtemperatureLogger creates a new temperatureLogger instance which can be
+// run in the background to collect and log temperature metrics
+func newTemperatureLogger() *temperatureLogger {
+	log.Debug("action=start")
+	defer log.Debug("action=done")
+	return &temperatureLogger{
+		temp: hardware.NewTemperatureReader(),
+	}
+}
+
+// StartBackground starts the commander in the background
+func (tl *temperatureLogger) StartBackground() error {
+	log.Debug("action=start")
+	defer log.Debug("action=done")
+	return tl.runner.startBackground(tl)
+}
+
+func (tl *temperatureLogger) getPeriod() time.Duration {
+	return time.Second
+}
+
+// Start performs initialization before the first tick
+func (tl *temperatureLogger) start() {
+	log.Warning("action=Tick")
+	defer log.Warning("action=Tick")
+}
+
+// Stop performs cleanup when the goroutine is exiting
+func (tl *temperatureLogger) stop() {
+	log.Warning("action=Tick")
+	defer log.Warning("action=Tick")
+}
+
+// Tick executes on a ticker schedule
+func (tl *temperatureLogger) tick() bool {
+	log.Warning("action=Tick")
+	defer log.Warning("action=Tick")
+	readings := tl.collectTemperatureMetrics()
+	tl.logTemperatureMetrics(readings)
+	return true
+}
+
+func (tl *temperatureLogger) collectTemperatureMetrics() *models.TemperatureReadings {
+	log.Infof("action=start numProbes=%d", tl.temp.GetNumProbes())
 	readings := models.TemperatureReadings{}
-	for i := int32(1); i <= temp.GetNumProbes(); i++ {
+	for i := int32(1); i <= tl.temp.GetNumProbes(); i++ {
 		log.Debugf("action=iterate probe=%d", i)
 		reading := models.TemperatureReading{}
-		if err := temp.GetTemperatureReading(i, &reading); err != nil {
+		if err := tl.temp.GetTemperatureReading(i, &reading); err != nil {
 			log.Error(err)
 		}
 		readings = append(readings, &reading)
@@ -49,7 +70,7 @@ func collectTemperatureMetrics(temp hardware.TemperatureArray) *models.Temperatu
 	return &readings
 }
 
-func logTemperatureMetrics(readings *models.TemperatureReadings) {
+func (tl *temperatureLogger) logTemperatureMetrics(readings *models.TemperatureReadings) {
 	log.Infof("action=start numReadings=%d", len(*readings))
 	log.Infof("action=done")
 }

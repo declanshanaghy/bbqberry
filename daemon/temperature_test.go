@@ -18,10 +18,10 @@ var _ = Describe("Temperature daemon", func() {
 	})
 
 	It("should collect valid temperature readings from all probes", func() {
-		temp := hardware.NewTemperatureReader()
-		readings := collectTemperatureMetrics(temp)
+		temperatureLogger := newTemperatureLogger()
+		readings := temperatureLogger.collectTemperatureMetrics()
 
-		Expect(len(*readings)).To(Equal(int(temp.GetNumProbes())))
+		Expect(len(*readings)).To(Equal(int(temperatureLogger.temp.GetNumProbes())))
 		for i, r := range *readings {
 			Expect(*r.Probe).To(Equal(int32(i + 1)))
 		}

@@ -40,7 +40,9 @@ type cmdOptions struct {
 var cmdOptionsValues cmdOptions
 
 func configureFlags(api *operations.AppAPI) {
-	log.Info("action=start")
+	log.Debug("action=start")
+	defer log.Debug("action=done")
+	
 	api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{
 		{
 			ShortDescription: "BBQ Berry Server Flags",
@@ -51,7 +53,9 @@ func configureFlags(api *operations.AppAPI) {
 }
 
 func configureAPI(api *operations.AppAPI) http.Handler {
-	log.Info("action=start")
+	log.Debug("action=start")
+	defer log.Debug("action=done")
+	
 	// configure the api here
 	api.ServeError = errors.ServeError
 
@@ -86,15 +90,15 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 }
 
 func globalShutdown() {
-	log.Info("action=start")
+	log.Debug("action=start")
+	defer log.Debug("action=done")
 
-	if err := commander.Exit(); err != nil {
+	if err := commander.StopBackground(); err != nil {
 		log.Error(err.Error())
 	}
 		
 	hardware.Shutdown()
 
-	log.Info("action=done")
 }
 
 // The TLS configuration before HTTPS server starts.
@@ -107,13 +111,13 @@ func configureTLS(tlsConfig *tls.Config) {
 // This function can be called multiple times, depending on the number of serving schemes.
 // scheme value will be set accordingly: "http", "https" or "unix"
 func configureServer(s *graceful.Server, scheme string) {
-	log.Infof("action=start scheme=%s", scheme)
+	log.Debug("action=start scheme=%s", scheme)
+	defer log.Debug("action=done scheme=%s", scheme)
 
 	if scheme == "http" {
-		go commander.Run()
+		commander.StartBackground()
 	}
 
-	log.Infof("action=done scheme=%s", scheme)
 }
 
 // The middleware configuration is for the handler executors. These do not apply to the swagger.json document.
@@ -125,8 +129,9 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 // The middleware configuration happens before anything, this middleware also applies to serving the swagger.json document.
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
-	log.Info("action=start")
-	defer log.Info("action=done")
+	log.Debug("action=start")
+	defer log.Debug("action=done")
+
 	return handlers.NewPanicHandler(
 		handlers.NewLoggingHandler(
 			handlers.NewSwaggerUIHandler(cmdOptionsValues.StaticDir, handler)))

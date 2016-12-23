@@ -83,49 +83,98 @@ func (s *temperatureArray) readProbe(probe int32) (int32, error) {
 }
 
 func (s *temperatureArray) GetTemperatureReading(probe int32, reading *models.TemperatureReading) error {
-	a, err := s.readProbe(probe)
+	analog, err := s.readProbe(probe)
 	if err != nil {
 		return err
 	}
-	k, c, f, v, o := SteinhartHart(a)
+	
+	/*
+		Voltage divider configuration
+			vcc	(3.3v)
+		    /\
+			|
+			r1	(Temp Sensor)
+			|
+			|------> vOut
+			|
+			r2	(1k)
+			|
+		   ---
+			gnd	(0v)
+	*/
+	vcc := float32(3.3)
+	maxA := float32(1024.0)
+	vPerA := vcc / maxA
+	r2 := float32(1000.0)
+	vOut := float32(analog) * vPerA
+
+	// When previously using a thermistor the resistance was needed
+	// It's not needed at all for a thermocoupld based system. Leaving it here for the laugh!
+	r1 := int32(((vcc * r2) / vOut) - r2)
+
+	// log.Infof("A=%0.5f, V=%0.5f, R1=%0.5f", analog, vOut, r1)
+
+	// tempK, tempC, tempF := SteinhartHartRtoKCF(r1)
+	tempK, tempC, tempF := adafruitAD8495ThermocoupleVtoKCF(vOut)
+	log.Infof("probe=%d, A=%0.5f, V=%0.5f, R=%0.5f, K=%0.5f, C=%0.5f, F=%0.5f", probe, analog, vOut, r1, tempK, tempC, tempF)
+
 
 	time := strfmt.DateTime(time.Now())
 	reading.Probe = &probe
 	reading.DateTime = &time
-	reading.Analog = &a
-	reading.Voltage = &v
-	reading.Resistance = &o
-	reading.Kelvin = &k
-	reading.Celsius = &c
-	reading.Fahrenheit = &f
+	reading.Analog = &analog
+	reading.Voltage = &vOut
+	reading.Resistance = &r1
+	reading.Kelvin = &tempK
+	reading.Celsius = &tempC
+	reading.Fahrenheit = &tempF
 
 	return nil
 }
 
-// SteinhartHart calculates temperature from the given analog value using the Steinhart Hart formula
-func SteinhartHart(analog int32) (tempK float32, tempC float32, tempF float32, voltage float32, resistance int32) {
-	// iBBQ probe is 100.8K at 25c
+// adafruitAD8495ThermocoupleVtoKCF converts the voltage read from the Adafruit Thermocouple breakout board
+// to temperatures in Kelvin, Celcius and Fahrenheit
+func adafruitAD8495ThermocoupleVtoKCF(v float32) (tempK float32, tempC float32, tempF float32) {
+	// https://www.adafruit.com/product/1778
+	// Analog Output K-Type Thermocouple Amplifier - AD8495 Breakout
+	// PRODUCT ID: 1778
+	// Temperature = (Vout - 1.25) / 0.005 V
+	// e.g:
+	// v = 1.5VDC 
+	// The temperature is (1.5 - 1.25) / 0.005 = 50°C
 
-	volts := (float64(analog) * 3.3) / 1024 // calculate the voltage
-	voltage = float32(volts)
-	ohms := ((1 / volts) * 3300) - 1000 // calculate the resistance of the thermististor
-	resistance = int32(ohms)
+	tempC = (v - 1.25) / 0.005 
+	tempK, tempF = convertCToKF(tempC)
+	return
+}
 
-	lnohm := math.Log1p(ohms) // take ln(ohms)
+// convertKToCF converts a celsius temperature to kelvin and fahrenheit
+func convertCToKF(tempC float32) (tempK float32, tempF float32) {
+	tempK = tempC + 273.15 // C to K
+	tempF = tempC * 1.8 + 32 // C to F
+	return
+}
 
+// convertKToCF converts a kelvin temperature to celsius and fahrenheit
+func convertKToCF(tempK float32) (tempC float32, tempF float32) {
+	tempC = tempK - 273.15 // K to C
+	tempF = tempC * 1.8 + 32 // C to F
+	return
+}
+
+// steinhartHartRtoKCF converts the given thermocouple resistance to temperature in Kelvin, Celsius and Fahrenheit
+func steinhartHartRtoKCF(resistance float32) (tempK float32, tempC float32, tempF float32) {
 	a := framework.Constants.SteinhartHart.A
 	b := framework.Constants.SteinhartHart.B
 	c := framework.Constants.SteinhartHart.C
+	// Rn := framework.Constants.SteinhartHart.Rn
+
+	v := math.Log(float64(resistance))
 
 	// Steinhart Hart Equation
-	// T = 1/(a + b[ln(ohm)] + c[ln(ohm)]^3)
-	t1 := (b * lnohm)     // b[ln(ohm)]
-	c2 := c * lnohm       // c[ln(ohm)]
-	t2 := math.Pow(c2, 3) // c[ln(ohm)]^3
-
-	tempK = float32(1 / (a + t1 + t2)) // Calculate temperature in Kelvin
-	tempC = tempK - 273.15 - 4         // K to C (the -4 is error correction for bad python math)
-	tempF = tempC*9/5 + 32             // Fahrenheit
+	// T = 1/(a + b[ln(R)] + (c[ln(R)])^3)
+	tempK = float32(1.0 / (a + b*v + c*v*v*v))
+	tempC, tempF = convertKToCF(tempK)
 
 	return
 }
