@@ -118,9 +118,9 @@ func (s *temperatureArray) GetTemperatureReading(probe int32, reading *models.Te
 	tempK, tempC, tempF := adafruitAD8495ThermocoupleVtoKCF(vOut)
 	log.Infof("probe=%d, A=%d, R=%d, V=%0.5f, K=%0.5f, C=%0.5f, F=%0.5f", probe, analog, r1, vOut, tempK, tempC, tempF)
 
-	time := strfmt.DateTime(time.Now())
+	t := strfmt.DateTime(time.Now())
 	reading.Probe = &probe
-	reading.DateTime = &time
+	reading.DateTime = &t
 	reading.Analog = &analog
 	reading.Voltage = &vOut
 	reading.Resistance = &r1
@@ -132,7 +132,7 @@ func (s *temperatureArray) GetTemperatureReading(probe int32, reading *models.Te
 }
 
 // adafruitAD8495ThermocoupleVtoKCF converts the voltage read from the Adafruit Thermocouple breakout board
-// to temperatures in Kelvin, Celcius and Fahrenheit
+// to temperatures in Kelvin, Celsius and Fahrenheit
 func adafruitAD8495ThermocoupleVtoKCF(v float32) (tempK float32, tempC float32, tempF float32) {
 	// https://www.adafruit.com/product/1778
 	// Analog Output K-Type Thermocouple Amplifier - AD8495 Breakout

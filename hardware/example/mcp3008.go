@@ -43,6 +43,7 @@ func main() {
 			tot += v
 		}
 		analog := float32(tot) / float32(len(readings))
+		fmt.Printf("Read value %f", analog)
 
 		time.Sleep(1 * time.Second)
 	}

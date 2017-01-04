@@ -32,7 +32,8 @@ func (cmdr *Commander) getPeriod() time.Duration {
 	return time.Second
 }
 
-func (t *Commander) GetName() string {
+// GetName returns a human readable name for this background task
+func (cmdr *Commander) GetName() string {
 	return "temperatureLogger"
 }
 

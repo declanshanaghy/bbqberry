@@ -35,7 +35,8 @@ func (tl *temperatureLogger) getPeriod() time.Duration {
 	return time.Second
 }
 
-func (t *temperatureLogger) GetName() string {
+// GetName returns a human readable name for this background task
+func (tl *temperatureLogger) GetName() string {
 	return "temperatureLogger"
 }
 

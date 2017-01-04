@@ -22,8 +22,8 @@ type Tickable interface {
 
 	// getPeriod will be called by the runner. The time.Duration returned will be used as the period between calls to tick
 	getPeriod() time.Duration
-
-	// GetName is used for a human to identify background tasks
+	
+	// GetName returns a human readable name for this background task
 	GetName() string
 }
 
@@ -105,7 +105,7 @@ func (r *runner) StopBackground() error {
 	timeout := math.Max(float64(r.tickable.getPeriod())*1.5, float64(time.Second.Nanoseconds()))
 	timedOut := waitTimeout(r.wg, time.Duration(int64(timeout)))
 	if timedOut {
-		return errors.New(fmt.Sprintf("Timed out waiting for background task to exit: name=%s", r.tickable.GetName()))
+		return fmt.Errorf("Timed out waiting for background task to exit: name=%s", r.tickable.GetName())
 	}
 
 	r.tickable = nil
