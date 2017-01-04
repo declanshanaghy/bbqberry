@@ -1,8 +1,9 @@
 package daemon
 
 import (
-	"github.com/Polarishq/middleware/framework/log"
 	"time"
+
+	"github.com/Polarishq/middleware/framework/log"
 )
 
 // Commander is the main controller of all background goroutines
@@ -29,6 +30,10 @@ func (cmdr *Commander) StartBackground() error {
 
 func (cmdr *Commander) getPeriod() time.Duration {
 	return time.Second
+}
+
+func (t *Commander) GetName() string {
+	return "temperatureLogger"
 }
 
 // Start performs initialization before the first tick

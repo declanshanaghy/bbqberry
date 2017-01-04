@@ -4,11 +4,8 @@
 package main
 
 import (
-	"math"
 	"time"
 
-	"github.com/Polarishq/middleware/framework/log"
-	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/kidoman/embd"
 	"github.com/kidoman/embd/convertors/mcp3008"
 	_ "github.com/kidoman/embd/host/rpi"

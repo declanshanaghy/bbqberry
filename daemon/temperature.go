@@ -1,10 +1,11 @@
 package daemon
 
 import (
+	"time"
+
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/models"
-	"time"
 )
 
 // temperatureLogger collects and logs temperature metrics
@@ -32,6 +33,10 @@ func (tl *temperatureLogger) StartBackground() error {
 
 func (tl *temperatureLogger) getPeriod() time.Duration {
 	return time.Second
+}
+
+func (t *temperatureLogger) GetName() string {
+	return "temperatureLogger"
 }
 
 // Start performs initialization before the first tick

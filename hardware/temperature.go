@@ -87,7 +87,7 @@ func (s *temperatureArray) GetTemperatureReading(probe int32, reading *models.Te
 	if err != nil {
 		return err
 	}
-	
+
 	/*
 		Voltage divider configuration
 			vcc	(3.3v)
@@ -116,8 +116,7 @@ func (s *temperatureArray) GetTemperatureReading(probe int32, reading *models.Te
 
 	// tempK, tempC, tempF := SteinhartHartRtoKCF(r1)
 	tempK, tempC, tempF := adafruitAD8495ThermocoupleVtoKCF(vOut)
-	log.Infof("probe=%d, A=%0.5f, V=%0.5f, R=%0.5f, K=%0.5f, C=%0.5f, F=%0.5f", probe, analog, vOut, r1, tempK, tempC, tempF)
-
+	log.Infof("probe=%d, A=%d, R=%d, V=%0.5f, K=%0.5f, C=%0.5f, F=%0.5f", probe, analog, r1, vOut, tempK, tempC, tempF)
 
 	time := strfmt.DateTime(time.Now())
 	reading.Probe = &probe
@@ -140,10 +139,10 @@ func adafruitAD8495ThermocoupleVtoKCF(v float32) (tempK float32, tempC float32, 
 	// PRODUCT ID: 1778
 	// Temperature = (Vout - 1.25) / 0.005 V
 	// e.g:
-	// v = 1.5VDC 
+	// v = 1.5VDC
 	// The temperature is (1.5 - 1.25) / 0.005 = 50°C
 
-	tempC = (v - 1.25) / 0.005 
+	tempC = (v - 1.25) / 0.005
 	tempK, tempF = convertCToKF(tempC)
 	return
 }
@@ -151,14 +150,14 @@ func adafruitAD8495ThermocoupleVtoKCF(v float32) (tempK float32, tempC float32, 
 // convertKToCF converts a celsius temperature to kelvin and fahrenheit
 func convertCToKF(tempC float32) (tempK float32, tempF float32) {
 	tempK = tempC + 273.15 // C to K
-	tempF = tempC * 1.8 + 32 // C to F
+	tempF = tempC*1.8 + 32 // C to F
 	return
 }
 
 // convertKToCF converts a kelvin temperature to celsius and fahrenheit
 func convertKToCF(tempK float32) (tempC float32, tempF float32) {
 	tempC = tempK - 273.15 // K to C
-	tempF = tempC * 1.8 + 32 // C to F
+	tempF = tempC*1.8 + 32 // C to F
 	return
 }
 
