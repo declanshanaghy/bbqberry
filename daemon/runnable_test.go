@@ -3,9 +3,9 @@ package daemon
 import (
 	"time"
 
+	"github.com/Polarishq/middleware/framework/log"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/Polarishq/middleware/framework/log"
 )
 
 type testingTickable struct {
@@ -55,7 +55,7 @@ var _ = Describe("The runner", func() {
 			t := testingTickable{}
 			err := t.StartBackground()
 			Expect(err).ToNot(HaveOccurred())
-			
+
 			Expect(t.running).To(BeTrue(), "Expected the tickable to be running")
 
 			// This should allow at least 1 tickable execution
