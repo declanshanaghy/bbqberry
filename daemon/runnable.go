@@ -22,7 +22,7 @@ type Tickable interface {
 
 	// getPeriod will be called by the runner. The time.Duration returned will be used as the period between calls to tick
 	getPeriod() time.Duration
-	
+
 	// GetName returns a human readable name for this background task
 	GetName() string
 }
