@@ -11,13 +11,19 @@ import (
 
 // LoggingHandler provides a middleware handler which logs all requests and responses
 type LoggingHandler struct {
-	handler     http.Handler
-	captureBody bool
+	handler         http.Handler
+	logResponseBody bool
 }
 
 // NewLoggingHandler creates a middleware handler which logs all requests and responses
 func NewLoggingHandler(handler http.Handler) *LoggingHandler {
-	return &LoggingHandler{handler: handler, captureBody: false /* changeme */}
+	return &LoggingHandler{handler: handler, logResponseBody: false}
+}
+
+// NewLoggingHandlerWithResponseBody creates a middleware handler which logs all requests and responses,
+// with an option to enable logging of the response body
+func NewLoggingHandlerWithResponseBody(handler http.Handler, captureBody bool) *LoggingHandler {
+	return &LoggingHandler{handler: handler, logResponseBody: captureBody}
 }
 
 type loggingResponseWriter struct {
@@ -52,11 +58,11 @@ func stringify(r *http.Request) string {
 
 func (l *LoggingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	startTime := time.Now()
-	log.Infof("LoggingHandler: request: %+v string_request %+v", r, stringify(r))
-	lwr := loggingResponseWriter{w: w, captureBody: l.captureBody}
+	log.Debugf("LoggingHandler: request: %+v string_request %+v", r, stringify(r))
+	lwr := loggingResponseWriter{w: w, captureBody: l.logResponseBody}
 	l.handler.ServeHTTP(&lwr, r)
 	endTime := time.Now()
 	// if the code is 0, it means that an outter handler will write the code
-	log.Infof("LoggingHandler: response code=%d header='%v' string_body='%+v' time=%v",
+	log.Debugf("LoggingHandler: response code=%d header='%v' string_body='%+v' time=%v",
 		lwr.code, lwr.headers, string(lwr.data), endTime.Sub(startTime))
 }

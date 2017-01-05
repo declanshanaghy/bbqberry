@@ -9,14 +9,12 @@ import (
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/models"
 	"github.com/go-openapi/strfmt"
-	"github.com/golang/glog"
 	"github.com/kidoman/embd"
 	"github.com/kidoman/embd/convertors/mcp3008"
 )
 
-// TemperatureArray provides an interface to read temperature values from the physical
-// temperature probes
-type TemperatureArray interface {
+// TemperatureReader provides an interface to read temperature values from the physical temperature probes
+type TemperatureReader interface {
 	// GetTemperatureReading reads the tempearature from the requested probe
 	GetTemperatureReading(probe int32, reading *models.TemperatureReading) error
 	// GetNumProbes returns the number of configured temperature probes
@@ -25,7 +23,7 @@ type TemperatureArray interface {
 	Close()
 }
 
-type temperatureArray struct {
+type temperatureReader struct {
 	numProbes int32
 	bus       embd.SPIBus
 	adc       *mcp3008.MCP3008
@@ -35,31 +33,31 @@ var fakeTemps = make(map[int32]int, 0)
 
 // newTemperatureArray constructs a concrete implementation of
 // TemperatureArray which can communicate with the underlying hardware
-func newTemperatureArray(numProbes int32, bus embd.SPIBus) TemperatureArray {
-	return &temperatureArray{
+func newTemperatureReader(numProbes int32, bus embd.SPIBus) TemperatureReader {
+	return &temperatureReader{
 		numProbes: numProbes,
 		bus:       bus,
 		adc:       mcp3008.New(mcp3008.SingleMode, bus),
 	}
 }
 
-func (s *temperatureArray) Close() {
+func (s *temperatureReader) Close() {
 	log.Info("action=Close")
 	s.bus.Close()
 }
 
-func (s *temperatureArray) GetNumProbes() int32 {
+func (s *temperatureReader) GetNumProbes() int32 {
 	return s.numProbes
 }
 
-func (s *temperatureArray) errorCheckProbeNumber(probe int32) error {
+func (s *temperatureReader) errorCheckProbeNumber(probe int32) error {
 	if probe < 1 || probe > s.numProbes {
 		return fmt.Errorf("Invalid probe: %d. Must be between 1 and %d", probe, s.numProbes)
 	}
 	return nil
 }
 
-func (s *temperatureArray) readProbe(probe int32) (int32, error) {
+func (s *temperatureReader) readProbe(probe int32) (int32, error) {
 	var v int
 	var err error
 
@@ -78,11 +76,11 @@ func (s *temperatureArray) readProbe(probe int32) (int32, error) {
 			return 0, err
 		}
 	}
-	glog.V(4).Infof("action=readProbe probe=%v v=%v", probe, v)
+	log.Debugf("action=readProbe probe=%v v=%v", probe, v)
 	return int32(v), err
 }
 
-func (s *temperatureArray) GetTemperatureReading(probe int32, reading *models.TemperatureReading) error {
+func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.TemperatureReading) error {
 	analog, err := s.readProbe(probe)
 	if err != nil {
 		return err
@@ -116,7 +114,7 @@ func (s *temperatureArray) GetTemperatureReading(probe int32, reading *models.Te
 
 	// tempK, tempC, tempF := SteinhartHartRtoKCF(r1)
 	tempK, tempC, tempF := adafruitAD8495ThermocoupleVtoKCF(vOut)
-	log.Infof("probe=%d, A=%d, R=%d, V=%0.5f, K=%0.5f, C=%0.5f, F=%0.5f", probe, analog, r1, vOut, tempK, tempC, tempF)
+	log.Debugf("probe=%d, A=%d, R=%d, V=%0.5f, K=%0.5f, C=%0.5f, F=%0.5f", probe, analog, r1, vOut, tempK, tempC, tempF)
 
 	t := strfmt.DateTime(time.Now())
 	reading.Probe = &probe

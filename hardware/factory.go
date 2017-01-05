@@ -48,9 +48,9 @@ func NewStrandController() WS2801 {
 }
 
 // NewTemperatureReader provides an abstracted interface to the temperature probes
-func NewTemperatureReader() TemperatureArray {
+func NewTemperatureReader() TemperatureReader {
 	bus := newSPIBus(1)
-	return newTemperatureArray(HardwareConfig.NumTemperatureProbes, bus)
+	return newTemperatureReader(HardwareConfig.NumTemperatureProbes, bus)
 }
 
 func newSPIBus(channel byte) embd.SPIBus {

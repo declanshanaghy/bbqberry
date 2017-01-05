@@ -9,27 +9,29 @@ import (
 // Commander is the main controller of all background goroutines
 type Commander struct {
 	runner
-	ticks int
+	tempLogger *temperatureLogger
 }
 
-// NewCommander creates a new Commander instance which can be
+// NewCommander creates a Commander instance which can be
 // used to query and control all background processes.
 // e.g: Temperature logger, temperature monitor
 func NewCommander() *Commander {
-	log.Debug("action=start")
-	defer log.Debug("action=done")
-	return &Commander{}
+	log.Debug("action=method_entry")
+	defer log.Debug("action=method_exit")
+	return &Commander{
+		tempLogger: newTemperatureLogger(),
+	}
 }
 
 // StartBackground starts the commander in the background
 func (cmdr *Commander) StartBackground() error {
-	log.Debug("action=start")
-	defer log.Debug("action=done")
+	log.Debug("action=method_entry")
+	defer log.Debug("action=method_exit")
 	return cmdr.startBackground(cmdr)
 }
 
 func (cmdr *Commander) getPeriod() time.Duration {
-	return time.Second
+	return time.Second * 10
 }
 
 // GetName returns a human readable name for this background task
@@ -39,25 +41,24 @@ func (cmdr *Commander) GetName() string {
 
 // Start performs initialization before the first tick
 func (cmdr *Commander) start() {
-	log.Warning("action=Tick")
-	defer log.Warning("action=Tick")
+	log.Debug("action=method_entry")
+	defer log.Debug("action=method_entry")
+
+	cmdr.tempLogger.StartBackground()
 }
 
 // Stop performs cleanup when the goroutine is exiting
 func (cmdr *Commander) stop() {
-	log.Warning("action=Tick")
-	defer log.Warning("action=Tick")
+	log.Debug("action=stop")
+	defer log.Debug("action=stop")
+
+	cmdr.tempLogger.StopBackground()
 }
 
 // Tick executes on a ticker schedule
 func (cmdr *Commander) tick() bool {
-	log.Warning("action=Tick")
-	defer log.Warning("action=Tick")
-
-	cmdr.ticks++
-	if cmdr.ticks >= 5 {
-		return false
-	}
+	log.Debug("action=tick")
+	defer log.Debug("action=tick")
 
 	return true
 }

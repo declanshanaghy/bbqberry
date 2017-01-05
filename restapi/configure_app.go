@@ -40,8 +40,8 @@ type cmdOptions struct {
 var cmdOptionsValues cmdOptions
 
 func configureFlags(api *operations.AppAPI) {
-	log.Debug("action=start")
-	defer log.Debug("action=done")
+	log.Debug("action=method_entry")
+	defer log.Debug("action=method_exit")
 	
 	api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{
 		{
@@ -53,8 +53,8 @@ func configureFlags(api *operations.AppAPI) {
 }
 
 func configureAPI(api *operations.AppAPI) http.Handler {
-	log.Debug("action=start")
-	defer log.Debug("action=done")
+	log.Info("action=method_entry")
+	defer log.Info("action=method_exit")
 	
 	// configure the api here
 	api.ServeError = errors.ServeError
@@ -90,15 +90,14 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 }
 
 func globalShutdown() {
-	log.Debug("action=start")
-	defer log.Debug("action=done")
+	log.Info("action=method_entry")
+	defer log.Info("action=method_exit")
 
 	if err := commander.StopBackground(); err != nil {
 		log.Error(err.Error())
 	}
 		
 	hardware.Shutdown()
-
 }
 
 // The TLS configuration before HTTPS server starts.
@@ -111,13 +110,12 @@ func configureTLS(tlsConfig *tls.Config) {
 // This function can be called multiple times, depending on the number of serving schemes.
 // scheme value will be set accordingly: "http", "https" or "unix"
 func configureServer(s *graceful.Server, scheme string) {
-	log.Debug("action=start scheme=%s", scheme)
-	defer log.Debug("action=done scheme=%s", scheme)
+	log.Debug("action=method_entry scheme=%s", scheme)
+	defer log.Debug("action=method_exit scheme=%s", scheme)
 
 	if scheme == "http" {
 		commander.StartBackground()
 	}
-
 }
 
 // The middleware configuration is for the handler executors. These do not apply to the swagger.json document.
@@ -129,8 +127,8 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 // The middleware configuration happens before anything, this middleware also applies to serving the swagger.json document.
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
-	log.Debug("action=start")
-	defer log.Debug("action=done")
+	log.Debug("action=method_entry")
+	defer log.Debug("action=method_exit")
 
 	return handlers.NewPanicHandler(
 		handlers.NewLoggingHandler(

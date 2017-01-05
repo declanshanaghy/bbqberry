@@ -19,11 +19,6 @@ type SwaggerUIHandler struct {
 
 // NewSwaggerUIHandler creates a new middleware handler which serves the swagger UI
 func NewSwaggerUIHandler(dir string, handler http.Handler) *SwaggerUIHandler {
-	if dir == "" {
-		// swagger ui path not set up let's try to discover it
-		gopath := os.Getenv("GOPATH")
-		dir = gopath + "/src" + "/splunk/avanti-container/static/"
-	}
 	return &SwaggerUIHandler{dir: dir, handler: handler}
 }
 

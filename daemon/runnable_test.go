@@ -10,8 +10,17 @@ import (
 
 type testingTickable struct {
 	runner
-	startCalls, stopCalls, tickCalls, nTicks int
-	tickReturn                               bool
+
+	// These variables keep track of interactions between this tickable and the runner
+	startCalls, stopCalls, tickCalls int
+
+	// These variables control how this tickable behaves
+
+	// max # of times tick can be called before it will indicate that it wants to exit. < 0 means execute forever
+	maxTickCalls int
+
+	// duration that each call to tick should sleep
+	tickSleep time.Duration
 }
 
 func (t *testingTickable) getPeriod() time.Duration {
@@ -23,7 +32,7 @@ func (t *testingTickable) GetName() string {
 }
 
 func (t *testingTickable) start() {
-	log.Info("action=start")
+	log.Info("action=method_entry")
 	t.startCalls++
 }
 
@@ -37,9 +46,14 @@ func (t *testingTickable) tick() bool {
 	// This is very verbose
 	//log.Warningf("action=tick tickCalls=%d", t.tickCalls)
 
-	if t.nTicks >= 0 && t.tickCalls > t.nTicks {
-		log.Infof("Tick limit reached nTicks=%d tickReturn=%t", t.nTicks, t.tickReturn)
-		return t.tickReturn
+	if t.tickSleep > 0 {
+		log.Infof("action=sleep duration=%d", t.tickSleep)
+		time.Sleep(t.tickSleep)
+	}
+
+	if t.maxTickCalls >= 0 && t.tickCalls > t.maxTickCalls {
+		log.Infof("Tick limit reached nTicks=%d", t.maxTickCalls)
+		return false
 	}
 
 	return true
@@ -71,12 +85,37 @@ var _ = Describe("The runner", func() {
 		})
 	})
 	Context("When given a tickable that never exits", func() {
-		It("should refuse to start twice and exit when the channel is closed", func() {
-			log.Info("It should refuse to start twice and exit when the channel is closed")
-			t := testingTickable{
-				nTicks: -1,
-			}
+		var t testingTickable
 
+		BeforeEach(func() {
+			t = testingTickable{
+				maxTickCalls: -1,
+			}
+		})
+
+		It("should refuse to start twice and timeout when told to stop", func() {
+			t.tickSleep = time.Second * 10
+
+			err := t.StartBackground()
+			Expect(err).ToNot(HaveOccurred())
+
+			// Secondary test. Try to start it twice
+			err = t.StartBackground()
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(Equal("Cannot execute StartBackground. Already running"))
+
+			// This should allow at least 1 tickable execution
+			time.Sleep(time.Millisecond)
+
+			err = t.StopBackground()
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(Equal("Timed out waiting for background task to exit: name=testingTickable"))
+
+			Expect(t.startCalls).Should(Equal(1), "Number of calls to start is incorrect")
+			Expect(t.tickCalls).Should(Equal(1), "Number of calls to tick is incorrect")
+			Expect(t.stopCalls).Should(Equal(0), "Number of calls to stop is incorrect")
+		})
+		It("should exit when the channel is closed", func() {
 			actualTicks := 0
 			go func() {
 				for _ = 0; 5 > t.tickCalls; {
@@ -88,11 +127,6 @@ var _ = Describe("The runner", func() {
 
 			err := t.StartBackground()
 			Expect(err).ToNot(HaveOccurred())
-
-			// Secondary test. Try to start it twice
-			err = t.StartBackground()
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal("Cannot execute StartBackground. Already running"))
 
 			// This should allow at least 1 tickable execution
 			time.Sleep(time.Millisecond)

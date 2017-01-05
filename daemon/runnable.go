@@ -38,8 +38,8 @@ type runner struct {
 // StartBackground starts the main loop of the runner resulting the the given
 // Tickable being executed on the default Ticker schedule
 func (r *runner) startBackground(tickable Tickable) error {
-	log.Debug("action=start")
-	defer log.Debug("action=done")
+	log.Debugf("action=method_entry name=%s", tickable.GetName())
+	defer log.Debugf("action=method_exit name=%s", tickable.GetName())
 
 	if r.running {
 		return errors.New("Cannot execute StartBackground. Already running")
@@ -61,9 +61,9 @@ func (r *runner) startBackground(tickable Tickable) error {
 
 // loop executes the main loop of this runner, calling the Tickable every second
 func (r *runner) loop(tickable Tickable) {
-	log.Info("action=start")
+	log.Debugf("action=method_entry name=%s", tickable.GetName())
 	defer r.wg.Done()
-	defer log.Info("action=done")
+	defer log.Debugf("action=method_exit name=%s", tickable.GetName())
 
 	// Ensure running flag is set
 	r.running = true
@@ -75,7 +75,7 @@ func (r *runner) loop(tickable Tickable) {
 	for r.running {
 		select {
 		case r.running = <-r.ch:
-			log.Infof("action=rx running=%t", r.running)
+			log.Debugf("action=rx running=%t", r.running)
 		case <-ticker.C:
 			log.Debugf("action=timeout")
 			r.running = tickable.tick()
@@ -91,8 +91,8 @@ func (r *runner) loop(tickable Tickable) {
 
 // StopBackground causes the background goroutine to exit
 func (r *runner) StopBackground() error {
-	log.Debug("action=start")
-	defer log.Debug("action=done")
+	log.Debugf("action=method_entry name=%s", r.tickable.GetName())
+	defer log.Debugf("action=method_exit name=%s", r.tickable.GetName())
 
 	if !r.running {
 		return errors.New("Cannot execute StopBackground. Not running")
@@ -101,8 +101,9 @@ func (r *runner) StopBackground() error {
 	// Close the run channel which will cause the runner loop to exit
 	close(r.ch)
 
-	// Wait at least 1 second for the loop to exit
-	timeout := math.Max(float64(r.tickable.getPeriod())*1.5, float64(time.Second.Nanoseconds()))
+	// Wait at least this amount of time for the loop to exit
+	minWait := float64(time.Second.Nanoseconds()) * 0.01
+	timeout := math.Max(float64(r.tickable.getPeriod())*1.5, minWait)
 	timedOut := waitTimeout(r.wg, time.Duration(int64(timeout)))
 	if timedOut {
 		return fmt.Errorf("Timed out waiting for background task to exit: name=%s", r.tickable.GetName())
@@ -115,20 +116,21 @@ func (r *runner) StopBackground() error {
 // WaitTimeout waits for the WaitGroup for the specified Duration.
 // Returns true if waiting timed out.
 func waitTimeout(wg *sync.WaitGroup, timeout time.Duration) bool {
-	log.Infof("action=WaitTimeout timeout=%d", timeout)
+	log.Debug("action=method_entry")
+	defer log.Debug("action=method_exit")
 
 	c := make(chan struct{})
 	go func() {
 		defer close(c)
 		wg.Wait()
-		log.Info("action=WaitTimeout status=wg_exited")
+		log.Debug("action=WaitTimeout status=wg_exited")
 	}()
 	select {
 	case <-c:
-		log.Info("action=WaitTimeout status=exit_success")
+		log.Debug("action=WaitTimeout status=exit_success")
 		return false // completed normally
 	case <-time.After(timeout):
-		log.Info("action=WaitTimeout status=exit_failed")
+		log.Error("action=WaitTimeout status=exit_failed")
 		return true // timed out
 	}
 }

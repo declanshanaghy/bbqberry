@@ -3,8 +3,8 @@ package hardware
 import (
 	"fmt"
 
-	"github.com/golang/glog"
 	"github.com/kidoman/embd"
+	"github.com/Polarishq/middleware/framework/log"
 )
 
 // WS2801 privdes an interface for communicating with an LED strip which uses the WS2801 chip
@@ -37,7 +37,7 @@ func (s *ws2801Strand) GetNumPixels() int {
 }
 
 func (s *ws2801Strand) Off() error {
-	glog.Info("action=Off nPixels=%d", s.GetNumPixels())
+	log.Info("action=Off nPixels=%d", s.GetNumPixels())
 	for i := 0; i < s.GetNumPixels(); i++ {
 		s.SetPixelColor(i, 0)
 	}
@@ -45,19 +45,19 @@ func (s *ws2801Strand) Off() error {
 }
 
 func (s *ws2801Strand) Close() error {
-	glog.Info("action=Close nPixels=%d", s.GetNumPixels())
+	log.Info("action=Close nPixels=%d", s.GetNumPixels())
 	s.Off()
 	return s.bus.Close()
 }
 
 func (s *ws2801Strand) Update() error {
-	glog.V(3).Infof("action=Update nPixels=%d", s.GetNumPixels())
+	log.Debugf("action=Update nPixels=%d", s.GetNumPixels())
 	copy(s.data, s.pixels)
 	return s.bus.TransferAndReceiveData(s.data)
 }
 
 func (s *ws2801Strand) SetPixelColor(n int, color int) error {
-	glog.V(3).Infof("action=SetPixelColor n=%d, color=%#06x", n, color)
+	log.Debugf("action=SetPixelColor n=%d, color=%#06x", n, color)
 	return s.SetPixelRGB(n, uint8(color>>16&0xFF), uint8(color>>8&0xFF), uint8(color&0xFF))
 }
 
@@ -66,7 +66,7 @@ func (s *ws2801Strand) SetPixelRGB(n int, r uint8, g uint8, b uint8) error {
 		return err
 	}
 	base := n * 3
-	glog.V(3).Infof("action=SetPixelRGB n=%d base=%d nPixels=%d r=%#02x g=%#02x b=%#02x", n, base, len(s.pixels), r, g, b)
+	log.Debugf("action=SetPixelRGB n=%d base=%d nPixels=%d r=%#02x g=%#02x b=%#02x", n, base, len(s.pixels), r, g, b)
 	s.pixels[base] = r
 	s.pixels[base+1] = g
 	s.pixels[base+2] = b
