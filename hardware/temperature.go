@@ -2,7 +2,6 @@ package hardware
 
 import (
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/Polarishq/middleware/framework/log"
@@ -12,6 +11,18 @@ import (
 	"github.com/kidoman/embd"
 	"github.com/kidoman/embd/convertors/mcp3008"
 )
+
+var fakeTemps = make(map[int32]int32, 0)
+
+func init() {
+	hardware := framework.Constants.Hardware
+
+	if framework.Constants.Stub {
+		for i := int32(1); i <= hardware.NumTemperatureProbes; i++ {
+			fakeTemps[i] = i
+		}
+	}
+}
 
 // TemperatureReader provides an interface to read temperature values from the physical temperature probes
 type TemperatureReader interface {
@@ -29,10 +40,8 @@ type temperatureReader struct {
 	adc       *mcp3008.MCP3008
 }
 
-var fakeTemps = make(map[int32]int, 0)
-
-// newTemperatureArray constructs a concrete implementation of
-// TemperatureArray which can communicate with the underlying hardware
+// newTemperatureReader constructs a concrete implementation of
+// TemperatureReader which can communicate with the underlying hardware
 func newTemperatureReader(numProbes int32, bus embd.SPIBus) TemperatureReader {
 	return &temperatureReader{
 		numProbes: numProbes,
@@ -57,10 +66,7 @@ func (s *temperatureReader) errorCheckProbeNumber(probe int32) error {
 	return nil
 }
 
-func (s *temperatureReader) readProbe(probe int32) (int32, error) {
-	var v int
-	var err error
-
+func (s *temperatureReader) readProbe(probe int32) (v int32, err error) {
 	if err := s.errorCheckProbeNumber(probe); err != nil {
 		return 0, err
 	}
@@ -71,7 +77,8 @@ func (s *temperatureReader) readProbe(probe int32) (int32, error) {
 		}
 		fakeTemps[probe] = v
 	} else {
-		v, err = s.adc.AnalogValueAt(int(probe - 1))
+		iv, err := s.adc.AnalogValueAt(int(probe - 1))
+		v = int32(iv)
 		if err != nil {
 			return 0, err
 		}
@@ -110,11 +117,8 @@ func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 	// It's not needed at all for a thermocoupld based system. Leaving it here for the laugh!
 	r1 := int32(((vcc * r2) / vOut) - r2)
 
-	// log.Infof("A=%0.5f, V=%0.5f, R1=%0.5f", analog, vOut, r1)
-
-	// tempK, tempC, tempF := SteinhartHartRtoKCF(r1)
 	tempK, tempC, tempF := adafruitAD8495ThermocoupleVtoKCF(vOut)
-	log.Debugf("probe=%d, A=%d, R=%d, V=%0.5f, K=%0.5f, C=%0.5f, F=%0.5f", probe, analog, r1, vOut, tempK, tempC, tempF)
+	log.Infof("probe=%d, A=%d, R=%d, V=%0.5f, K=%0.5f, C=%0.5f, F=%0.5f", probe, analog, r1, vOut, tempK, tempC, tempF)
 
 	t := strfmt.DateTime(time.Now())
 	reading.Probe = &probe
@@ -156,22 +160,5 @@ func convertCToKF(tempC float32) (tempK float32, tempF float32) {
 func convertKToCF(tempK float32) (tempC float32, tempF float32) {
 	tempC = tempK - 273.15 // K to C
 	tempF = tempC*1.8 + 32 // C to F
-	return
-}
-
-// steinhartHartRtoKCF converts the given thermocouple resistance to temperature in Kelvin, Celsius and Fahrenheit
-func steinhartHartRtoKCF(resistance float32) (tempK float32, tempC float32, tempF float32) {
-	a := framework.Constants.SteinhartHart.A
-	b := framework.Constants.SteinhartHart.B
-	c := framework.Constants.SteinhartHart.C
-	// Rn := framework.Constants.SteinhartHart.Rn
-
-	v := math.Log(float64(resistance))
-
-	// Steinhart Hart Equation
-	// T = 1/(a + b[ln(R)] + (c[ln(R)])^3)
-	tempK = float32(1.0 / (a + b*v + c*v*v*v))
-	tempC, tempF = convertKToCF(tempK)
-
 	return
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	. "github.com/declanshanaghy/bbqberry/backend"
+	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
 	"github.com/declanshanaghy/bbqberry/stubs/stubembd"
@@ -18,6 +19,7 @@ var _ = Describe("Termperatures API", func() {
 	var (
 		bus *stubembd.StubSPIBus
 	)
+	hwCfg := framework.Constants.Hardware
 
 	BeforeEach(func() {
 		bus = stubembd.NewStubSPIBus()
@@ -50,7 +52,7 @@ var _ = Describe("Termperatures API", func() {
 
 		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings should not have returned an error")
 		Expect(m).To(
-			HaveLen(int(hardware.HardwareConfig.NumTemperatureProbes)),
+			HaveLen(int(hwCfg.NumTemperatureProbes)),
 			"Incorrect number of readings returneds")
 
 		for i, reading := range m {

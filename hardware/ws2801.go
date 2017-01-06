@@ -3,8 +3,8 @@ package hardware
 import (
 	"fmt"
 
-	"github.com/kidoman/embd"
 	"github.com/Polarishq/middleware/framework/log"
+	"github.com/kidoman/embd"
 )
 
 // WS2801 privdes an interface for communicating with an LED strip which uses the WS2801 chip

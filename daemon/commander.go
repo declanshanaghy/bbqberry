@@ -27,6 +27,7 @@ func NewCommander() *Commander {
 func (cmdr *Commander) StartBackground() error {
 	log.Debug("action=method_entry")
 	defer log.Debug("action=method_exit")
+
 	return cmdr.startBackground(cmdr)
 }
 

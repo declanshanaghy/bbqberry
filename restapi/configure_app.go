@@ -80,21 +80,40 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 		func(params temperature.GetMonitorsParams) middleware.Responder {
 			return framework.HandleAPIRequestWithError(backend.GetTemperatureMonitors(&params))
 		})
-
-	hardware.Startup()
+	
+	globalMiddleware := setupGlobalMiddleware(api.Serve(setupMiddlewares))
+	
+	globalStartup()
 	api.ServerShutdown = func() {
 		globalShutdown()
 	}
+	
+	return globalMiddleware
+}
 
-	return setupGlobalMiddleware(api.Serve(setupMiddlewares))
+func globalStartup() {
+	log.Info("action=method_entry")
+	defer log.Info("action=method_exit")
+
+	hardware.Startup()
+	
+	if ( ! commander.IsRunning() ) {
+		if err := commander.StartBackground(); err != nil {
+			panic(err)
+		}
+	}
+	
+	return
 }
 
 func globalShutdown() {
 	log.Info("action=method_entry")
 	defer log.Info("action=method_exit")
-
-	if err := commander.StopBackground(); err != nil {
-		log.Error(err.Error())
+	
+	if ( commander.IsRunning() ) {
+		if err := commander.StopBackground(); err != nil {
+			panic(err)
+		}
 	}
 		
 	hardware.Shutdown()
@@ -110,12 +129,6 @@ func configureTLS(tlsConfig *tls.Config) {
 // This function can be called multiple times, depending on the number of serving schemes.
 // scheme value will be set accordingly: "http", "https" or "unix"
 func configureServer(s *graceful.Server, scheme string) {
-	log.Debug("action=method_entry scheme=%s", scheme)
-	defer log.Debug("action=method_exit scheme=%s", scheme)
-
-	if scheme == "http" {
-		commander.StartBackground()
-	}
 }
 
 // The middleware configuration is for the handler executors. These do not apply to the swagger.json document.

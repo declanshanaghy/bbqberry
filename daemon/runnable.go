@@ -35,7 +35,12 @@ type runner struct {
 	tickable Tickable
 }
 
-// StartBackground starts the main loop of the runner resulting the the given
+// IsRunning returns the internal state representing if the main loop is running or not.
+func (r *runner) IsRunning() bool {
+	return r.running
+}
+
+// startBackground starts the main loop of the runner resulting the the given
 // Tickable being executed on the default Ticker schedule
 func (r *runner) startBackground(tickable Tickable) error {
 	log.Debugf("action=method_entry name=%s", tickable.GetName())

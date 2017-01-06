@@ -1,6 +1,7 @@
 package hardware_test
 
 import (
+	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	. "github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/stubs/stubembd"
@@ -21,9 +22,11 @@ var _ = Describe("WS2801", func() {
 	})
 
 	Context("sanity checks", func() {
+		hwCfg := framework.Constants.Hardware
+
 		It("should return correct pixel count", func() {
 			numPixels := strand.GetNumPixels()
-			Expect(hardware.HardwareConfig.NumLEDPixels).To(Equal(numPixels))
+			Expect(hwCfg.NumLEDPixels).To(Equal(numPixels))
 		})
 		It("should fail on exceeding max pixel count", func() {
 			numPixels := strand.GetNumPixels()

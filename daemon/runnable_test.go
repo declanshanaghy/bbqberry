@@ -70,7 +70,7 @@ var _ = Describe("The runner", func() {
 			err := t.StartBackground()
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(t.running).To(BeTrue(), "Expected the tickable to be running")
+			Expect(t.IsRunning()).To(BeTrue(), "Expected the tickable to be running")
 
 			// This should allow at least 1 tickable execution
 			time.Sleep(time.Millisecond)
@@ -78,6 +78,8 @@ var _ = Describe("The runner", func() {
 			// Requesting stop should fail because it exits on its own
 			err = t.StopBackground()
 			Expect(err).To(HaveOccurred())
+
+			Expect(t.IsRunning()).To(BeFalse(), "Expected the tickable to not be running")
 
 			Expect(t.startCalls).Should(Equal(1), "Number of calls to start is incorrect")
 			Expect(t.tickCalls).Should(Equal(1), "Number of calls to tick is incorrect")
