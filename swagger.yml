@@ -160,6 +160,8 @@ definitions:
         format: int32
         minimum: 0
         maximum: 1000000
+      warning:
+        type: string
       probe:
         type: integer
         format: int32

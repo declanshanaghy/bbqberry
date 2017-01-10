@@ -12,14 +12,15 @@ import (
 	"github.com/kidoman/embd/convertors/mcp3008"
 )
 
-var fakeTemps = make(map[int32]int32, 0)
+// FakeTemps can be set to return specific analog readings during tests
+var FakeTemps = make(map[int32]int32, 0)
 
 func init() {
 	hardware := framework.Constants.Hardware
 
 	if framework.Constants.Stub {
 		for i := int32(1); i <= hardware.NumTemperatureProbes; i++ {
-			fakeTemps[i] = i
+			FakeTemps[i] = i
 		}
 	}
 }
@@ -71,11 +72,11 @@ func (s *temperatureReader) readProbe(probe int32) (v int32, err error) {
 		return 0, err
 	}
 	if framework.Constants.Stub {
-		v = fakeTemps[probe] + 1
+		v = FakeTemps[probe] + 1
 		if v == 1024 {
 			v = 0
 		}
-		fakeTemps[probe] = v
+		FakeTemps[probe] = v
 	} else {
 		iv, err := s.adc.AnalogValueAt(int(probe - 1))
 		v = int32(iv)
@@ -107,19 +108,22 @@ func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 		   ---
 			gnd	(0v)
 	*/
-	vcc := float32(3.3)
-	maxA := float32(1024.0)
-	vPerA := vcc / maxA
-	r2 := float32(1000.0)
-	vOut := float32(analog) * vPerA
-
-	// When previously using a thermistor the resistance was needed
-	// It's not needed at all for a thermocoupld based system. Leaving it here for the laugh!
-	r1 := int32(((vcc * r2) / vOut) - r2)
+	hwCfg := framework.Constants.Hardware
+	vOut := float32(analog) * hwCfg.AnalogVoltsPerUnit
+	r1 := int32(((hwCfg.VCC * hwCfg.VDivR2) / vOut) - hwCfg.VDivR2)
 
 	tempK, tempC, tempF := adafruitAD8495ThermocoupleVtoKCF(vOut)
 	log.Infof("probe=%d, A=%d, R=%d, V=%0.5f, K=%0.5f, C=%0.5f, F=%0.5f", probe, analog, r1, vOut, tempK, tempC, tempF)
-
+	
+	if tempC < hwCfg.MinTempWarnCelsius {
+		reading.Warning = fmt.Sprintf("Low temperature limit exceeded: actual=%0.2f °C < threshold=%0.2f °C",
+			tempC, hwCfg.MinTempWarnCelsius)
+	}
+	if tempC > hwCfg.MaxTempWarnCelsius {
+		reading.Warning = fmt.Sprintf("High temperature limit exceeded: actual=%0.2f °C > threshold=%0.2f °C",
+			tempC, hwCfg.MaxTempWarnCelsius)
+	}
+	
 	t := strfmt.DateTime(time.Now())
 	reading.Probe = &probe
 	reading.DateTime = &t
@@ -149,16 +153,9 @@ func adafruitAD8495ThermocoupleVtoKCF(v float32) (tempK float32, tempC float32, 
 	return
 }
 
-// convertKToCF converts a celsius temperature to kelvin and fahrenheit
+// convertCToKF converts a celsius temperature to kelvin and fahrenheit
 func convertCToKF(tempC float32) (tempK float32, tempF float32) {
 	tempK = tempC + 273.15 // C to K
-	tempF = tempC*1.8 + 32 // C to F
-	return
-}
-
-// convertKToCF converts a kelvin temperature to celsius and fahrenheit
-func convertKToCF(tempK float32) (tempC float32, tempF float32) {
-	tempC = tempK - 273.15 // K to C
 	tempF = tempC*1.8 + 32 // C to F
 	return
 }
