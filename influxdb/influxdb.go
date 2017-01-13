@@ -13,6 +13,8 @@ import (
 )
 
 var defaultTimeout = time.Second
+
+// Settings holds all pertient connection parameters for InfluxDB
 var Settings *influxDBSettings
 
 type influxDBSettings struct {
@@ -24,13 +26,10 @@ type influxDBSettings struct {
 }
 
 func init() {
-	s := LoadConfig()
-	Settings = s
-	log.Infof("action=init Settings=%+v", Settings)
+	loadConfig()
 }
 
-// LoadConfig loads the influxdb connection settings
-func LoadConfig() *influxDBSettings {
+func loadConfig() {
 	database := os.Getenv("INFLUXDB")
 	if database == "" {
 		database = "no_name_given"
@@ -52,7 +51,7 @@ func LoadConfig() *influxDBSettings {
 	username := os.Getenv("INFLUXDB_USERNAME")
 	password := os.Getenv("INFLUXDB_PASSWORD")
 	
-	s := influxDBSettings{
+	Settings = &influxDBSettings{
 		Config: client.Config{
 			URL: URL,
 			Username: username,
@@ -62,9 +61,7 @@ func LoadConfig() *influxDBSettings {
 		Host: host,
 		Port: port,
 	}
-	log.Infof("action=LoadConfig influxDBSettings=%+v URL=%s", s, s.URL.String())
-	
-	return &s
+	log.Infof("action=LoadConfig influxDBSettings=%+v URL=%s", Settings, Settings.URL.String())
 }
 
 // NewClientWithTimeout will retry pinging the server until a specified timeout passes
