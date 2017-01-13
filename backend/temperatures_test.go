@@ -61,7 +61,7 @@ var _ = Describe("Termperatures API", func() {
 				fmt.Sprintf("Probe %d has incorrect number", i))
 			dt, err := strfmt.ParseDateTime(reading.DateTime.String())
 			Expect(err).ToNot(HaveOccurred())
-			Expect(time.Time(dt)).Should(BeTemporally("~", started))
+			Expect(time.Time(dt)).Should(BeTemporally("~", started, time.Second))
 		}
 	})
 })

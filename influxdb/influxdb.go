@@ -68,15 +68,49 @@ func LoadConfig() {
 
 // NewClient creates a new raw InfluxDB client
 func NewClient() (*client.Client, error) {
-	c, err := client.NewClient(Cfg.Config)
-	if err != nil {
-		return nil, fmt.Errorf("Could not create client %s", err)
+	return NewClientWithRetry(time.Nanosecond)
+}
+
+// NewClientWithRetry will retry pinging the server until a specified timeout passes
+func NewClientWithRetry(timeout time.Duration) (c *client.Client, err error) {
+	deadline := time.Now().Add(timeout)
+	sleep := time.Millisecond * 100
+	iterations := 0
+	
+	hasTimedout := func() bool {
+		return time.Now().After(deadline)
 	}
-	duration, v, err := c.Ping()
-	log.Debugf("action=influx_ping t=%v version=%s err=%v", duration, v, err)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to %s: %v", Cfg.Config.URL.String(), err.Error())
+	
+	for true {
+		iterations++
+		
+		if iterations > 1 {
+			log.Errorf("action=sleeping duration=%v", sleep)
+			time.Sleep(sleep)
+		}
+		
+		c, err := client.NewClient(Cfg.Config)
+		if err != nil {
+			log.Errorf("action=create_client err=%v", err)
+			if hasTimedout() {
+				return nil, fmt.Errorf("Could not create client %s", err)
+			}
+			continue
+		}
+		
+		duration, v, err := c.Ping()
+		if err != nil {
+			log.Errorf("action=ping t=%v version=%s err=%v", duration, v, err)
+			if hasTimedout() {
+				return nil, fmt.Errorf("failed to connect to %s: %v", Cfg.Config.URL.String(), err.Error())
+			}
+			continue
+		}
+		
+		// If we made it this far everything is working
+		break
 	}
+	
 	return c, nil
 }
 

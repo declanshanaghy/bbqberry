@@ -7,10 +7,11 @@ import (
 	"encoding/json"
 	"github.com/influxdata/influxdb/client"
 	"os"
+	"time"
 )
 
 func main() {
-	c, err := influxdb.NewClient()
+	c, err := influxdb.NewClientWithRetry(time.Second * 10)
 	if err != nil {
 		fmt.Println(err, os.Stderr)
 		os.Exit(1)

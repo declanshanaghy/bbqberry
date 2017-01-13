@@ -2,8 +2,6 @@
 - type: serial
   service: builder
   steps:
-  - name: Wait for influx
-    command: sleep 10
   - name: Run tests & publish code coverage
     command: make unittest_bbqberry coveralls
   - name: Build Executable
