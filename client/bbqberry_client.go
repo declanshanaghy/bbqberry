@@ -13,7 +13,7 @@ import (
 	"github.com/declanshanaghy/bbqberry/client/temperature"
 )
 
-// Default app HTTP client.
+// Default bbqberry HTTP client.
 var Default = NewHTTPClient(nil)
 
 const (
@@ -28,14 +28,14 @@ const (
 // DefaultSchemes are the default schemes found in Meta (info) section of spec file
 var DefaultSchemes = []string{"http"}
 
-// NewHTTPClient creates a new app HTTP client.
-func NewHTTPClient(formats strfmt.Registry) *App {
+// NewHTTPClient creates a new bbqberry HTTP client.
+func NewHTTPClient(formats strfmt.Registry) *Bbqberry {
 	return NewHTTPClientWithConfig(formats, nil)
 }
 
-// NewHTTPClientWithConfig creates a new app HTTP client,
+// NewHTTPClientWithConfig creates a new bbqberry HTTP client,
 // using a customizable transport config.
-func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *App {
+func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *Bbqberry {
 	// ensure nullable parameters have default
 	if formats == nil {
 		formats = strfmt.Default
@@ -49,9 +49,9 @@ func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *App
 	return New(transport, formats)
 }
 
-// New creates a new app client
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *App {
-	cli := new(App)
+// New creates a new bbqberry client
+func New(transport runtime.ClientTransport, formats strfmt.Registry) *Bbqberry {
+	cli := new(Bbqberry)
 	cli.Transport = transport
 
 	cli.Health = health.New(transport, formats)
@@ -100,8 +100,8 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 	return cfg
 }
 
-// App is a client for app
-type App struct {
+// Bbqberry is a client for bbqberry
+type Bbqberry struct {
 	Health *health.Client
 
 	Temperature *temperature.Client
@@ -110,7 +110,7 @@ type App struct {
 }
 
 // SetTransport changes the transport on the client and all its subresources
-func (c *App) SetTransport(transport runtime.ClientTransport) {
+func (c *Bbqberry) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 
 	c.Health.SetTransport(transport)

@@ -3,12 +3,12 @@ package restapi
 import (
 	"crypto/tls"
 	"net/http"
-
+	
 	errors "github.com/go-openapi/errors"
 	runtime "github.com/go-openapi/runtime"
 	middleware "github.com/go-openapi/runtime/middleware"
 	graceful "github.com/tylerb/graceful"
-
+	
 	"github.com/Polarishq/middleware/framework"
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/Polarishq/middleware/handlers"
@@ -39,7 +39,7 @@ type cmdOptions struct {
 
 var cmdOptionsValues cmdOptions
 
-func configureFlags(api *operations.AppAPI) {
+func configureFlags(api *operations.BbqberryAPI) {
 	log.Debug("action=method_entry")
 	defer log.Debug("action=method_exit")
 	
@@ -52,22 +52,19 @@ func configureFlags(api *operations.AppAPI) {
 	}
 }
 
-func configureAPI(api *operations.AppAPI) http.Handler {
-	log.Info("action=method_entry")
-	defer log.Info("action=method_exit")
-	
+func configureAPI(api *operations.BbqberryAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
-
+	
 	log.SetDebug(cmdOptionsValues.Verbose)
 	if cmdOptionsValues.LogFile != "" {
 		log.SetOutput(cmdOptionsValues.LogFile)
 	}
 	api.Logger = log.Infof
-
+	
 	api.JSONConsumer = runtime.JSONConsumer()
 	api.JSONProducer = runtime.JSONProducer()
-
+	
 	api.HealthHealthHandler = health.HealthHandlerFunc(
 		func(params health.HealthParams) middleware.Responder {
 			return framework.HandleAPIRequestWithError(backend.Health())
@@ -94,7 +91,7 @@ func configureAPI(api *operations.AppAPI) http.Handler {
 func globalStartup() {
 	log.Info("action=method_entry")
 	defer log.Info("action=method_exit")
-
+	
 	hardware.Startup()
 	
 	if ( ! commander.IsRunning() ) {
@@ -115,7 +112,7 @@ func globalShutdown() {
 			panic(err)
 		}
 	}
-		
+	
 	hardware.Shutdown()
 }
 
@@ -142,7 +139,7 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
 	log.Debug("action=method_entry")
 	defer log.Debug("action=method_exit")
-
+	
 	return handlers.NewPanicHandler(
 		handlers.NewLoggingHandler(
 			handlers.NewSwaggerUIHandler(cmdOptionsValues.StaticDir, handler)))

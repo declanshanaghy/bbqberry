@@ -21,7 +21,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	api := operations.NewAppAPI(swaggerSpec)
+	api := operations.NewBbqberryAPI(swaggerSpec)
 	server := restapi.NewServer(api)
 	defer server.Shutdown()
 
