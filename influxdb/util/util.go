@@ -19,7 +19,7 @@ func WriteHealthCheck() (*client.Point, error) {
 
 	// Create a new point batch
 	bp, err := client.NewBatchPoints(client.BatchPointsConfig{
-		Database:  influxdb.Cfg.Database,
+		Database:  influxdb.Settings.Database,
 		Precision: "s",
 	})
 	if err != nil {

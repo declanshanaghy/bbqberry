@@ -13,11 +13,9 @@ import (
 )
 
 var defaultTimeout = time.Second
+var Settings *influxDBSettings
 
-// Cfg holds settings to communicate with influxdb
-var Cfg clientConfig
-
-type clientConfig struct {
+type influxDBSettings struct {
 	client.Config
 
 	Database string
@@ -26,11 +24,18 @@ type clientConfig struct {
 }
 
 func init() {
-	LoadConfig()
+	s := LoadConfig()
+	Settings = s
+	log.Infof("action=init Settings=%+v", Settings)
 }
 
 // LoadConfig loads the influxdb connection settings
-func LoadConfig() {
+func LoadConfig() *influxDBSettings {
+	database := os.Getenv("INFLUXDB")
+	if database == "" {
+		database = "no_name_given"
+	}
+	
 	host := os.Getenv("INFLUXDB_HOST")
 	if host == "" {
 		host = "influxdb"
@@ -39,49 +44,42 @@ func LoadConfig() {
 	if port == "" {
 		port = strconv.Itoa(client.DefaultPort)
 	}
-	username := os.Getenv("INFLUXDB_USERNAME")
-	password := os.Getenv("INFLUXDB_PASSWORD")
-	database := os.Getenv("INFLUXDB")
-	if database == "" {
-		database = "no_name_given"
-	}
-
-	addr := net.JoinHostPort(host, port)
-	URL, err := client.ParseConnectionString(addr, false)
+	URL, err := client.ParseConnectionString(net.JoinHostPort(host, port), false)
 	if err != nil {
 		panic(err)
 	}
-
-	cc := client.Config{
-		Username: username,
-		Password: password,
-		URL:      URL,
-		Timeout:  defaultTimeout,
-	}
-	Cfg = clientConfig{
+	
+	username := os.Getenv("INFLUXDB_USERNAME")
+	password := os.Getenv("INFLUXDB_PASSWORD")
+	
+	s := influxDBSettings{
+		Config: client.Config{
+			URL: URL,
+			Username: username,
+			Password: password,
+		},
 		Database: database,
-		Host:     host,
-		Port:     port,
+		Host: host,
+		Port: port,
 	}
-	Cfg.Config = cc
+	log.Infof("action=LoadConfig influxDBSettings=%+v URL=%s", s, s.URL.String())
+	
+	return &s
 }
 
-// NewClient creates a new raw InfluxDB client
-func NewClient() (*client.Client, error) {
-	return NewClientWithRetry(time.Nanosecond)
-}
-
-// NewClientWithRetry will retry pinging the server until a specified timeout passes
-func NewClientWithRetry(timeout time.Duration) (c *client.Client, err error) {
+// NewClientWithTimeout will retry pinging the server until a specified timeout passes
+func NewClientWithTimeout(timeout time.Duration) (*client.Client, error) {
 	deadline := time.Now().Add(timeout)
 	sleep := time.Millisecond * 100
 	iterations := 0
+	var c *client.Client
+	var err error
 	
 	hasTimedout := func() bool {
 		return time.Now().After(deadline)
 	}
 	
-	for true {
+	for !hasTimedout() {
 		iterations++
 		
 		if iterations > 1 {
@@ -89,7 +87,9 @@ func NewClientWithRetry(timeout time.Duration) (c *client.Client, err error) {
 			time.Sleep(sleep)
 		}
 		
-		c, err := client.NewClient(Cfg.Config)
+		cfg := Settings.Config
+		
+		c, err = client.NewClient(cfg)
 		if err != nil {
 			log.Errorf("action=create_client err=%v", err)
 			if hasTimedout() {
@@ -102,7 +102,7 @@ func NewClientWithRetry(timeout time.Duration) (c *client.Client, err error) {
 		if err != nil {
 			log.Errorf("action=ping t=%v version=%s err=%v", duration, v, err)
 			if hasTimedout() {
-				return nil, fmt.Errorf("failed to connect to %s: %v", Cfg.Config.URL.String(), err.Error())
+				return nil, fmt.Errorf("failed to connect to %s: %v", cfg.URL.String(), err.Error())
 			}
 			continue
 		}
@@ -111,15 +111,15 @@ func NewClientWithRetry(timeout time.Duration) (c *client.Client, err error) {
 		break
 	}
 	
-	return c, nil
+	return c, err
 }
 
 // ExecuteQuery executes the given query against the database and returns the response or an error
 func ExecuteQuery(c *client.Client, query string) (*client.Response, error) {
-	log.Info("action=ExecuteQuery q=" + query)
+	log.Infof("action=ExecuteQuery q=%s client=%+v", query, c)
 	q := client.Query{
 		Command:  query,
-		Database: Cfg.Database,
+		Database: Settings.Database,
 		Chunked:  true,
 	}
 	response, err := c.Query(q)
@@ -131,17 +131,17 @@ func ExecuteQuery(c *client.Client, query string) (*client.Response, error) {
 
 // NewHTTPClient creates a new client for reading & writing data to influxDB over HTTP
 func NewHTTPClient() (v2.Client, error) {
-	addr := Cfg.Config.URL.String()
+	addr := Settings.Config.URL.String()
 	c, err := v2.NewHTTPClient(v2.HTTPConfig{
 		Addr:     addr,
-		Username: Cfg.Config.Username,
-		Password: Cfg.Config.Password,
+		Username: Settings.Config.Username,
+		Password: Settings.Config.Password,
 		Timeout:  defaultTimeout,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	log.Infof("action=NewHTTPClient addr=%s username=%s", addr, Cfg.Config.Username)
+	log.Infof("action=NewHTTPClient addr=%s username=%s", addr, Settings.Config.Username)
 	return c, nil
 }

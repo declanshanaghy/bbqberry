@@ -14,7 +14,7 @@ func WriteExamplePoint(c client.Client, name string, tags map[string]string,
 
 	// Create a new point batch
 	bp, err := client.NewBatchPoints(client.BatchPointsConfig{
-		Database:  influxdb.Cfg.Database,
+		Database:  influxdb.Settings.Database,
 		Precision: "s",
 	})
 

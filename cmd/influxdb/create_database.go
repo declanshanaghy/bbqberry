@@ -11,13 +11,13 @@ import (
 )
 
 func main() {
-	c, err := influxdb.NewClientWithRetry(time.Second * 10)
+	c, err := influxdb.NewClientWithTimeout(time.Second * 10)
 	if err != nil {
 		fmt.Println(err, os.Stderr)
 		os.Exit(1)
 	}
 
-	r, err := influxdb.ExecuteQuery(c, "CREATE DATABASE " + influxdb.Cfg.Database)
+	r, err := influxdb.ExecuteQuery(c, "CREATE DATABASE " + influxdb.Settings.Database)
 	if err != nil {
 		fmt.Println(err, os.Stderr)
 		os.Exit(1)
