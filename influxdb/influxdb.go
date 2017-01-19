@@ -26,10 +26,10 @@ type influxDBSettings struct {
 }
 
 func init() {
-	loadConfig()
+	LoadConfig()
 }
 
-func loadConfig() {
+func LoadConfig() {
 	database := os.Getenv("INFLUXDB")
 	if database == "" {
 		database = "no_name_given"

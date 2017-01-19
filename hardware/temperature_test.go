@@ -5,7 +5,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/models"
-	"fmt"
 	"github.com/declanshanaghy/bbqberry/framework"
 )
 
@@ -35,7 +34,6 @@ var _ = Describe("TemperatureReader Object", func() {
 
 			hardware.FakeTemps[1] = lowBoundary
 			reader.GetTemperatureReading(1, &reading)
-			fmt.Printf("Warning is %s\n", reading.Warning)
 
 			Expect(reading.Warning).To(Equal(""))
 			Expect(*reading.Celsius).To(BeNumerically(">", hwCfg.MinTempWarnCelsius))
@@ -56,7 +54,6 @@ var _ = Describe("TemperatureReader Object", func() {
 
 			hardware.FakeTemps[1] = highBoundary
 			reader.GetTemperatureReading(1, &reading)
-			fmt.Printf("Warning is %s\n", reading.Warning)
 
 			Expect(reading.Warning).To(Equal(""))
 			Expect(*reading.Celsius).To(BeNumerically("<", hwCfg.MaxTempWarnCelsius))
