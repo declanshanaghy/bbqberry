@@ -139,7 +139,7 @@ func NewHTTPClient() (clientV2.Client, error) {
 		return nil, err
 	}
 
-	log.Infof("action=NewHTTPClient addr=%s username=%s", addr, Settings.Config.Username)
+	log.Debugf("action=NewHTTPClient addr=%s username=%s", addr, Settings.Config.Username)
 	return c, nil
 }
 

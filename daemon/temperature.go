@@ -61,24 +61,14 @@ func (tl *temperatureLogger) tick() bool {
 	log.Debug("action=tick")
 	defer log.Debug("action=tick")
 
-	incAndCheckError := func() bool {
-		tl.errorCount++
-		if tl.errorCount > 10 {
-			return false
-		}
-		return true
-	}
-
 	readings, err := tl.collectTemperatureMetrics()
 	if err != nil {
 		log.Error(err.Error())
-		return incAndCheckError()
 	}
 
 	err = tl.logTemperatureMetrics(readings)
 	if err != nil {
 		log.Error(err.Error())
-		return incAndCheckError()
 	}
 
 	return true

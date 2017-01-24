@@ -51,6 +51,7 @@ var _ = Describe("Temperature daemon", func() {
 	It("should log temperature readings successfully", func() {
 		temperatureLogger := newTemperatureLogger()
 		readings := models.TemperatureReadings{}
+
 		for i := int32(0); i < 5; i++ {
 			t := strfmt.DateTime(time.Now())
 			p := 10 * i
