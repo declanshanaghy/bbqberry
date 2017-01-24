@@ -29,6 +29,7 @@ func init() {
 	LoadConfig()
 }
 
+// LoadConfig (re)loads the influxDB config so a connection can be initialized
 func LoadConfig() {
 	database := os.Getenv("INFLUXDB")
 	if database == "" {
