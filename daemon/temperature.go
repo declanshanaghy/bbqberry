@@ -4,14 +4,18 @@ import (
 	"time"
 
 	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/models"
+	"github.com/declanshanaghy/bbqberry/influxdb"
+	"fmt"
 )
 
 // temperatureLogger collects and logs temperature metrics
 type temperatureLogger struct {
 	runner
 	reader hardware.TemperatureReader
+	errorCount	int
 }
 
 // newTemperatureLogger creates a new temperatureLogger instance which can be
@@ -57,12 +61,30 @@ func (tl *temperatureLogger) tick() bool {
 	log.Debug("action=tick")
 	defer log.Debug("action=tick")
 
-	readings := tl.collectTemperatureMetrics()
-	tl.logTemperatureMetrics(readings)
+	incAndCheckError := func() bool {
+		tl.errorCount++
+		if tl.errorCount > 10 {
+			return false
+		}
+		return true
+	}
+
+	readings, err := tl.collectTemperatureMetrics()
+	if err != nil {
+		log.Error(err.Error())
+		return incAndCheckError()
+	}
+
+	err = tl.logTemperatureMetrics(readings)
+	if err != nil {
+		log.Error(err.Error())
+		return incAndCheckError()
+	}
+
 	return true
 }
 
-func (tl *temperatureLogger) collectTemperatureMetrics() *models.TemperatureReadings {
+func (tl *temperatureLogger) collectTemperatureMetrics() (*models.TemperatureReadings, error) {
 	log.Debug("action=method_entry numProbes=%d", tl.reader.GetNumProbes())
 	defer log.Debug("action=method_exit")
 
@@ -71,14 +93,28 @@ func (tl *temperatureLogger) collectTemperatureMetrics() *models.TemperatureRead
 		log.Debugf("action=iterate probe=%d", i)
 		reading := models.TemperatureReading{}
 		if err := tl.reader.GetTemperatureReading(i, &reading); err != nil {
-			log.Error(err)
+			return nil, err
 		}
 		readings = append(readings, &reading)
 	}
-	return &readings
+	return &readings, nil
 }
 
-func (tl *temperatureLogger) logTemperatureMetrics(readings *models.TemperatureReadings) {
+func (tl *temperatureLogger) logTemperatureMetrics(readings *models.TemperatureReadings) error {
 	log.Debugf("action=method_entry numReadings=%d", len(*readings))
 	defer log.Debug("action=method_exit")
+
+	for _, reading := range *readings {
+		tags := map[string]string{
+			"probe": fmt.Sprintf("%d", reading.Probe),
+		}
+		fields := map[string]interface{}{
+			"version": framework.Constants.Version,
+		}
+		if _, err := influxdb.WritePoint("temp", tags, fields); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

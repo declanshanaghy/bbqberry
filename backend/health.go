@@ -4,8 +4,8 @@ import (
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/framework/errorcodes"
-	"github.com/declanshanaghy/bbqberry/influxdb/util"
 	"github.com/declanshanaghy/bbqberry/models"
+	"github.com/declanshanaghy/bbqberry/influxdb"
 )
 
 // Health performs all internal health checks to ensure all systems are functioning
@@ -22,7 +22,12 @@ func Health() (m models.Health, err error) {
 	si.Version = &framework.Constants.Version
 	m.ServiceInfo = si
 
-	_, err = util.WriteHealthCheck()
+	tags := map[string]string{"service": framework.Constants.ServiceName}
+	fields := map[string]interface{}{
+		"version": framework.Constants.Version,
+	}
+
+	_, err = influxdb.WritePoint("health", tags, fields)
 	if err != nil {
 		log.Error(err)
 		e := new(models.Error)

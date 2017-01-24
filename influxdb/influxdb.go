@@ -9,7 +9,7 @@ import (
 
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/influxdata/influxdb/client"
-	v2 "github.com/influxdata/influxdb/client/v2"
+	clientV2 "github.com/influxdata/influxdb/client/v2"
 )
 
 var defaultTimeout = time.Second
@@ -127,9 +127,9 @@ func ExecuteQuery(c *client.Client, query string) (*client.Response, error) {
 }
 
 // NewHTTPClient creates a new client for reading & writing data to influxDB over HTTP
-func NewHTTPClient() (v2.Client, error) {
+func NewHTTPClient() (clientV2.Client, error) {
 	addr := Settings.Config.URL.String()
-	c, err := v2.NewHTTPClient(v2.HTTPConfig{
+	c, err := clientV2.NewHTTPClient(clientV2.HTTPConfig{
 		Addr:     addr,
 		Username: Settings.Config.Username,
 		Password: Settings.Config.Password,
@@ -141,4 +141,36 @@ func NewHTTPClient() (v2.Client, error) {
 
 	log.Infof("action=NewHTTPClient addr=%s username=%s", addr, Settings.Config.Username)
 	return c, nil
+}
+
+// WritePoint writes a single point to the DB with the given, name, tags and fields
+func WritePoint(name string, tags map[string]string, fields map[string]interface{}) (*clientV2.Point, error) {
+	c, err := NewHTTPClient()
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a new point batch
+	bp, err := clientV2.NewBatchPoints(clientV2.BatchPointsConfig{
+		Database:  Settings.Database,
+		Precision: "s",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	pt, err := clientV2.NewPoint(name, tags, fields, time.Now())
+	if err != nil {
+		return nil, err
+	}
+
+	bp.AddPoint(pt)
+
+	// Write the batch and check for an error
+	if err = c.Write(bp); err != nil {
+		return nil, err
+	}
+
+	log.Debugf("Point=%v pt=%s", pt.Name(), pt.String())
+	return pt, nil
 }
