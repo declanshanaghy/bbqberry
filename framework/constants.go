@@ -4,6 +4,17 @@ import (
 	"os"
 )
 
+const vcc = 3.3
+const analogMax = 1024
+const r2 = 1000.0
+
+// Absolute temperature limits
+const tempLimitLowCelsius = -50
+const tempLimitHighCelsius = 250
+
+// Warn if temperature gets within this threshold of absolute limits
+const tempWarnThreshold = 0.1
+
 func init() {
 	stub := false
 	if os.Getenv("STUB") != "" {
@@ -13,40 +24,35 @@ func init() {
 	Constants = constants{
 		ServiceName: "bbqberry",
 		Version:     "v1",
-		SteinhartHart: steinhartHart{
-			// From http://www.thinksrs.com/downloads/programs/Therm%20Calc/NTCCalibrator/NTCcalculator.htm
-			// A=64, V=0.20625, R=15000, K=0.00036978864, C=-277.14963, F=-466.86932
-			// A: 0.9114243730,
-			// B: 1.915917966,
-			// C: 1.445400011,
-			//
-			// From http://www.thermistor.com/calculators.php
-			// Z/D (-4.4%/C @ 25C) Mil Ratio B 	99.6K	(iGrill 2 Probe)
-			A: 0.000535683116684,
-			B: 0.000240497428160, //(DOES NOT WORK)
-			C: 0.000000039680880,
-			//
-			// From http://www.thermistor.com/calculators.php
-			// Z/D (-4.4%/C @ 25C) Mil Ratio B 	968K	(PR-002 Ambient)
-			// A=78, V=0.25136718, R=12128, K=446.0333, C=168.8833, F=335.98993		(Actual ~330)
-			// A: 0.000001913640634,
-			// B: 0.000238220028939,					//(WORKS)
-			// C: 0.000000031739980,
+		Stub:        stub,
+		Hardware: hardwareConfig{
+			NumLEDPixels:           18,
+			NumTemperatureProbes:   3,
+			VCC:                    vcc,
+			VDivR2:                 r2,
+			AnalogVoltsPerUnit:     vcc / analogMax,
+			MinTempWarnCelsius:     tempLimitLowCelsius - (tempLimitLowCelsius * tempWarnThreshold),
+			MaxTempWarnCelsius:     tempLimitHighCelsius - (tempLimitHighCelsius * tempWarnThreshold),
 		},
-		Stub: stub,
 	}
 }
 
-// SteinhartHart holds the co-efficients for the SteinhartHart temperature calculations
-type steinhartHart struct {
-	A, B, C float64
+func init() {
+}
+
+// hardwareConfig represents the underlying physical hardware
+type hardwareConfig struct {
+	NumLEDPixels            int
+	NumTemperatureProbes    int32
+	VCC, VDivR2, AnalogVoltsPerUnit             float32
+	MinTempWarnCelsius, MaxTempWarnCelsius      float32
 }
 
 type constants struct {
-	ServiceName   string
-	Version       string
-	SteinhartHart steinhartHart
-	Stub          bool
+	ServiceName string
+	Version     string
+	Stub        bool
+	Hardware    hardwareConfig
 }
 
 // Constants contains static information about the running service

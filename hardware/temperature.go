@@ -2,7 +2,6 @@ package hardware
 
 import (
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/Polarishq/middleware/framework/log"
@@ -13,9 +12,21 @@ import (
 	"github.com/kidoman/embd/convertors/mcp3008"
 )
 
-// TemperatureArray provides an interface to read temperature values from the physical
-// temperature probes
-type TemperatureArray interface {
+// FakeTemps can be set to return specific analog readings during tests
+var FakeTemps = make(map[int32]int32, 0)
+
+func init() {
+	hardware := framework.Constants.Hardware
+
+	if framework.Constants.Stub {
+		for i := int32(1); i <= hardware.NumTemperatureProbes; i++ {
+			FakeTemps[i] = i
+		}
+	}
+}
+
+// TemperatureReader provides an interface to read temperature values from the physical temperature probes
+type TemperatureReader interface {
 	// GetTemperatureReading reads the tempearature from the requested probe
 	GetTemperatureReading(probe int32, reading *models.TemperatureReading) error
 	// GetNumProbes returns the number of configured temperature probes
@@ -24,107 +35,127 @@ type TemperatureArray interface {
 	Close()
 }
 
-type temperatureArray struct {
+type temperatureReader struct {
 	numProbes int32
 	bus       embd.SPIBus
 	adc       *mcp3008.MCP3008
 }
 
-var fakeTemps = make(map[int32]int, 0)
-
-// NewTemperatureArray constructs a concrete implementation of
-// TemperatureArray which can communicate with the underlying hardware
-func NewTemperatureArray(numProbes int32, bus embd.SPIBus) TemperatureArray {
-	return &temperatureArray{
+// newTemperatureReader constructs a concrete implementation of
+// TemperatureReader which can communicate with the underlying hardware
+func newTemperatureReader(numProbes int32, bus embd.SPIBus) TemperatureReader {
+	return &temperatureReader{
 		numProbes: numProbes,
 		bus:       bus,
 		adc:       mcp3008.New(mcp3008.SingleMode, bus),
 	}
 }
 
-func (s *temperatureArray) Close() {
+func (s *temperatureReader) Close() {
 	log.Info("action=Close")
 	s.bus.Close()
 }
 
-func (s *temperatureArray) GetNumProbes() int32 {
+func (s *temperatureReader) GetNumProbes() int32 {
 	return s.numProbes
 }
 
-func (s *temperatureArray) errorCheckProbeNumber(probe int32) error {
+func (s *temperatureReader) errorCheckProbeNumber(probe int32) error {
 	if probe < 1 || probe > s.numProbes {
 		return fmt.Errorf("Invalid probe: %d. Must be between 1 and %d", probe, s.numProbes)
 	}
 	return nil
 }
 
-func (s *temperatureArray) readProbe(probe int32) (int32, error) {
-	var v int
-	var err error
-
+func (s *temperatureReader) readProbe(probe int32) (v int32, err error) {
 	if err := s.errorCheckProbeNumber(probe); err != nil {
 		return 0, err
 	}
 	if framework.Constants.Stub {
-		v = fakeTemps[probe] + 1
+		v = FakeTemps[probe] + 1
 		if v == 1024 {
 			v = 0
 		}
-		fakeTemps[probe] = v
+		FakeTemps[probe] = v
 	} else {
-		v, err = s.adc.AnalogValueAt(int(probe - 1))
+		iv, err := s.adc.AnalogValueAt(int(probe - 1))
+		v = int32(iv)
 		if err != nil {
 			return 0, err
 		}
 	}
-	log.Infof("action=readProbe probe=%v v=%v", probe, v)
+	log.Debugf("action=readProbe probe=%v v=%v", probe, v)
 	return int32(v), err
 }
 
-func (s *temperatureArray) GetTemperatureReading(probe int32, reading *models.TemperatureReading) error {
-	a, err := s.readProbe(probe)
+func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.TemperatureReading) error {
+	analog, err := s.readProbe(probe)
 	if err != nil {
 		return err
 	}
-	k, c, f, v, o := SteinhartHart(a)
 
-	time := strfmt.DateTime(time.Now())
+	/*
+		Voltage divider configuration
+			vcc	(3.3v)
+		    /\
+			|
+			r1	(Temp Sensor)
+			|
+			|------> vOut
+			|
+			r2	(1k)
+			|
+		   ---
+			gnd	(0v)
+	*/
+	hwCfg := framework.Constants.Hardware
+	vOut := float32(analog) * hwCfg.AnalogVoltsPerUnit
+	r1 := int32(((hwCfg.VCC * hwCfg.VDivR2) / vOut) - hwCfg.VDivR2)
+
+	tempK, tempC, tempF := adafruitAD8495ThermocoupleVtoKCF(vOut)
+	log.Infof("probe=%d, A=%d, R=%d, V=%0.5f, K=%0.5f, C=%0.5f, F=%0.5f", probe, analog, r1, vOut, tempK, tempC, tempF)
+	
+	if tempC < hwCfg.MinTempWarnCelsius {
+		reading.Warning = fmt.Sprintf("Low temperature limit exceeded: actual=%0.2f °C < threshold=%0.2f °C",
+			tempC, hwCfg.MinTempWarnCelsius)
+	}
+	if tempC > hwCfg.MaxTempWarnCelsius {
+		reading.Warning = fmt.Sprintf("High temperature limit exceeded: actual=%0.2f °C > threshold=%0.2f °C",
+			tempC, hwCfg.MaxTempWarnCelsius)
+	}
+	
+	t := strfmt.DateTime(time.Now())
 	reading.Probe = &probe
-	reading.Time = &time
-	reading.Analog = &a
-	reading.Voltage = &v
-	reading.Resistance = &o
-	reading.Kelvin = &k
-	reading.Celsius = &c
-	reading.Fahrenheit = &f
+	reading.DateTime = &t
+	reading.Analog = &analog
+	reading.Voltage = &vOut
+	reading.Resistance = &r1
+	reading.Kelvin = &tempK
+	reading.Celsius = &tempC
+	reading.Fahrenheit = &tempF
 
 	return nil
 }
 
-// SteinhartHart calculates temperature from the given analog value using the Steinhart Hart formula
-func SteinhartHart(analog int32) (tempK float32, tempC float32, tempF float32, voltage float32, resistance int32) {
-	// iBBQ probe is 100.8K at 25c
+// adafruitAD8495ThermocoupleVtoKCF converts the voltage read from the Adafruit Thermocouple breakout board
+// to temperatures in Kelvin, Celsius and Fahrenheit
+func adafruitAD8495ThermocoupleVtoKCF(v float32) (tempK float32, tempC float32, tempF float32) {
+	// https://www.adafruit.com/product/1778
+	// Analog Output K-Type Thermocouple Amplifier - AD8495 Breakout
+	// PRODUCT ID: 1778
+	// Temperature = (Vout - 1.25) / 0.005 V
+	// e.g:
+	// v = 1.5VDC
+	// The temperature is (1.5 - 1.25) / 0.005 = 50°C
 
-	volts := (float64(analog) * 3.3) / 1024 // calculate the voltage
-	voltage = float32(volts)
-	ohms := ((1 / volts) * 3300) - 1000 // calculate the resistance of the thermististor
-	resistance = int32(ohms)
+	tempC = (v - 1.25) / 0.005
+	tempK, tempF = convertCToKF(tempC)
+	return
+}
 
-	lnohm := math.Log1p(ohms) // take ln(ohms)
-
-	a := framework.Constants.SteinhartHart.A
-	b := framework.Constants.SteinhartHart.B
-	c := framework.Constants.SteinhartHart.C
-
-	// Steinhart Hart Equation
-	// T = 1/(a + b[ln(ohm)] + c[ln(ohm)]^3)
-	t1 := (b * lnohm)     // b[ln(ohm)]
-	c2 := c * lnohm       // c[ln(ohm)]
-	t2 := math.Pow(c2, 3) // c[ln(ohm)]^3
-
-	tempK = float32(1 / (a + t1 + t2)) // Calculate temperature in Kelvin
-	tempC = tempK - 273.15 - 4         // K to C (the -4 is error correction for bad python math)
-	tempF = tempC*9/5 + 32             // Fahrenheit
-
+// convertCToKF converts a celsius temperature to kelvin and fahrenheit
+func convertCToKF(tempC float32) (tempK float32, tempF float32) {
+	tempK = tempC + 273.15 // C to K
+	tempF = tempC*1.8 + 32 // C to F
 	return
 }

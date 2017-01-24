@@ -20,7 +20,7 @@ func reader(w *sync.WaitGroup, temp chan<- *hardware.TemperatureReading, t hardw
 				log.Errorf("pkg: %v err=%v ok=%v", r, err, ok)
 			}
 		}
-		log.Infof("action=done")
+		log.Infof("action=method_exit")
 		w.Done()
 	}()
 
@@ -47,7 +47,7 @@ func processor(w *sync.WaitGroup, temp <-chan *hardware.TemperatureReading) {
 			continue
 		}
 	}
-	log.Infof("action=done")
+	log.Infof("action=method_exit")
 	w.Done()
 }
 

@@ -127,7 +127,7 @@ definitions:
       - celsius
       - fahrenheit
       - probe
-      - time
+      - date-time
     properties:
       kelvin:
         type: number
@@ -141,7 +141,7 @@ definitions:
         type: number
         format: float
         description: Temperature reading in degrees Fahrenheit
-      time:
+      date-time:
         type: string
         format: date-time
         description: The date and time of the reading
@@ -160,6 +160,8 @@ definitions:
         format: int32
         minimum: 0
         maximum: 1000000
+      warning:
+        type: string
       probe:
         type: integer
         format: int32

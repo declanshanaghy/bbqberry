@@ -2,10 +2,10 @@
 - type: serial
   service: builder
   steps:
-  - name: Generate code, run tests & publish code coverage
-    command: make generate unittest_bbqberry coveralls
+  - name: Run tests & publish code coverage
+    command: make unittest_bbqberry coveralls
   - name: Build Executable
-    command: make generate build
+    command: make build
 
 - type: push
   service: app
