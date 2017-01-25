@@ -12,6 +12,7 @@ import (
 	"github.com/Polarishq/middleware/framework"
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/Polarishq/middleware/handlers"
+	bbqhandlers "github.com/declanshanaghy/bbqberry/framework/handlers"
 	"github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/daemon"
 	"github.com/declanshanaghy/bbqberry/hardware"
@@ -142,5 +143,5 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 	
 	return handlers.NewPanicHandler(
 		handlers.NewLoggingHandler(
-			handlers.NewSwaggerUIHandler(cmdOptionsValues.StaticDir, handler)))
+			bbqhandlers.NewStaticHandler(cmdOptionsValues.StaticDir, handler)))
 }

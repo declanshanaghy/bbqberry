@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/Polarishq/middleware/framework/log"
-	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/models"
 	"github.com/declanshanaghy/bbqberry/influxdb"
@@ -15,7 +14,6 @@ import (
 type temperatureLogger struct {
 	runner
 	reader hardware.TemperatureReader
-	errorCount	int
 }
 
 // newTemperatureLogger creates a new temperatureLogger instance which can be
@@ -36,7 +34,7 @@ func (tl *temperatureLogger) StartBackground() error {
 }
 
 func (tl *temperatureLogger) getPeriod() time.Duration {
-	return time.Second * 10
+	return time.Second * 1
 }
 
 // GetName returns a human readable name for this background task
@@ -96,10 +94,13 @@ func (tl *temperatureLogger) logTemperatureMetrics(readings *models.TemperatureR
 
 	for _, reading := range *readings {
 		tags := map[string]string{
-			"probe": fmt.Sprintf("%d", reading.Probe),
+			"Probe": fmt.Sprintf("%d", *reading.Probe),
 		}
 		fields := map[string]interface{}{
-			"version": framework.Constants.Version,
+			"Celsius": *reading.Celsius,
+			"Fahrenheit": *reading.Fahrenheit,
+			"Kelvin": *reading.Kelvin,
+			"Warning": reading.Warning,
 		}
 		if _, err := influxdb.WritePoint("temp", tags, fields); err != nil {
 			return err

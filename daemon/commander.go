@@ -10,6 +10,7 @@ import (
 type Commander struct {
 	runner
 	tempLogger *temperatureLogger
+	tempIndicator *temperatureIndicator
 }
 
 // NewCommander creates a Commander instance which can be
@@ -20,6 +21,7 @@ func NewCommander() *Commander {
 	defer log.Debug("action=method_exit")
 	return &Commander{
 		tempLogger: newTemperatureLogger(),
+		tempIndicator: newTemperatureIndicator(),
 	}
 }
 
@@ -46,6 +48,7 @@ func (cmdr *Commander) start() {
 	defer log.Debug("action=method_entry")
 
 	cmdr.tempLogger.StartBackground()
+	cmdr.tempIndicator.StartBackground()
 }
 
 // Stop performs cleanup when the goroutine is exiting
@@ -54,6 +57,7 @@ func (cmdr *Commander) stop() {
 	defer log.Debug("action=stop")
 
 	cmdr.tempLogger.StopBackground()
+	cmdr.tempIndicator.StopBackground()
 }
 
 // Tick executes on a ticker schedule

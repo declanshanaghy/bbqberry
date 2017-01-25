@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/Polarishq/middleware/framework/log"
-	"github.com/influxdata/influxdb/client"
-	clientV2 "github.com/influxdata/influxdb/client/v2"
+	clientv1 "github.com/influxdata/influxdb/client"
+	"github.com/influxdata/influxdb/client/v2"
 )
 
 var defaultTimeout = time.Second
@@ -18,7 +18,7 @@ var defaultTimeout = time.Second
 var Settings *influxDBSettings
 
 type influxDBSettings struct {
-	client.Config
+	clientv1.Config
 
 	Database string
 	Host     string
@@ -42,9 +42,9 @@ func LoadConfig() {
 	}
 	port := os.Getenv("INFLUXDB_PORT_HTTP")
 	if port == "" {
-		port = strconv.Itoa(client.DefaultPort)
+		port = strconv.Itoa(clientv1.DefaultPort)
 	}
-	URL, err := client.ParseConnectionString(net.JoinHostPort(host, port), false)
+	URL, err := clientv1.ParseConnectionString(net.JoinHostPort(host, port), false)
 	if err != nil {
 		panic(err)
 	}
@@ -53,7 +53,7 @@ func LoadConfig() {
 	password := os.Getenv("INFLUXDB_PASSWORD")
 	
 	Settings = &influxDBSettings{
-		Config: client.Config{
+		Config: clientv1.Config{
 			URL: URL,
 			Username: username,
 			Password: password,
@@ -66,11 +66,11 @@ func LoadConfig() {
 }
 
 // NewClientWithTimeout will retry pinging the server until a specified timeout passes
-func NewClientWithTimeout(timeout time.Duration) (*client.Client, error) {
+func NewClientWithTimeout(timeout time.Duration) (*clientv1.Client, error) {
 	deadline := time.Now().Add(timeout)
 	sleep := time.Millisecond * 100
 	iterations := 0
-	var c *client.Client
+	var c *clientv1.Client
 	var err error
 	
 	hasTimedout := func() bool {
@@ -87,7 +87,7 @@ func NewClientWithTimeout(timeout time.Duration) (*client.Client, error) {
 		
 		cfg := Settings.Config
 		
-		c, err = client.NewClient(cfg)
+		c, err = clientv1.NewClient(cfg)
 		if err != nil {
 			log.Errorf("action=create_client err=%v", err)
 			if hasTimedout() {
@@ -113,9 +113,9 @@ func NewClientWithTimeout(timeout time.Duration) (*client.Client, error) {
 }
 
 // ExecuteQuery executes the given query against the database and returns the response or an error
-func ExecuteQuery(c *client.Client, query string) (*client.Response, error) {
+func ExecuteQuery(c *clientv1.Client, query string) (*clientv1.Response, error) {
 	log.Infof("action=ExecuteQuery q=%s client=%+v", query, c)
-	q := client.Query{
+	q := clientv1.Query{
 		Command:  query,
 		Database: Settings.Database,
 		Chunked:  true,
@@ -128,9 +128,9 @@ func ExecuteQuery(c *client.Client, query string) (*client.Response, error) {
 }
 
 // NewHTTPClient creates a new client for reading & writing data to influxDB over HTTP
-func NewHTTPClient() (clientV2.Client, error) {
+func NewHTTPClient() (client.Client, error) {
 	addr := Settings.Config.URL.String()
-	c, err := clientV2.NewHTTPClient(clientV2.HTTPConfig{
+	c, err := client.NewHTTPClient(client.HTTPConfig{
 		Addr:     addr,
 		Username: Settings.Config.Username,
 		Password: Settings.Config.Password,
@@ -145,14 +145,14 @@ func NewHTTPClient() (clientV2.Client, error) {
 }
 
 // WritePoint writes a single point to the DB with the given, name, tags and fields
-func WritePoint(name string, tags map[string]string, fields map[string]interface{}) (*clientV2.Point, error) {
+func WritePoint(name string, tags map[string]string, fields map[string]interface{}) (*client.Point, error) {
 	c, err := NewHTTPClient()
 	if err != nil {
 		return nil, err
 	}
 
 	// Create a new point batch
-	bp, err := clientV2.NewBatchPoints(clientV2.BatchPointsConfig{
+	bp, err := client.NewBatchPoints(client.BatchPointsConfig{
 		Database:  Settings.Database,
 		Precision: "s",
 	})
@@ -160,7 +160,7 @@ func WritePoint(name string, tags map[string]string, fields map[string]interface
 		return nil, err
 	}
 
-	pt, err := clientV2.NewPoint(name, tags, fields, time.Now())
+	pt, err := client.NewPoint(name, tags, fields, time.Now())
 	if err != nil {
 		return nil, err
 	}
@@ -174,4 +174,14 @@ func WritePoint(name string, tags map[string]string, fields map[string]interface
 
 	log.Debugf("Point=%v pt=%s", pt.Name(), pt.String())
 	return pt, nil
+}
+
+func Query(query string) (*client.Response, error) {
+	c, err := NewHTTPClient()
+	if err != nil {
+		return nil, err
+	}
+	q := client.NewQuery(query, Settings.Database, "s")
+	log.Infof("query=%s", query)
+	return c.Query(q)
 }

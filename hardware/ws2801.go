@@ -15,6 +15,7 @@ type WS2801 interface {
 	Update() error
 	SetPixelRGB(n int, r uint8, g uint8, b uint8) error
 	SetPixelColor(n int, color int) error
+	SetAllPixels(color int) error
 }
 
 type ws2801Strand struct {
@@ -59,6 +60,19 @@ func (s *ws2801Strand) Update() error {
 func (s *ws2801Strand) SetPixelColor(n int, color int) error {
 	log.Debugf("action=SetPixelColor n=%d, color=%#06x", n, color)
 	return s.SetPixelRGB(n, uint8(color>>16&0xFF), uint8(color>>8&0xFF), uint8(color&0xFF))
+}
+
+func (s *ws2801Strand) SetAllPixels(color int) error {
+	log.Debugf("action=SetAllPixels n=%d, color=%#06x", color)
+	r := uint8(color >> 16 & 0xFF)
+	g := uint8(color >> 8 & 0xFF)
+	b := uint8(color & 0xFF)
+	for i := 0; i < s.GetNumPixels(); i++ {
+		if err := s.SetPixelRGB(i, r, g, b); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *ws2801Strand) SetPixelRGB(n int, r uint8, g uint8, b uint8) error {

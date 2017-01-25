@@ -13,12 +13,12 @@ import (
 func main() {
 	tReader := hardware.NewTemperatureReader()
 	for true {
-		reading = models.TemperatureReading{}
+		reading := models.TemperatureReading{}
 		err := tReader.GetTemperatureReading(1, &reading)
 		if err != nil {
 			panic(err)
 		}
-		log.Infof("READING: %+v\n", reading)
+		log.Infof("READING: %0.2f\n", *reading.Fahrenheit)
 		time.Sleep(1 * time.Second)
 	}
 }

@@ -27,7 +27,7 @@ func Health() (m models.Health, err error) {
 		"version": framework.Constants.Version,
 	}
 
-	_, err = influxdb.WritePoint("health", tags, fields)
+	_, err = influxdb.WritePoint("Health", tags, fields)
 	if err != nil {
 		log.Error(err)
 		e := new(models.Error)

@@ -77,6 +77,9 @@ func (r *runner) loop(tickable Tickable) {
 	tickable.start()
 
 	ticker := time.NewTicker(tickable.getPeriod())
+
+	// Run first tick outside the loop
+	r.running = tickable.tick()
 	for r.running {
 		select {
 		case r.running = <-r.ch:
