@@ -20,8 +20,11 @@ type StaticHandler struct {
 
 // NewStaticHandler creates a new middleware handler which serves the swagger UI
 func NewStaticHandler(dir string, handler http.Handler) *StaticHandler {
+	if dir == "" {
+		panic(errors.New("Static dir not provided"))
+	}
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		panic(errors.New(fmt.Sprintf(dir+" does not exist")))
+		panic(errors.New(fmt.Sprintf("Static dir '%s' does not exist", dir)))
 	}
 
 

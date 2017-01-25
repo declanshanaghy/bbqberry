@@ -22,7 +22,8 @@ type influxDBSettings struct {
 
 	Database string
 	Host     string
-	Port     string
+	HTTPPort string
+	UDPPort  string
 }
 
 func init() {
@@ -40,15 +41,20 @@ func LoadConfig() {
 	if host == "" {
 		host = "influxdb"
 	}
-	port := os.Getenv("INFLUXDB_PORT_HTTP")
-	if port == "" {
-		port = strconv.Itoa(clientv1.DefaultPort)
+	HTTPPort := os.Getenv("INFLUXDB_PORT_HTTP")
+	if HTTPPort == "" {
+		HTTPPort = strconv.Itoa(clientv1.DefaultPort)
 	}
-	URL, err := clientv1.ParseConnectionString(net.JoinHostPort(host, port), false)
+	URL, err := clientv1.ParseConnectionString(net.JoinHostPort(host, HTTPPort), false)
 	if err != nil {
 		panic(err)
 	}
-	
+
+	UDPPort := os.Getenv("INFLUXDB_PORT_UDP")
+	if UDPPort == "" {
+		UDPPort = "8089"
+	}
+
 	username := os.Getenv("INFLUXDB_USERNAME")
 	password := os.Getenv("INFLUXDB_PASSWORD")
 	
@@ -58,11 +64,13 @@ func LoadConfig() {
 			Username: username,
 			Password: password,
 		},
-		Database: database,
-		Host: host,
-		Port: port,
+		Database:	database,
+		Host: 		host,
+		HTTPPort:   HTTPPort,
+		UDPPort:	UDPPort,
 	}
-	log.Infof("action=LoadConfig influxDBSettings=%+v URL=%s", Settings, Settings.URL.String())
+	log.Infof("action=LoadConfig influxDBSettings=%+v URL=%s, UDPPort=%s", Settings,
+		Settings.URL.String(), Settings.UDPPort)
 }
 
 // NewClientWithTimeout will retry pinging the server until a specified timeout passes
@@ -144,12 +152,18 @@ func NewHTTPClient() (client.Client, error) {
 	return c, nil
 }
 
-// WritePoint writes a single point to the DB with the given, name, tags and fields
+func NewUDPClient() (client.Client, error) {
+	config := client.UDPConfig{Addr: fmt.Sprintf("%s:%s", Settings.Host, Settings.UDPPort)}
+	return client.NewUDPClient(config)
+}
+
+// WritePoint writes a single point to the DB with the given name, tags and fields
 func WritePoint(name string, tags map[string]string, fields map[string]interface{}) (*client.Point, error) {
-	c, err := NewHTTPClient()
+	c, err := NewUDPClient()
 	if err != nil {
 		return nil, err
 	}
+	defer c.Close()
 
 	// Create a new point batch
 	bp, err := client.NewBatchPoints(client.BatchPointsConfig{
@@ -172,7 +186,7 @@ func WritePoint(name string, tags map[string]string, fields map[string]interface
 		return nil, err
 	}
 
-	log.Debugf("Point=%v pt=%s", pt.Name(), pt.String())
+	log.Debugf("WritePoint=%s", pt.String())
 	return pt, nil
 }
 
@@ -181,7 +195,9 @@ func Query(query string) (*client.Response, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer c.Close()
+
+	log.Infof("query=\"%s\"", query)
 	q := client.NewQuery(query, Settings.Database, "s")
-	log.Infof("query=%s", query)
 	return c.Query(q)
 }

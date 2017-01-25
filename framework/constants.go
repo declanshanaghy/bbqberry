@@ -26,9 +26,9 @@ func init() {
 		Version:     "v1",
 		Stub:        stub,
 		Hardware: hardwareConfig{
-			AmbientProbe:           1,
 			NumLEDPixels:           18,
-			NumTemperatureProbes:   3,
+			NumTemperatureProbes:   1,
+			AmbientProbeNumber:     1,
 			VCC:                    vcc,
 			VDivR2:                 r2,
 			AnalogVoltsPerUnit:     vcc / analogMax,
@@ -43,9 +43,9 @@ func init() {
 
 // hardwareConfig represents the underlying physical hardware
 type hardwareConfig struct {
-	AmbientProbe            int
 	NumLEDPixels            int
 	NumTemperatureProbes    int32
+	AmbientProbeNumber      int32
 	VCC, VDivR2, AnalogVoltsPerUnit             float32
 	MinTempWarnCelsius, MaxTempWarnCelsius      float32
 }
