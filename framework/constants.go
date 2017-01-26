@@ -26,7 +26,7 @@ func init() {
 		Version:     "v1",
 		Stub:        stub,
 		Hardware: hardwareConfig{
-			NumLEDPixels:           18,
+			NumLEDPixels:           26,
 			NumTemperatureProbes:   1,
 			AmbientProbeNumber:     1,
 			VCC:                    vcc,

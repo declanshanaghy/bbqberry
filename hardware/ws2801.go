@@ -38,7 +38,7 @@ func (s *ws2801Strand) GetNumPixels() int {
 }
 
 func (s *ws2801Strand) Off() error {
-	log.Info("action=Off nPixels=%d", s.GetNumPixels())
+	log.Infof("action=Off nPixels=%d", s.GetNumPixels())
 	for i := 0; i < s.GetNumPixels(); i++ {
 		s.SetPixelColor(i, 0)
 	}
@@ -46,7 +46,7 @@ func (s *ws2801Strand) Off() error {
 }
 
 func (s *ws2801Strand) Close() error {
-	log.Info("action=Close nPixels=%d", s.GetNumPixels())
+	log.Infof("action=Close nPixels=%d", s.GetNumPixels())
 	s.Off()
 	return s.bus.Close()
 }
