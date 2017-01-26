@@ -2,6 +2,8 @@
 
 include skel/Makefile
 
+OUTBIN=~/deploy
+
 unittest_bbqberry: create_influxdb unittest
 	@echo "Done"
 
@@ -26,4 +28,7 @@ kill:
 	ssh pi@bbqberry-gaff killall bbqberry
 
 run_remote: upload_scp
-	ssh pi@bbqberry-gaff ./deploy/bbqberry --host=0.0.0.0 --port=8888 --static=/home/pi/go/src/github.com/declanshanaghy/bbqberry/static
+	ssh pi@bbqberry-gaff $(OUTBIN)/bbqberry --host=0.0.0.0 --port=8888 --static=/home/pi/go/src/github.com/declanshanaghy/bbqberry/static
+
+run_deployed:
+	$(OUTBIN)/bbqberry --host=0.0.0.0 --port=8888 --static=/home/pi/go/src/github.com/declanshanaghy/bbqberry/static
