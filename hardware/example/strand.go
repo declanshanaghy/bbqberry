@@ -1,4 +1,4 @@
-// +build ignore
+// + build ignore
 
 package main
 
@@ -7,8 +7,7 @@ import (
 	"time"
 
 	"github.com/Polarishq/middleware/framework/log"
-	"github.com/declanshanaghy/bbqberry/hardware/ws2801"
-	"github.com/kidoman/embd"
+	"github.com/declanshanaghy/bbqberry/hardware"
 )
 
 func wheel(wp uint8) (r, g, b uint8) {
@@ -32,11 +31,7 @@ func wheel(wp uint8) (r, g, b uint8) {
 }
 
 // Rainbow cycles the LED strand through the rainbow colors
-func Rainbow(nPixels int, bus embd.SPIBus) {
-	strand0 := ws2801.NewWS2801(nPixels, bus)
-	strand0.GetNumPixels()
-	defer strand0.Close()
-
+func Rainbow(strand0 hardware.WS2801) {
 	log.Infof("action=Rainbow nPixels=%d", strand0.GetNumPixels())
 	n := strand0.GetNumPixels()
 
@@ -55,9 +50,7 @@ func Rainbow(nPixels int, bus embd.SPIBus) {
 
 // RedGreenBlueRandom sets the LED colors to all Red, all Green,
 // all Blue, then all random assignments of Red, Green or Blue
-func RedGreenBlueRandom(nPixels int, bus embd.SPIBus) {
-	strand0 := ws2801.NewWS2801(nPixels, bus)
-	defer strand0.Close()
+func RedGreenBlueRandom(strand0 hardware.WS2801) {
 
 	log.Infof("action=RedGreenBlueRandom nPixels=%d", strand0.GetNumPixels())
 
@@ -80,7 +73,7 @@ func RedGreenBlueRandom(nPixels int, bus embd.SPIBus) {
 	time.Sleep(1 * time.Second)
 
 	rand.Seed(time.Now().UnixNano())
-	colors := []int{ws2801.RED, ws2801.GREEN, ws2801.BLUE}
+	colors := []int{hardware.RED, hardware.GREEN, hardware.BLUE}
 	for i := 0; i < strand0.GetNumPixels(); i++ {
 		strand0.SetPixelColor(i, colors[rand.Intn(3)])
 	}
@@ -89,12 +82,8 @@ func RedGreenBlueRandom(nPixels int, bus embd.SPIBus) {
 }
 
 func main() {
-	if err := embd.InitSPI(); err != nil {
-		panic(err)
-	}
-	defer embd.CloseSPI()
+	strand := hardware.NewStrandController()
+	defer strand.Close()
 
-	spiBus := embd.NewSPIBus(embd.SPIMode0, channel, speed, bpw, delay)
-	defer spiBus.Close()
-	RedGreenBlueRandom(10, spiBus)
+	RedGreenBlueRandom(strand)
 }
