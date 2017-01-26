@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=320" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>Gauge</title>
+    <script type="text/javascript" src="../assets/js/prototype.js"></script>
     <script type="text/javascript" src="http://d3js.org/d3.v2.min.js"></script>
     <style>
         body {
@@ -203,14 +204,23 @@
             clipWidth: 300,
             clipHeight: 300,
             ringWidth: 60,
-            maxValue: 10,
-            transitionMs: 4000,
+            maxValue: 500,
+            transitionMs: 4000
         });
         powerGauge.render();
 
         function updateReadings() {
-            // just pump in random data here...
-            powerGauge.update(Math.random() * 10);
+            new Ajax.Request('/v1/temperatures/probes/reading?probe=1', {
+                method:'get',
+                onSuccess: function(transport) {
+                    var response = transport.responseText || "no response text";
+                    data = JSON.parse(response);
+                    console.log(data[0]['fahrenheit']);
+                    powerGauge.update(data[0]['fahrenheit']);
+                },
+                onFailure: function(e) { console.log("Error updating guage"); }
+            });
+
         }
 
         // every few seconds update reading values
