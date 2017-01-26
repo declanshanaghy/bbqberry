@@ -2,8 +2,6 @@
 
 include skel/Makefile
 
-export STUB=yes
-
 unittest_bbqberry: create_influxdb unittest
 	@echo "Done"
 

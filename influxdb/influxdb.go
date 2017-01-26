@@ -34,7 +34,7 @@ func init() {
 func LoadConfig() {
 	database := os.Getenv("INFLUXDB")
 	if database == "" {
-		database = "no_name_given"
+		database = "bbqberry"
 	}
 	
 	host := os.Getenv("INFLUXDB_HOST")
