@@ -186,7 +186,7 @@ func WritePoint(name string, tags map[string]string, fields map[string]interface
 		return nil, err
 	}
 
-	log.Debugf("WritePoint=%s", pt.String())
+	log.Infof("WritePoint=%s", pt.String())
 	return pt, nil
 }
 
