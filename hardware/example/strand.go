@@ -1,6 +1,6 @@
 // +build ignore
 
-package example
+package main
 
 import (
 	"math/rand"
@@ -86,4 +86,15 @@ func RedGreenBlueRandom(nPixels int, bus embd.SPIBus) {
 	}
 	strand0.Update()
 	time.Sleep(1 * time.Second)
+}
+
+func main() {
+	if err := embd.InitSPI(); err != nil {
+		panic(err)
+	}
+	defer embd.CloseSPI()
+
+	spiBus := embd.NewSPIBus(embd.SPIMode0, channel, speed, bpw, delay)
+	defer spiBus.Close()
+	RedGreenBlueRandom(10, spiBus)
 }
