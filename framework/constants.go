@@ -2,6 +2,8 @@ package framework
 
 import (
 	"os"
+	"github.com/declanshanaghy/bbqberry/influxdb"
+	"github.com/Polarishq/middleware/framework/log"
 )
 
 const vcc = 3.3
@@ -19,6 +21,11 @@ func init() {
 	stub := false
 	if os.Getenv("STUB") != "" {
 		stub = true
+		if os.Getenv("INFLUXDB") == "" {
+			log.Warningf("Hardware is stubbed, resetting influx database")
+			os.Setenv("INFLUXDB", "stub")
+			influxdb.LoadConfig()
+		}
 	}
 
 	Constants = constants{
@@ -36,9 +43,6 @@ func init() {
 			MaxTempWarnCelsius:     tempLimitHighCelsius - (tempLimitHighCelsius * tempWarnThreshold),
 		},
 	}
-}
-
-func init() {
 }
 
 // hardwareConfig represents the underlying physical hardware

@@ -112,8 +112,8 @@ func getTempColor(temp float32) int {
 
 	color := r << 16 | b
 
-	log.Infof("min=%0.2f, max=%0.2f rnge=%0.2f temp=%0.2f, corrected=%0.2f scaled=%0.2f " +
-			"(r, b) = (%d, %d) = (%x, %x) color=%x", min, max, rnge, temp, corrected, scaled, r, b, r, b, color)
+	//log.Infof("min=%0.2f, max=%0.2f rnge=%0.2f temp=%0.2f, corrected=%0.2f scaled=%0.2f " +
+	//		"(r, b) = (%d, %d) = (%x, %x) color=%x", min, max, rnge, temp, corrected, scaled, r, b, r, b, color)
 
 	return color
 }

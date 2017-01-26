@@ -12,7 +12,7 @@ import (
 	"github.com/influxdata/influxdb/client/v2"
 )
 
-var defaultTimeout = time.Second
+var defaultTimeout = time.Second * 5
 
 // Settings holds all pertient connection parameters for InfluxDB
 var Settings *influxDBSettings
@@ -159,7 +159,7 @@ func NewUDPClient() (client.Client, error) {
 
 // WritePoint writes a single point to the DB with the given name, tags and fields
 func WritePoint(name string, tags map[string]string, fields map[string]interface{}) (*client.Point, error) {
-	c, err := NewUDPClient()
+	c, err := NewHTTPClient()
 	if err != nil {
 		return nil, err
 	}
