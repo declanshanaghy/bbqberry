@@ -68,7 +68,8 @@ func (ti *temperatureIndicator) tick() bool {
 
 	log.Infof("avg=%0.2f", *avg.Fahrenheit)
 
-	if err := ti.strip.SetAllPixels(0xFF0000); err != nil {
+	color := getTempColor(*avg.Celsius)
+	if err := ti.strip.SetAllPixels(color); err != nil {
 		log.Error(err.Error())
 	}
 	if err := ti.strip.Update(); err != nil {
@@ -76,5 +77,44 @@ func (ti *temperatureIndicator) tick() bool {
 	}
 
 	return true
+}
+
+func getTempColor(temp float32) int {
+	// Map the temperature to a color to be displayed on the LED pixels.
+	// cold / min = blue	( 0x0000FF ) =
+	// hot / max = red ( 0xFF0000 )
+	// green LEDs should never be on.
+	// Treat each degree above min as a +1 of the red component and -1 of the blue component
+	// Therefore:
+	// 		avg temp <= min = pure blue
+	// 		avg temp >= max = pure red
+	// If the max limit is exceeded a visual indicator should be displayed (i.e. flashing)
+	min := framework.Constants.Hardware.MinTempWarnCelsius
+	max := framework.Constants.Hardware.MaxTempWarnCelsius
+
+	if temp < min {
+		log.Warningf("Temp (%0.2f) < min (%0.2f)...clamping", temp, min)
+		temp = min
+	}
+	if temp > max {
+		log.Warningf("Temp (%0.2f) > max (%0.2f)...clamping", temp, max)
+		temp = max
+	}
+
+	rnge := (max - min)
+
+	corrected := temp - min
+	scaled := corrected / rnge
+	//offset := int(255 * scaled)
+
+	r := int(255 * scaled)
+	b := 0xFF - r
+
+	color := r << 16 | b
+
+	log.Infof("min=%0.2f, max=%0.2f rnge=%0.2f temp=%0.2f, corrected=%0.2f scaled=%0.2f " +
+			"(r, b) = (%d, %d) = (%x, %x) color=%x", min, max, rnge, temp, corrected, scaled, r, b, r, b, color)
+
+	return color
 }
 

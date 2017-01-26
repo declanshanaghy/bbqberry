@@ -8,6 +8,7 @@ import (
 	"math"
 	"github.com/declanshanaghy/bbqberry/models"
 	"github.com/Polarishq/middleware/framework/log"
+	"errors"
 )
 
 
@@ -26,15 +27,6 @@ func QueryAverageTemperature(period time.Duration, probe int32) (*models.Tempera
 	if err != nil {
 		return nil, err
 	}
-
-	z := float32(0.00)
-	reading := models.TemperatureReading{
-		Probe: &probe,
-		Fahrenheit: &z,
-		Celsius: &z,
-		Kelvin: &z,
-	}
-
 
 	toF := func(v interface{}) (float32, error) {
 		s := fmt.Sprintf("%v", v)
@@ -65,12 +57,15 @@ func QueryAverageTemperature(period time.Duration, probe int32) (*models.Tempera
 			return nil, err
 		}
 
-		reading.Celsius = &c
-		reading.Fahrenheit = &f
-		reading.Kelvin = &k
-	} else {
-		log.Warningf("No results returned from InfluxDB %+v", response)
-	}
+		reading := models.TemperatureReading{
+			Probe: &probe,
+			Celsius: &c,
+			Fahrenheit: &f,
+			Kelvin: &k,
+		}
 
-	return &reading, nil
+		return &reading, nil
+	} else {
+		return nil, errors.New("No results returned from InfluxDB")
+	}
 }
