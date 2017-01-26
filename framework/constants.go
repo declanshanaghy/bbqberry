@@ -10,7 +10,7 @@ const r2 = 1000.0
 
 // Absolute temperature limits
 const tempLimitLowCelsius = -50
-const tempLimitHighCelsius = 250
+const tempLimitHighCelsius = 400
 
 // Warn if temperature gets within this threshold of absolute limits
 const tempWarnThreshold = 0.1
