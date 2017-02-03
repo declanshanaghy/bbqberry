@@ -23,7 +23,7 @@ type TemperatureReading struct {
 
 	// Temperature reading in degrees Celsius
 	// Required: true
-	Celsius *float32 `json:"celsius"`
+	Celsius *int32 `json:"celsius"`
 
 	// The date and time of the reading
 	// Required: true
@@ -31,11 +31,11 @@ type TemperatureReading struct {
 
 	// Temperature reading in degrees Fahrenheit
 	// Required: true
-	Fahrenheit *float32 `json:"fahrenheit"`
+	Fahrenheit *int32 `json:"fahrenheit"`
 
 	// Temperature reading in degrees Kelvin
 	// Required: true
-	Kelvin *float32 `json:"kelvin"`
+	Kelvin *int32 `json:"kelvin"`
 
 	// probe
 	// Required: true

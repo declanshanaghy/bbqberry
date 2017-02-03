@@ -77,7 +77,7 @@ func (ti *temperatureIndicator) tick() bool {
 	return true
 }
 
-func getTempColor(temp float32) int {
+func getTempColor(temp int32) int {
 	// Map the temperature to a color to be displayed on the LED pixels.
 	// cold / min = blue	( 0x0000FF ) =
 	// hot / max = red ( 0xFF0000 )
@@ -102,7 +102,7 @@ func getTempColor(temp float32) int {
 	rnge := (max - min)
 
 	corrected := temp - min
-	scaled := corrected / rnge
+	scaled := float32(corrected) / float32(rnge)
 	//offset := int(255 * scaled)
 
 	r := int(255 * scaled)
@@ -110,8 +110,8 @@ func getTempColor(temp float32) int {
 
 	color := r << 16 | b
 
-	//log.Infof("min=%0.2f, max=%0.2f rnge=%0.2f temp=%0.2f, corrected=%0.2f scaled=%0.2f " +
-	//		"(r, b) = (%d, %d) = (%x, %x) color=%x", min, max, rnge, temp, corrected, scaled, r, b, r, b, color)
+	log.Debugf("min=%d, max=%d rnge=%d temp=%d, corrected=%d scaled=%0.2f " +
+			"(r, b) = (%d, %d) = (%x, %x) color=%x", min, max, rnge, temp, corrected, scaled, r, b, r, b, color)
 
 	return color
 }

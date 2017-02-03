@@ -152,6 +152,9 @@ func NewHTTPClient() (client.Client, error) {
 	return c, nil
 }
 
+// NewUDPClient creates a client which will use UDP protocol to send data to the configured influxDB server.
+// NB: The configured database is not used in this client. The server configuration determines which database
+// UDP data goes into
 func NewUDPClient() (client.Client, error) {
 	config := client.UDPConfig{Addr: fmt.Sprintf("%s:%s", Settings.Host, Settings.UDPPort)}
 	return client.NewUDPClient(config)
@@ -190,6 +193,7 @@ func WritePoint(name string, tags map[string]string, fields map[string]interface
 	return pt, nil
 }
 
+// Query executes InfluxQL statements against the configured database
 func Query(query string) (*client.Response, error) {
 	c, err := NewHTTPClient()
 	if err != nil {

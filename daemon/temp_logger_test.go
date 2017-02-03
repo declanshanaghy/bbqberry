@@ -58,9 +58,9 @@ var _ = Describe("Temperature daemon", func() {
 			a := p + 1
 			r := p + 3
 			v := float32(p + 3)
-			k := float32(p + 4)
-			c := float32(p + 5)
-			f := float32(p + 6)
+			k := p + 4
+			c := p + 5
+			f := p + 6
 			readings = append(readings, &models.TemperatureReading{
 				Probe: &i,
 				Analog: &a,

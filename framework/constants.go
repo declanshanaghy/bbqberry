@@ -39,8 +39,8 @@ func init() {
 			VCC:                    vcc,
 			VDivR2:                 r2,
 			AnalogVoltsPerUnit:     vcc / analogMax,
-			MinTempWarnCelsius:     tempLimitLowCelsius - (tempLimitLowCelsius * tempWarnThreshold),
-			MaxTempWarnCelsius:     tempLimitHighCelsius - (tempLimitHighCelsius * tempWarnThreshold),
+			MinTempWarnCelsius:     int32(tempLimitLowCelsius - (tempLimitLowCelsius * tempWarnThreshold)),
+			MaxTempWarnCelsius:     int32(tempLimitHighCelsius - (tempLimitHighCelsius * tempWarnThreshold)),
 		},
 	}
 }
@@ -51,7 +51,7 @@ type hardwareConfig struct {
 	NumTemperatureProbes    int32
 	AmbientProbeNumber      int32
 	VCC, VDivR2, AnalogVoltsPerUnit             float32
-	MinTempWarnCelsius, MaxTempWarnCelsius      float32
+	MinTempWarnCelsius, MaxTempWarnCelsius      int32
 }
 
 type constants struct {

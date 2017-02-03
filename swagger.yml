@@ -131,15 +131,18 @@ definitions:
     properties:
       kelvin:
         type: number
-        format: float
+        format: integer
+        format: int32
         description: Temperature reading in degrees Kelvin
       celsius:
         type: number
-        format: float
+        format: integer
+        format: int32
         description: Temperature reading in degrees Celsius
       fahrenheit:
         type: number
-        format: float
+        format: integer
+        format: int32
         description: Temperature reading in degrees Fahrenheit
       date-time:
         type: string

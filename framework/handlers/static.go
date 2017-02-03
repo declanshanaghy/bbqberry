@@ -24,7 +24,7 @@ func NewStaticHandler(dir string, handler http.Handler) *StaticHandler {
 		panic(errors.New("Static dir not provided"))
 	}
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		panic(errors.New(fmt.Sprintf("Static dir '%s' does not exist", dir)))
+		panic(fmt.Errorf("Static dir '%s' does not exist", dir))
 	}
 
 

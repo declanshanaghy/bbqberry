@@ -5,11 +5,11 @@ angular.module('bbqberry', [
     // 3rd Party modules
     'emguo.poller',
     'ngRoute',
+    'ngRadialGauge',
     'ui.bootstrap',
 
     // BBQBerry Components
     'bbqberry.nav',
-    'bbqberry.tempguage',
 
     //BBQBErry Views
     'bbqberry.glance',

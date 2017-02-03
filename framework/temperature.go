@@ -28,13 +28,13 @@ func QueryAverageTemperature(period time.Duration, probe int32) (*models.Tempera
 		return nil, err
 	}
 
-	toF := func(v interface{}) (float32, error) {
+	toF := func(v interface{}) (int32, error) {
 		s := fmt.Sprintf("%v", v)
 		f, err := strconv.ParseFloat(s, 32)
 		if err == nil {
-			return float32(f), nil
+			return int32(f), nil
 		}
-		return math.MaxFloat32, err
+		return math.MaxInt32, err
 	}
 
 	if len(response.Results) > 0 && len(response.Results[0].Series) > 0 {
@@ -64,7 +64,7 @@ func QueryAverageTemperature(period time.Duration, probe int32) (*models.Tempera
 		}
 
 		return &reading, nil
-	} else {
-		return nil, errors.New("No results returned from InfluxDB")
 	}
+
+	return nil, errors.New("No results returned from InfluxDB")
 }

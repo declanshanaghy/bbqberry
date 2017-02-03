@@ -20,7 +20,7 @@ func init() {
 
 	if framework.Constants.Stub {
 		for i := int32(1); i <= hardware.NumTemperatureProbes; i++ {
-			FakeTemps[i] = 350
+			FakeTemps[i] = 360
 		}
 	}
 }
@@ -72,11 +72,11 @@ func (s *temperatureReader) readProbe(probe int32) (v int32, err error) {
 		return 0, err
 	}
 	if framework.Constants.Stub {
-		v = FakeTemps[probe] + 5
+		v = FakeTemps[probe]
 		if v == 750 {
 			v = 350
 		}
-		FakeTemps[probe] = v
+		FakeTemps[probe] = v + 1
 	} else {
 		iv, err := s.adc.AnalogValueAt(int(probe - 1))
 		v = int32(iv)
@@ -113,14 +113,15 @@ func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 	r1 := int32(((hwCfg.VCC * hwCfg.VDivR2) / vOut) - hwCfg.VDivR2)
 
 	tempK, tempC, tempF := adafruitAD8495ThermocoupleVtoKCF(vOut)
-	log.Debugf("probe=%d, A=%d, R=%d, V=%0.5f, K=%0.5f, C=%0.5f, F=%0.5f", probe, analog, r1, vOut, tempK, tempC, tempF)
+	log.Debugf("probe=%d A=%d R=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
+		probe, analog, r1, vOut, tempK, tempC, tempF, hwCfg.MinTempWarnCelsius, hwCfg.MaxTempWarnCelsius)
 	
 	if tempC < hwCfg.MinTempWarnCelsius {
-		reading.Warning = fmt.Sprintf("Low temperature limit exceeded: actual=%0.2f °C < threshold=%0.2f °C",
+		reading.Warning = fmt.Sprintf("Low temperature limit exceeded: actual=%d °C < threshold=%d °C",
 			tempC, hwCfg.MinTempWarnCelsius)
 	}
 	if tempC > hwCfg.MaxTempWarnCelsius {
-		reading.Warning = fmt.Sprintf("High temperature limit exceeded: actual=%0.2f °C > threshold=%0.2f °C",
+		reading.Warning = fmt.Sprintf("High temperature limit exceeded: actual=%d °C > threshold=%d °C",
 			tempC, hwCfg.MaxTempWarnCelsius)
 	}
 	
@@ -139,7 +140,7 @@ func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 
 // adafruitAD8495ThermocoupleVtoKCF converts the voltage read from the Adafruit Thermocouple breakout board
 // to temperatures in Kelvin, Celsius and Fahrenheit
-func adafruitAD8495ThermocoupleVtoKCF(v float32) (tempK float32, tempC float32, tempF float32) {
+func adafruitAD8495ThermocoupleVtoKCF(v float32) (tempK int32, tempC int32, tempF int32) {
 	// https://www.adafruit.com/product/1778
 	// Analog Output K-Type Thermocouple Amplifier - AD8495 Breakout
 	// PRODUCT ID: 1778
@@ -148,8 +149,11 @@ func adafruitAD8495ThermocoupleVtoKCF(v float32) (tempK float32, tempC float32, 
 	// v = 1.5VDC
 	// The temperature is (1.5 - 1.25) / 0.005 = 50°C
 
-	tempC = (v - 1.25) / 0.005
-	tempK, tempF = convertCToKF(tempC)
+	fTempC := (v - 1.25) / 0.005
+	tempC = int32(fTempC)
+	fTempK, fTempF := convertCToKF(fTempC)
+	tempF = int32(fTempF)
+	tempK = int32(fTempK)
 	return
 }
 
