@@ -66,8 +66,6 @@ func (ti *temperatureIndicator) tick() bool {
 		return true
 	}
 
-	log.Infof("avg=%0.2f", *avg.Fahrenheit)
-
 	color := getTempColor(*avg.Celsius)
 	if err := ti.strip.SetAllPixels(color); err != nil {
 		log.Error(err.Error())

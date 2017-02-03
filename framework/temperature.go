@@ -40,7 +40,6 @@ func QueryAverageTemperature(period time.Duration, probe int32) (*models.Tempera
 	if len(response.Results) > 0 && len(response.Results[0].Series) > 0 {
 		r := response.Results[0]
 		values := r.Series[0].Values[0]
-		log.Infof("values=%+v", values)
 
 		c, err := toF(values[1])
 		if err != nil {

@@ -1,6 +1,4 @@
 
-<pre>
-<code>
-        {{ probes | json }}
-</code>
-</pre>
+<div ng-repeat="probe in probes">
+        <temp-guage probe="probe"></temp-guage>
+</div>

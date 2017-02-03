@@ -15,6 +15,6 @@
     "commit": "e435ed32a3fd6bf146ac0ea66e538bd2455b9cf9"
   },
   "_source": "https://github.com/angular/bower-angular-loader.git",
-  "_target": "~1.6.0",
+  "_target": "1.6.x",
   "_originalSource": "angular-loader"
 }

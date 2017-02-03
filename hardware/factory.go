@@ -54,7 +54,7 @@ func NewTemperatureReader() TemperatureReader {
 
 func newSPIBus(channel byte) embd.SPIBus {
 	if framework.Constants.Stub {
-		log.Warningf("action=NewSPIBus channel=%d STUBBED", channel)
+		//log.Warningf("action=NewSPIBus channel=%d STUBBED", channel)
 		if StubBus == nil {
 			StubBus = stubembd.NewStubSPIBus()
 		}
