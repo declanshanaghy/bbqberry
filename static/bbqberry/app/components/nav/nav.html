@@ -1,0 +1,18 @@
+<nav class="navbar navbar-default" role="navigation" ng-controller="BBQBerryNav">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" ng-click="isNavCollapsed = !isNavCollapsed">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">BBQBerry</a>
+    </div>
+    <div class="collapse navbar-collapse" uib-collapse="isNavCollapsed">
+        <ul class="nav navbar-nav">
+            <li ng-class="{ active: isActive('/glance')}"><a href="#!/glance">Glance</a></li>
+            <li ng-class="{ active: isActive('/view1')}"><a href="#!/view1">View 1</a></li>
+            <li ng-class="{ active: isActive('/view2')}"><a href="#!/view2">View 2</a></li>
+        </ul>
+    </div>
+</nav>

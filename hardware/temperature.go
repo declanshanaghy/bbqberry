@@ -20,7 +20,7 @@ func init() {
 
 	if framework.Constants.Stub {
 		for i := int32(1); i <= hardware.NumTemperatureProbes; i++ {
-			FakeTemps[i] = i
+			FakeTemps[i] = 350
 		}
 	}
 }
@@ -72,9 +72,9 @@ func (s *temperatureReader) readProbe(probe int32) (v int32, err error) {
 		return 0, err
 	}
 	if framework.Constants.Stub {
-		v = FakeTemps[probe] + 1
-		if v == 1024 {
-			v = 0
+		v = FakeTemps[probe] + 5
+		if v == 750 {
+			v = 350
 		}
 		FakeTemps[probe] = v
 	} else {

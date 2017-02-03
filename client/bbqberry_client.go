@@ -4,6 +4,9 @@ package client
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"os"
+	"strings"
+
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 
@@ -22,7 +25,7 @@ const (
 	DefaultHost string = "localhost"
 	// DefaultBasePath is the default BasePath
 	// found in Meta (info) section of spec file
-	DefaultBasePath string = "/v1"
+	DefaultBasePath string = "/api/v1"
 )
 
 // DefaultSchemes are the default schemes found in Meta (info) section of spec file
@@ -64,10 +67,27 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Bbqberry {
 // DefaultTransportConfig creates a TransportConfig with the
 // default settings taken from the meta section of the spec file.
 func DefaultTransportConfig() *TransportConfig {
+	var scheme []string
+	var host string
+
+	envScheme := os.Getenv(strings.Replace(strings.ToUpper(DefaultSchemes[0]), "-", "_", -1) + "_SCHEME")
+	if len(envScheme) == 0 {
+		scheme = DefaultSchemes
+	} else {
+		scheme = []string{envScheme}
+	}
+
+	envHost := os.Getenv(strings.Replace(strings.ToUpper(DefaultHost), "-", "_", -1) + "_HOST")
+	if len(envHost) == 0 {
+		host = DefaultHost
+	} else {
+		host = envHost
+	}
+
 	return &TransportConfig{
-		Host:     DefaultHost,
+		Host:     host,
 		BasePath: DefaultBasePath,
-		Schemes:  DefaultSchemes,
+		Schemes:  scheme,
 	}
 }
 

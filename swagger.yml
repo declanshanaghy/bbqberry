@@ -3,7 +3,7 @@ info:
   description: "Rest API definition for BBQ Berry"
   version: "v1"
   title: "BBQ Berry"
-basePath: /v1
+basePath: /api/v1
 schemes:
   - http
 consumes:
@@ -37,7 +37,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: "#/definitions/Error"
-  /temperatures/probes/reading:
+  /temperatures/probes:
     get:
       operationId: getProbeReadings
       tags:

@@ -39,11 +39,11 @@ func (o *GetProbeReadingsURL) SetBasePath(bp string) {
 func (o *GetProbeReadingsURL) Build() (*url.URL, error) {
 	var result url.URL
 
-	var _path = "/temperatures/probes/reading"
+	var _path = "/temperatures/probes"
 
 	_basePath := o._basePath
 	if _basePath == "" {
-		_basePath = "/v1"
+		_basePath = "/api/v1"
 	}
 	result.Path = golangswaggerpaths.Join(_basePath, _path)
 
