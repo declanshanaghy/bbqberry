@@ -4,6 +4,9 @@ include skel/Makefile
 
 OUTBIN=~/deploy
 
+export STUB=yes
+
+
 unittest_bbqberry: create_influxdb unittest
 	@echo "Done"
 
