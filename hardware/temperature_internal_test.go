@@ -31,8 +31,8 @@ var _ = Describe("Temperature package", func() {
 			
 			// Format is [v] = [k, c, f]
 			conversions := map[float32][3]float32 {
-				0.0: [3]float32{23.15, -250.0, -418.0},
-				hwCfg.VCC: [3]float32{683.15, 410.0, 770.0},
+				0.0: [3]float32{23, -250, -418},
+				hwCfg.VCC: [3]float32{683, 410, 770},
 			}
 			
 			for v, answer := range conversions {

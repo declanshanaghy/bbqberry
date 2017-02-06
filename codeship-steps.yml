@@ -5,9 +5,18 @@
   - name: Run tests & publish code coverage
     command: make unittest_bbqberry coveralls
   - name: Build Executable
-    command: make build
+    command: make build_bbqberry
 
+# Tag with the branch name
 - type: push
   service: app
+  image_tag: "{{.Branch}}"
+  image_name:  declanshanaghy/bbqberry
+  encrypted_dockercfg_path: dockercfg.json.encrypted
+
+# If it's the master branch tag it as latest
+- type: push
+  service: app
+  tag: "master"
   image_name:  declanshanaghy/bbqberry
   encrypted_dockercfg_path: dockercfg.json.encrypted

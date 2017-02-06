@@ -62,7 +62,7 @@ func (a *Client) GetProbeReadings(params *GetProbeReadingsParams) (*GetProbeRead
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "getProbeReadings",
 		Method:             "GET",
-		PathPattern:        "/temperatures/probes/reading",
+		PathPattern:        "/temperatures/probes",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},

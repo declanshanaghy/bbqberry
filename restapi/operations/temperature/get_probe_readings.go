@@ -27,7 +27,7 @@ func NewGetProbeReadings(ctx *middleware.Context, handler GetProbeReadingsHandle
 	return &GetProbeReadings{Context: ctx, Handler: handler}
 }
 
-/*GetProbeReadings swagger:route GET /temperatures/probes/reading Temperature getProbeReadings
+/*GetProbeReadings swagger:route GET /temperatures/probes Temperature getProbeReadings
 
 Get the current temperature reading from the requested probe(s)
 

@@ -6,7 +6,7 @@ builder:
   links:
   - influxdb
   volumes:
-  - tmp/bin:/tmp/bin
+  - tmp:/go/src/github.com/declanshanaghy/bbqberry/tmp
 
 influxdb:
   image: influxdb

@@ -228,7 +228,7 @@ func (o *BbqberryAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/temperatures/probes/reading"] = temperature.NewGetProbeReadings(o.context, o.TemperatureGetProbeReadingsHandler)
+	o.handlers["GET"]["/temperatures/probes"] = temperature.NewGetProbeReadings(o.context, o.TemperatureGetProbeReadingsHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)

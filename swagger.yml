@@ -3,7 +3,7 @@ info:
   description: "Rest API definition for BBQ Berry"
   version: "v1"
   title: "BBQ Berry"
-basePath: /v1
+basePath: /api/v1
 schemes:
   - http
 consumes:
@@ -37,7 +37,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: "#/definitions/Error"
-  /temperatures/probes/reading:
+  /temperatures/probes:
     get:
       operationId: getProbeReadings
       tags:
@@ -131,15 +131,18 @@ definitions:
     properties:
       kelvin:
         type: number
-        format: float
+        format: integer
+        format: int32
         description: Temperature reading in degrees Kelvin
       celsius:
         type: number
-        format: float
+        format: integer
+        format: int32
         description: Temperature reading in degrees Celsius
       fahrenheit:
         type: number
-        format: float
+        format: integer
+        format: int32
         description: Temperature reading in degrees Fahrenheit
       date-time:
         type: string
