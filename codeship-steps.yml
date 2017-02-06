@@ -5,7 +5,7 @@
   - name: Run tests & publish code coverage
     command: make unittest_bbqberry coveralls
   - name: Build Executable
-    command: make build
+    command: make build_bbqberry
 
 - type: push
   service: app

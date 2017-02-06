@@ -15,7 +15,7 @@ create_influxdb:
 
 build_bbqberry:
 	@echo "Building BBQBerry..."
-	env GOOS=linux GOARCH=arm make build
+	env GOOS=linux GOARCH=arm make build OUTBIN=tmp/bin
 
 upload_ftp: kill build_bbqberry
 	@echo "Uploading via FTP..."
