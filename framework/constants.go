@@ -14,7 +14,7 @@ const r2 = 1000.0
 const tempLimitLowCelsius = -50
 const tempLimitHighCelsius = 400
 
-// Warn if temperature gets within this threshold of absolute limits
+// Warn if temperature gets within this threshold of absolute limits (percentage)
 const tempWarnThreshold = 0.1
 
 func init() {

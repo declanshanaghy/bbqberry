@@ -5,6 +5,22 @@
 
 }
 
+.guage-list {
+  width: 100%;
+}
+
+.guage {
+  width: 500px;
+  margin: 0 auto;
+}
+
+.guage-label {
+  width: 50%;
+  margin: 0 auto;
+  text-align: center;
+  /*border: 1px solid white;*/
+}
+
 .menu {
   list-style: none;
   border-bottom: 0.1em solid black;

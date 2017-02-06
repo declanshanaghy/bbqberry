@@ -14,34 +14,46 @@ angular.module('bbqberry.glance', ['ngRadialGauge', 'ngRoute', 'emguo.poller'])
             {
                 min: 0,
                 max: 100,
-                color: '#DEDEDE'
+                color: '#22FF44'
             },
             {
                 min: 100,
                 max: 200,
-                color: '#8DCA2F'
+                color: '#41DF3F'
             },
             {
                 min: 200,
                 max: 300,
-                color: '#FDC702'
+                color: '#61BF3A'
             },
             {
                 min: 300,
                 max: 400,
-                color: '#FF7700'
+                color: '#80A035'
             },
             {
                 min: 400,
                 max: 500,
-                color: '#e82d2b'
+                color: '#A08030'
             },
             {
                 min: 500,
                 max: 600,
-                color: '#C50200'
+                color: '#BF612B'
+            },
+            {
+                min: 600,
+                max: 700,
+                color: '#DF4126'
+            },
+            {
+                min: 700,
+                max: 800,
+                color: '#FF2222'
             }
         ];
+        $scope.upperLimit = $scope.ranges[$scope.ranges.length - 1].max;
+        $scope.majorGraduations = $scope.ranges.length;
 
         var myPoller = poller.get('/api/v1/temperatures/probes', {
             action: 'get',
