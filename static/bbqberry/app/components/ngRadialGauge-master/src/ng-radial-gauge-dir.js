@@ -64,10 +64,10 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
              var majorGraduationLength = Math.round((view.width * 16) / 300);
              var minorGraduationLength = Math.round((view.width * 10) / 300);
              var majorGraduationMarginTop = Math.round((view.width * 7) / 300);
-             var majorGraduationColor = attrs.majorGraduationColor || "#B0B0B0";
-             var minorGraduationColor = attrs.minorGraduationColor || "#D0D0D0";
-             var majorGraduationTextColor = attrs.majorGraduationTextColor || "#6C6C6C";
-             var needleColor = attrs.needleColor || "#416094";
+             var majorGraduationColor = attrs.majorGraduationColor || "#FFFFFF";
+             var minorGraduationColor = attrs.minorGraduationColor || "#707070";
+             var majorGraduationTextColor = attrs.majorGraduationTextColor || "#FFFFFF";
+             var needleColor = attrs.needleColor || "#FFFFFF";
              var valueVerticalOffset = Math.round((view.width * 30) / 300);
              var inactiveColor = "#D7D7D7";
              var transitionMs = parseInt(attrs.transitionMs) || 750;
