@@ -12,7 +12,7 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
     .controller('GlanceController', ['$scope', '$http', 'poller', 'd3Service',
         function ($scope, $http, poller, d3Service) {
             d3Service.d3().then(function (d3) {
-                var min = 100;
+                var min = 0;
                 var max = 700;
                 var colorStep = 1;
                 var gradStep = 100;
@@ -32,16 +32,15 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
                     var mn = grads(i);
                     var mx = colorStep + mn;
                     var c = color(i);
-                    var range = {
+                    $scope.ranges[$scope.ranges.length] = {
                         min: mn,
                         max: mx,
                         color: c
                     };
-                    $scope.ranges[$scope.ranges.length] = range
                 }
                 $scope.lowerLimit = min;
                 $scope.upperLimit = $scope.ranges[$scope.ranges.length - 1].max;
-                $scope.majorGraduations = ((max - min) / gradStep);
+                $scope.majorGraduations = ((max - min) / gradStep) + 1;
 
 
                 var myPoller = poller.get('/api/v1/temperatures/probes', {
