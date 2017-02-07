@@ -3,6 +3,7 @@
 // Declare app level module which depends on views, and components
 angular.module('bbqberry', [
     // 3rd Party modules
+    'd3',
     'emguo.poller',
     'ngRoute',
     'ngRadialGauge',
