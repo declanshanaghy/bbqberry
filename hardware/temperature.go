@@ -74,7 +74,7 @@ func (s *temperatureReader) readProbe(probe int32) (v int32, err error) {
 	if framework.Constants.Stub {
 		v = FakeTemps[probe]
 		if v == 750 {
-			v = 350
+			v = 360
 		}
 		FakeTemps[probe] = v + 1
 	} else {

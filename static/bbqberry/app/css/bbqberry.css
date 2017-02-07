@@ -1,34 +1,55 @@
 /* app css stylesheet */
-.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+.nav, .pagination, .carousel, .panel-title a {
+    cursor: pointer;
+}
+
+.navbar-image {
+    background-image: url('../img/navbar-brand.png');
+    background-repeat: no-repeat;
+}
 
 .navbar-brand {
+}
 
+.guage-list {
+    width: 100%;
+}
+
+.guage {
+    width: 500px;
+    margin: 0 auto;
+}
+
+.guage-label {
+    width: 50%;
+    margin: 0 auto;
+    text-align: center;
 }
 
 .menu {
-  list-style: none;
-  border-bottom: 0.1em solid black;
-  margin-bottom: 2em;
-  padding: 0 0 0.5em;
+    list-style: none;
+    border-bottom: 0.1em solid black;
+    margin-bottom: 2em;
+    padding: 0 0 0.5em;
 }
 
 .menu:before {
-  content: "[";
+    content: "[";
 }
 
 .menu:after {
-  content: "]";
+    content: "]";
 }
 
 .menu > li {
-  display: inline;
+    display: inline;
 }
 
 .menu > li + li:before {
-  content: "|";
-  padding-right: 0.3em;
+    content: "|";
+    padding-right: 0.3em;
 }
 
 body {
-  padding: 10px;
+    padding: 10px;
 }

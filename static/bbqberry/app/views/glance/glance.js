@@ -43,13 +43,42 @@ angular.module('bbqberry.glance', ['ngRadialGauge', 'ngRoute', 'emguo.poller'])
             }
         ];
 
+        // var grads = d3.scale.linear()
+        //     .range([0, 800])
+        //     .interpolate(d3.interpolateNumber);
+        //
+        // var min = 0;
+        // var max = 800;
+        // var step = 100;
+        // var steps = (max - min) / step;
+        //
+        // var color = d3.scale.linear()
+        //     .range(["darkblue", "red"])
+        //     .interpolate(d3.interpolateHcl);
+        //
+        // $scope.ranges = [];
+        // var pos = 0;
+        // for (var i = min; i < max; i += step) {
+        //     pos = i / (max - min);
+        //     var mn = grads(pos);
+        //     var mx = mn + step;
+        //     var c = color(pos);
+        //     console.log("mn=" + mn + ", mx=" + mx + ", c=" + c);
+        //     $scope.ranges[$scope.ranges.length] = {
+        //         min: mn,
+        //         max: mx,
+        //         color: c
+        //     };
+        // }
+        $scope.upperLimit = $scope.ranges[$scope.ranges.length - 1].max;
+        $scope.majorGraduations = $scope.ranges.length + 1;
+
         var myPoller = poller.get('/api/v1/temperatures/probes', {
             action: 'get',
             delay: 5000
         });
 
-        myPoller.promise.then(null, null, function(response) {
+        myPoller.promise.then(null, null, function (response) {
             $scope.probes = response['data'];
         });
-
     }]);
