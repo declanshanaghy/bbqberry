@@ -12,35 +12,37 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
     .controller('GlanceController', ['$scope', '$http', 'poller', 'd3Service',
         function ($scope, $http, poller, d3Service) {
             d3Service.d3().then(function (d3) {
-                var grads = d3.scale.linear()
-                    .range([0, 800])
-                    .interpolate(d3.interpolateNumber);
+                var min = 100;
+                var max = 700;
+                var colorStep = 1;
+                var gradStep = 100;
+                var steps = (max - min) / colorStep;
 
-                var min = 0;
-                var max = 800;
-                var step = 100;
-                var steps = (max - min) / step;
+                var grads = d3.scale.linear()
+                    .range([min, max])
+                    .interpolate(d3.interpolateRound);
 
                 var color = d3.scale.linear()
-                    .range(["darkblue", "red"])
+                    .range(["#00ff00", "#ff0000"])
                     .interpolate(d3.interpolateHcl);
 
                 $scope.ranges = [];
                 var pos = 0;
-                for (var i = min; i < max; i += step) {
-                    pos = i / (max - min);
-                    var mn = grads(pos);
-                    var mx = mn + step;
-                    var c = color(pos);
-                    console.log("mn=" + mn + ", mx=" + mx + ", c=" + c);
-                    $scope.ranges[$scope.ranges.length] = {
+                for (var i = 0; i <= 1; i += 1.0 / steps) {
+                    var mn = grads(i);
+                    var mx = colorStep + mn;
+                    var c = color(i);
+                    var range = {
                         min: mn,
                         max: mx,
                         color: c
                     };
+                    $scope.ranges[$scope.ranges.length] = range
                 }
+                $scope.lowerLimit = min;
                 $scope.upperLimit = $scope.ranges[$scope.ranges.length - 1].max;
-                $scope.majorGraduations = $scope.ranges.length + 1;
+                $scope.majorGraduations = ((max - min) / gradStep);
+
 
                 var myPoller = poller.get('/api/v1/temperatures/probes', {
                     action: 'get',
