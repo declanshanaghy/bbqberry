@@ -16,8 +16,9 @@
 }
 
 .guage {
-    width: 500px;
+    width: 380px;
     margin: 0 auto;
+    alignment: center;
 }
 
 .guage-label {

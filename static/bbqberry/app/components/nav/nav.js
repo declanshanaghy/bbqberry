@@ -11,6 +11,7 @@ angular.module('bbqberry.nav', [])
 })
 
 .controller('BBQBerryNav', [ '$scope', '$location', function($scope, $location) {
+    $scope.isNavCollapsed = true;
     $scope.isActive = function(viewLocation) {
         return $location.path() == viewLocation;
     }
