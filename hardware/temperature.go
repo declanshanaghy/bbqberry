@@ -2,6 +2,7 @@ package hardware
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/Polarishq/middleware/framework/log"
@@ -15,12 +16,17 @@ import (
 // FakeTemps can be set to return specific analog readings during tests
 var FakeTemps = make(map[int32]int32, 0)
 
+const stubMaxA = 1023
+const stubMinA = 360
+
 func init() {
 	hardware := framework.Constants.Hardware
 
 	if framework.Constants.Stub {
 		for i := int32(1); i <= hardware.NumTemperatureProbes; i++ {
-			FakeTemps[i] = 360
+			v := int32(rand.Intn(stubMinA) + (stubMaxA - stubMinA))
+			log.Infof("probe %d init to %d", i, v)
+			FakeTemps[i] = v
 		}
 	}
 }
@@ -73,10 +79,10 @@ func (s *temperatureReader) readProbe(probe int32) (v int32, err error) {
 	}
 	if framework.Constants.Stub {
 		v = FakeTemps[probe]
-		if v == 750 {
-			v = 360
+		if v >= stubMaxA {
+			v = stubMinA
 		}
-		FakeTemps[probe] = v + 1
+		FakeTemps[probe] = v + int32(rand.Intn(10))
 	} else {
 		iv, err := s.adc.AnalogValueAt(int(probe - 1))
 		v = int32(iv)
@@ -113,18 +119,20 @@ func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 	r1 := int32(((hwCfg.VCC * hwCfg.VDivR2) / vOut) - hwCfg.VDivR2)
 
 	tempK, tempC, tempF := adafruitAD8495ThermocoupleVtoKCF(vOut)
-	log.Debugf("probe=%d A=%d R=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
+	log.Infof("probe=%d A=%d R=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
 		probe, analog, r1, vOut, tempK, tempC, tempF, hwCfg.MinTempWarnCelsius, hwCfg.MaxTempWarnCelsius)
-	
+
 	if tempC < hwCfg.MinTempWarnCelsius {
-		reading.Warning = fmt.Sprintf("Low temperature limit exceeded: actual=%d °C < threshold=%d °C",
-			tempC, hwCfg.MinTempWarnCelsius)
+		_, f := convertCToKF(float32(hwCfg.MinTempWarnCelsius))
+		reading.Warning = fmt.Sprintf("Low temperature limit exceeded: actual=%d °F < threshold=%d °F",
+			tempF, int32(f))
 	}
 	if tempC > hwCfg.MaxTempWarnCelsius {
-		reading.Warning = fmt.Sprintf("High temperature limit exceeded: actual=%d °C > threshold=%d °C",
-			tempC, hwCfg.MaxTempWarnCelsius)
+		_, f := convertCToKF(float32(hwCfg.MaxTempWarnCelsius))
+		reading.Warning = fmt.Sprintf("High temperature limit exceeded: actual=%d °F > threshold=%d °F",
+			tempF, int32(f))
 	}
-	
+
 	t := strfmt.DateTime(time.Now())
 	reading.Probe = &probe
 	reading.DateTime = &t

@@ -1,8 +1,11 @@
-<input type="text" ng-model="name" placeholder="Type your name here"/>
-<input type="button" value="Add Name" ng-click="addName()"/>
-<br/>
-<h1>Hello, {{name}}</h1>
-<hr/>
-<ul>
-  <li ng-repeat="nm in names">{{nm.name}}</li>
-</ul>
+<div style="height: 305px">
+    <div uib-carousel active="active" interval="myInterval" no-wrap="noWrapSlides">
+        <div uib-slide ng-repeat="slide in slides track by slide.id" index="slide.id">
+            <img ng-src="{{slide.image}}" style="margin:auto;">
+            <div class="carousel-caption">
+                <h4>Slide {{slide.id}}</h4>
+                <p>{{slide.text}}</p>
+            </div>
+        </div>
+    </div>
+</div>

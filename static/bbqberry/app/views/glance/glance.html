@@ -1,13 +1,16 @@
-<div class="guage-list" ng-repeat="probe in probes track by probe.probe">
-    <div class="guage" ng-radial-gauge
-         ranges="ranges"
-         value="probe.fahrenheit"
-         value-unit="'F'"
-         precision="0"
-         major-graduations="{{majorGraduations}}"
-         lower-limit="lowerLimit"
-         upper-limit="upperLimit">
-        <div class="guage-label">
+<div class="probe-carousel" uib-carousel
+     active="activeSlide" interval="carouselInterval" no-wrap="carouselNoWrap"
+     ng-swipe-right="swipeRight()" ng-swipe-left="swipeLeft()">
+    <div class="probe-slide"
+         uib-slide ng-repeat="probe in probes track by probe.probe - 1" index="probe.probe - 1">
+        <div class="alert alert-danger probe-danger">{{probe.warning}}</div>
+        <div class="probe-guage"
+             ng-radial-gauge ranges="ranges" value="probe.fahrenheit"
+             value-unit="'F'" precision="0"
+             major-graduations="{{majorGraduations}}"
+             lower-limit="lowerLimit" upper-limit="upperLimit">
+        </div>
+        <div class="carousel-caption probe-label">
             Probe {{ probe.probe }}
         </div>
     </div>

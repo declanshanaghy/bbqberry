@@ -3,11 +3,12 @@ package daemon
 import (
 	"time"
 
+	"fmt"
+
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/hardware"
-	"github.com/declanshanaghy/bbqberry/models"
 	"github.com/declanshanaghy/bbqberry/influxdb"
-	"fmt"
+	"github.com/declanshanaghy/bbqberry/models"
 )
 
 // temperatureLogger collects and logs temperature metrics
@@ -97,10 +98,10 @@ func (tl *temperatureLogger) logTemperatureMetrics(readings *models.TemperatureR
 			"Probe": fmt.Sprintf("%d", *reading.Probe),
 		}
 		fields := map[string]interface{}{
-			"Celsius": *reading.Celsius,
+			"Celsius":    *reading.Celsius,
 			"Fahrenheit": *reading.Fahrenheit,
-			"Kelvin": *reading.Kelvin,
-			"Warning": reading.Warning,
+			"Kelvin":     *reading.Kelvin,
+			"Warning":    reading.Warning,
 		}
 		if _, err := influxdb.WritePoint("temp", tags, fields); err != nil {
 			return err

@@ -3,7 +3,7 @@
  */
 'use strict';
 
-angular.module('bbqberry.nav', [])
+angular.module('bbqberry.nav', ['ngAnimate'])
 
 .component('bbqberryNav', {
     templateUrl: 'components/nav/nav.html',

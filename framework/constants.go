@@ -2,8 +2,9 @@ package framework
 
 import (
 	"os"
-	"github.com/declanshanaghy/bbqberry/influxdb"
+
 	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/influxdb"
 )
 
 const vcc = 3.3
@@ -33,25 +34,25 @@ func init() {
 		Version:     "v1",
 		Stub:        stub,
 		Hardware: hardwareConfig{
-			NumLEDPixels:           26,
-			NumTemperatureProbes:   1,
-			AmbientProbeNumber:     1,
-			VCC:                    vcc,
-			VDivR2:                 r2,
-			AnalogVoltsPerUnit:     vcc / analogMax,
-			MinTempWarnCelsius:     int32(tempLimitLowCelsius - (tempLimitLowCelsius * tempWarnThreshold)),
-			MaxTempWarnCelsius:     int32(tempLimitHighCelsius - (tempLimitHighCelsius * tempWarnThreshold)),
+			NumLEDPixels:         26,
+			NumTemperatureProbes: 3,
+			AmbientProbeNumber:   1,
+			VCC:                  vcc,
+			VDivR2:               r2,
+			AnalogVoltsPerUnit:   vcc / analogMax,
+			MinTempWarnCelsius:   int32(tempLimitLowCelsius - (tempLimitLowCelsius * tempWarnThreshold)),
+			MaxTempWarnCelsius:   int32(tempLimitHighCelsius - (tempLimitHighCelsius * tempWarnThreshold)),
 		},
 	}
 }
 
 // hardwareConfig represents the underlying physical hardware
 type hardwareConfig struct {
-	NumLEDPixels            int
-	NumTemperatureProbes    int32
-	AmbientProbeNumber      int32
-	VCC, VDivR2, AnalogVoltsPerUnit             float32
-	MinTempWarnCelsius, MaxTempWarnCelsius      int32
+	NumLEDPixels                           int
+	NumTemperatureProbes                   int32
+	AmbientProbeNumber                     int32
+	VCC, VDivR2, AnalogVoltsPerUnit        float32
+	MinTempWarnCelsius, MaxTempWarnCelsius int32
 }
 
 type constants struct {

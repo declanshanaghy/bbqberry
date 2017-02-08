@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"net/http"
-	"strings"
-	"os"
-	"github.com/Polarishq/middleware/framework/log"
-	"fmt"
 	"errors"
+	"fmt"
+	"net/http"
+	"os"
+	"strings"
+
+	"github.com/Polarishq/middleware/framework/log"
 )
 
 // staticPath is the static URL prefix from which all static assets are served
@@ -14,8 +15,8 @@ const staticPath = "/static"
 
 // StaticHandler provides a middleware handler which serves the swagger UI
 type StaticHandler struct {
-	handler 	http.Handler
-	fileServer  http.Handler
+	handler    http.Handler
+	fileServer http.Handler
 }
 
 // NewStaticHandler creates a new middleware handler which serves the swagger UI
@@ -27,9 +28,8 @@ func NewStaticHandler(dir string, handler http.Handler) *StaticHandler {
 		panic(fmt.Errorf("Static dir '%s' does not exist", dir))
 	}
 
-
 	return &StaticHandler{
-		handler: handler,
+		handler:    handler,
 		fileServer: http.FileServer(http.Dir(dir)),
 	}
 }
@@ -44,4 +44,3 @@ func (s *StaticHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	s.handler.ServeHTTP(w, r)
 }
-

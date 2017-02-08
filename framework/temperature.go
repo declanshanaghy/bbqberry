@@ -1,16 +1,16 @@
 package framework
 
 import (
-	"time"
-	"fmt"
-	"github.com/declanshanaghy/bbqberry/influxdb"
-	"strconv"
-	"math"
-	"github.com/declanshanaghy/bbqberry/models"
-	"github.com/Polarishq/middleware/framework/log"
 	"errors"
-)
+	"fmt"
+	"math"
+	"strconv"
+	"time"
 
+	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/influxdb"
+	"github.com/declanshanaghy/bbqberry/models"
+)
 
 // QueryAverageTemperature retrieves the average temperature over the given period for the requested probe from InfluxDB
 func QueryAverageTemperature(period time.Duration, probe int32) (*models.TemperatureReading, error) {
@@ -57,10 +57,10 @@ func QueryAverageTemperature(period time.Duration, probe int32) (*models.Tempera
 		}
 
 		reading := models.TemperatureReading{
-			Probe: &probe,
-			Celsius: &c,
+			Probe:      &probe,
+			Celsius:    &c,
 			Fahrenheit: &f,
-			Kelvin: &k,
+			Kelvin:     &k,
 		}
 
 		return &reading, nil

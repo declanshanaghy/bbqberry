@@ -5,7 +5,9 @@ angular.module('bbqberry', [
     // 3rd Party modules
     'd3',
     'emguo.poller',
+    'ngAnimate',
     'ngRoute',
+    'ngTouch',
     'ngRadialGauge',
     'ui.bootstrap',
 

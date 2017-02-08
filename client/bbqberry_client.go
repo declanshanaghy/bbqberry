@@ -12,6 +12,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/declanshanaghy/bbqberry/client/config"
 	"github.com/declanshanaghy/bbqberry/client/health"
 	"github.com/declanshanaghy/bbqberry/client/temperature"
 )
@@ -56,6 +57,8 @@ func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *Bbq
 func New(transport runtime.ClientTransport, formats strfmt.Registry) *Bbqberry {
 	cli := new(Bbqberry)
 	cli.Transport = transport
+
+	cli.Config = config.New(transport, formats)
 
 	cli.Health = health.New(transport, formats)
 
@@ -122,6 +125,8 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // Bbqberry is a client for bbqberry
 type Bbqberry struct {
+	Config *config.Client
+
 	Health *health.Client
 
 	Temperature *temperature.Client
@@ -132,6 +137,8 @@ type Bbqberry struct {
 // SetTransport changes the transport on the client and all its subresources
 func (c *Bbqberry) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
+
+	c.Config.SetTransport(transport)
 
 	c.Health.SetTransport(transport)
 

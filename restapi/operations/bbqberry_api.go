@@ -16,6 +16,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
+	"github.com/declanshanaghy/bbqberry/restapi/operations/config"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
 )
@@ -32,6 +33,9 @@ func NewBbqberryAPI(spec *loads.Document) *BbqberryAPI {
 		ServeError:      errors.ServeError,
 		JSONConsumer:    runtime.JSONConsumer(),
 		JSONProducer:    runtime.JSONProducer(),
+		ConfigGetConfigHandler: config.GetConfigHandlerFunc(func(params config.GetConfigParams) middleware.Responder {
+			return middleware.NotImplemented("operation ConfigGetConfig has not yet been implemented")
+		}),
 		TemperatureGetMonitorsHandler: temperature.GetMonitorsHandlerFunc(func(params temperature.GetMonitorsParams) middleware.Responder {
 			return middleware.NotImplemented("operation TemperatureGetMonitors has not yet been implemented")
 		}),
@@ -59,6 +63,8 @@ type BbqberryAPI struct {
 	// JSONProducer registers a producer for a "application/json" mime type
 	JSONProducer runtime.Producer
 
+	// ConfigGetConfigHandler sets the operation handler for the get config operation
+	ConfigGetConfigHandler config.GetConfigHandler
 	// TemperatureGetMonitorsHandler sets the operation handler for the get monitors operation
 	TemperatureGetMonitorsHandler temperature.GetMonitorsHandler
 	// TemperatureGetProbeReadingsHandler sets the operation handler for the get probe readings operation
@@ -126,6 +132,10 @@ func (o *BbqberryAPI) Validate() error {
 
 	if o.JSONProducer == nil {
 		unregistered = append(unregistered, "JSONProducer")
+	}
+
+	if o.ConfigGetConfigHandler == nil {
+		unregistered = append(unregistered, "config.GetConfigHandler")
 	}
 
 	if o.TemperatureGetMonitorsHandler == nil {
@@ -219,6 +229,11 @@ func (o *BbqberryAPI) initHandlerCache() {
 	if o.handlers == nil {
 		o.handlers = make(map[string]map[string]http.Handler)
 	}
+
+	if o.handlers["GET"] == nil {
+		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/config"] = config.NewGetConfig(o.context, o.ConfigGetConfigHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)

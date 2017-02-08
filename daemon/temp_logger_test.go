@@ -4,11 +4,11 @@ import (
 	"time"
 
 	"github.com/declanshanaghy/bbqberry/hardware"
+	"github.com/declanshanaghy/bbqberry/models"
 	"github.com/declanshanaghy/bbqberry/stubs/stubembd"
+	"github.com/go-openapi/strfmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/declanshanaghy/bbqberry/models"
-	"github.com/go-openapi/strfmt"
 )
 
 var _ = Describe("Temperature daemon", func() {
@@ -62,13 +62,13 @@ var _ = Describe("Temperature daemon", func() {
 			c := p + 5
 			f := p + 6
 			readings = append(readings, &models.TemperatureReading{
-				Probe: &i,
-				Analog: &a,
-				DateTime: &t,
+				Probe:      &i,
+				Analog:     &a,
+				DateTime:   &t,
 				Resistance: &r,
-				Voltage: &v,
-				Kelvin: &k,
-				Celsius: &c,
+				Voltage:    &v,
+				Kelvin:     &k,
+				Celsius:    &c,
 				Fahrenheit: &f,
 			})
 		}

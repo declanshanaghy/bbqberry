@@ -4,16 +4,16 @@ import (
 	"time"
 
 	"github.com/Polarishq/middleware/framework/log"
-	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/framework"
+	"github.com/declanshanaghy/bbqberry/hardware"
 )
 
 // temperatureIndicator collects and logs temperature metrics
 type temperatureIndicator struct {
 	runner
-	reader	hardware.TemperatureReader
-	strip	hardware.WS2801
-	errorCount	int
+	reader     hardware.TemperatureReader
+	strip      hardware.WS2801
+	errorCount int
 }
 
 // newTemperatureIndicator creates a new temperatureIndicator instance which can be
@@ -23,7 +23,7 @@ func newTemperatureIndicator() *temperatureIndicator {
 	defer log.Debug("action=method_exit")
 	return &temperatureIndicator{
 		reader: hardware.NewTemperatureReader(),
-		strip: hardware.NewStrandController(),
+		strip:  hardware.NewStrandController(),
 	}
 }
 
@@ -91,11 +91,11 @@ func getTempColor(temp int32) int {
 	max := framework.Constants.Hardware.MaxTempWarnCelsius
 
 	if temp < min {
-		log.Warningf("Temp (%0.2f) < min (%0.2f)...clamping", temp, min)
+		log.Warningf("Temp (%d) < min (%d)...clamping", temp, min)
 		temp = min
 	}
 	if temp > max {
-		log.Warningf("Temp (%0.2f) > max (%0.2f)...clamping", temp, max)
+		log.Warningf("Temp (%d) > max (%d)...clamping", temp, max)
 		temp = max
 	}
 
@@ -103,16 +103,14 @@ func getTempColor(temp int32) int {
 
 	corrected := temp - min
 	scaled := float32(corrected) / float32(rnge)
-	//offset := int(255 * scaled)
 
 	r := int(255 * scaled)
 	b := 0xFF - r
 
-	color := r << 16 | b
+	color := r<<16 | b
 
-	log.Debugf("min=%d, max=%d rnge=%d temp=%d, corrected=%d scaled=%0.2f " +
-			"(r, b) = (%d, %d) = (%x, %x) color=%x", min, max, rnge, temp, corrected, scaled, r, b, r, b, color)
+	log.Infof("min=%d, max=%d rnge=%d temp=%d, corrected=%d scaled=%0.2f "+
+		"(r, b) = (%d, %d) = (%x, %x) color=%x", min, max, rnge, temp, corrected, scaled, r, b, r, b, color)
 
 	return color
 }
-
