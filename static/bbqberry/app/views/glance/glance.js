@@ -36,6 +36,7 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
 
             d3Service.d3().then(function (d3) {
                 var min = 0;
+                var warn = 600;
                 var max = 800;
                 var colorStep = 1;
                 var gradStep = 100;
@@ -50,7 +51,7 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
                     .range(["#0000ff", "#00ff00"])
                     .interpolate(d3.interpolateHcl);
                 var color = d3.scale.linear()
-                    .range(["#00ff00", "#ff0000"])
+                    .range(["#00ff00", "#FF5F05"])
                     .interpolate(d3.interpolateHcl);
 
                 $scope.ranges = [];
@@ -62,6 +63,9 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
                     var c = color(i);
                     if ( mx < 32 ) {
                         c = subZero(i * 25);
+                    }
+                    if ( mn > warn ) {
+                        c = "#FF0000"
                     }
 
                     $scope.ranges[$scope.ranges.length] = {
@@ -76,7 +80,7 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
 
                 var myPoller = poller.get('/api/v1/temperatures/probes', {
                     action: 'get',
-                    delay: 250
+                    delay: 1000
                 });
 
                 myPoller.promise.then(null, null, function (response) {

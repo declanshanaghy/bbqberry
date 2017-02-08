@@ -2,8 +2,8 @@ package hardware
 
 import (
 	"fmt"
-	"time"
 	"math/rand"
+	"time"
 
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/framework"
@@ -15,6 +15,7 @@ import (
 
 // FakeTemps can be set to return specific analog readings during tests
 var FakeTemps = make(map[int32]int32, 0)
+
 const stubMaxA = 1023
 const stubMinA = 360
 
@@ -120,16 +121,18 @@ func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 	tempK, tempC, tempF := adafruitAD8495ThermocoupleVtoKCF(vOut)
 	log.Infof("probe=%d A=%d R=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
 		probe, analog, r1, vOut, tempK, tempC, tempF, hwCfg.MinTempWarnCelsius, hwCfg.MaxTempWarnCelsius)
-	
+
 	if tempC < hwCfg.MinTempWarnCelsius {
-		reading.Warning = fmt.Sprintf("Low temperature limit exceeded: actual=%d °C < threshold=%d °C",
-			tempC, hwCfg.MinTempWarnCelsius)
+		_, f := convertCToKF(float32(hwCfg.MinTempWarnCelsius))
+		reading.Warning = fmt.Sprintf("Low temperature limit exceeded: actual=%d °F < threshold=%d °F",
+			tempF, int32(f))
 	}
 	if tempC > hwCfg.MaxTempWarnCelsius {
-		reading.Warning = fmt.Sprintf("High temperature limit exceeded: actual=%d °C > threshold=%d °C",
-			tempC, hwCfg.MaxTempWarnCelsius)
+		_, f := convertCToKF(float32(hwCfg.MaxTempWarnCelsius))
+		reading.Warning = fmt.Sprintf("High temperature limit exceeded: actual=%d °F > threshold=%d °F",
+			tempF, int32(f))
 	}
-	
+
 	t := strfmt.DateTime(time.Now())
 	reading.Probe = &probe
 	reading.DateTime = &t

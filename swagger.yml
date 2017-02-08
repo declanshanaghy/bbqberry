@@ -11,6 +11,21 @@ consumes:
 produces:
   - application/json
 paths:
+  /config:
+    get:
+      operationId: getConfig
+      tags:
+        - Config
+      summary: "Get current configuration settings"
+      responses:
+        200:
+          description: "The config was retrieved successfully"
+          schema:
+            $ref: "#/definitions/Config"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
   /temperatures/monitors:
     get:
       operationId: getMonitors
@@ -83,6 +98,17 @@ paths:
             $ref: "#/definitions/Error"
 
 definitions:
+  Config:
+    type: object
+    required:
+      - num-probes
+    properties:
+      num-probes:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 8
+        default: 0
   TemperatureMonitors:
     type: object
     additionalProperties:

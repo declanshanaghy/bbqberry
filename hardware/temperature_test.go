@@ -1,20 +1,20 @@
 package hardware_test
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/models"
-	"github.com/declanshanaghy/bbqberry/framework"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("TemperatureReader Object", func() {
 	Context("limit tests", func() {
 		hwCfg := framework.Constants.Hardware
-		
+
 		// Analog reading corresponding to the low threshold
 		lowBoundary := int32(317)
-		
+
 		// Analog reading corresponding to the high threshold
 		highBoundary := int32(948)
 
@@ -26,7 +26,7 @@ var _ = Describe("TemperatureReader Object", func() {
 			reader.GetTemperatureReading(1, &reading)
 
 			Expect(reading.Warning).To(Equal("Low temperature limit exceeded: " +
-					"actual=-46 °C < threshold=-45 °C"))
+				"actual=-51 °F < threshold=-49 °F"))
 			Expect(*reading.Celsius).To(BeNumerically("<", hwCfg.MinTempWarnCelsius))
 		})
 		It("should return no warnings when above the low limit", func() {
@@ -47,7 +47,7 @@ var _ = Describe("TemperatureReader Object", func() {
 			reader.GetTemperatureReading(1, &reading)
 
 			Expect(reading.Warning).To(Equal("High temperature limit exceeded: " +
-					"actual=361 °C > threshold=360 °C"))
+				"actual=681 °F > threshold=680 °F"))
 			Expect(*reading.Celsius).To(BeNumerically(">", hwCfg.MaxTempWarnCelsius))
 		})
 		It("should return no warnings when below the high limit", func() {

@@ -9,7 +9,7 @@ import (
 // Commander is the main controller of all background goroutines
 type Commander struct {
 	runner
-	tempLogger *temperatureLogger
+	tempLogger    *temperatureLogger
 	tempIndicator *temperatureIndicator
 }
 
@@ -20,7 +20,7 @@ func NewCommander() *Commander {
 	log.Debug("action=method_entry")
 	defer log.Debug("action=method_exit")
 	return &Commander{
-		tempLogger: newTemperatureLogger(),
+		tempLogger:    newTemperatureLogger(),
 		tempIndicator: newTemperatureIndicator(),
 	}
 }

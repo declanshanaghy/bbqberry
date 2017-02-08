@@ -36,7 +36,7 @@ func LoadConfig() {
 	if database == "" {
 		database = "bbqberry"
 	}
-	
+
 	host := os.Getenv("INFLUXDB_HOST")
 	if host == "" {
 		host = "influxdb"
@@ -57,17 +57,17 @@ func LoadConfig() {
 
 	username := os.Getenv("INFLUXDB_USERNAME")
 	password := os.Getenv("INFLUXDB_PASSWORD")
-	
+
 	Settings = &influxDBSettings{
 		Config: clientv1.Config{
-			URL: URL,
+			URL:      URL,
 			Username: username,
 			Password: password,
 		},
-		Database:	database,
-		Host: 		host,
-		HTTPPort:   HTTPPort,
-		UDPPort:	UDPPort,
+		Database: database,
+		Host:     host,
+		HTTPPort: HTTPPort,
+		UDPPort:  UDPPort,
 	}
 	log.Infof("action=LoadConfig influxDBSettings=%+v URL=%s, UDPPort=%s", Settings,
 		Settings.URL.String(), Settings.UDPPort)
@@ -80,21 +80,21 @@ func NewClientWithTimeout(timeout time.Duration) (*clientv1.Client, error) {
 	iterations := 0
 	var c *clientv1.Client
 	var err error
-	
+
 	hasTimedout := func() bool {
 		return time.Now().After(deadline)
 	}
-	
+
 	for !hasTimedout() {
 		iterations++
-		
+
 		if iterations > 1 {
 			log.Errorf("action=sleeping duration=%v", sleep)
 			time.Sleep(sleep)
 		}
-		
+
 		cfg := Settings.Config
-		
+
 		c, err = clientv1.NewClient(cfg)
 		if err != nil {
 			log.Errorf("action=create_client err=%v", err)
@@ -103,7 +103,7 @@ func NewClientWithTimeout(timeout time.Duration) (*clientv1.Client, error) {
 			}
 			continue
 		}
-		
+
 		duration, v, err := c.Ping()
 		if err != nil {
 			log.Errorf("action=ping t=%v version=%s err=%v", duration, v, err)
@@ -112,11 +112,11 @@ func NewClientWithTimeout(timeout time.Duration) (*clientv1.Client, error) {
 			}
 			continue
 		}
-		
+
 		// If we made it this far everything is working
 		break
 	}
-	
+
 	return c, err
 }
 
