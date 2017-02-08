@@ -11,16 +11,27 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
 
     .controller('GlanceController', ['$scope', '$http', 'poller', 'd3Service',
         function ($scope, $http, poller, d3Service) {
-            $scope.interval = 0;
-            $scope.noWrapSlides = false;
-            $scope.active = false;
+            $scope.carouselInterval = 0;
+            $scope.carouselNoWrap = false;
+            $scope.carouselActive = false;
+            $scope.activeSlide = 0;
             $scope.probes = [];
 
             $scope.swipeLeft = function() {
-                console.log('swipe left');
+                // console.log('swipe left: curr=' + $scope.activeSlide);
+                var curr = $scope.activeSlide + 1;
+                if ( curr > $scope.probes.length - 1 )
+                    curr = $scope.probes.length - 1;
+                $scope.activeSlide = curr;
+                // console.log('swipe left: new=' + $scope.activeSlide);
             };
             $scope.swipeRight = function() {
-                console.log('swipe right');
+                // console.log('swipe right: curr=' + $scope.activeSlide);
+                var curr = $scope.activeSlide - 1;
+                if ( curr < 0 )
+                    curr = 0;
+                $scope.activeSlide = curr;
+                // console.log('swipe right: new=' + $scope.activeSlide);
             };
 
             d3Service.d3().then(function (d3) {
@@ -65,30 +76,14 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
 
                 var myPoller = poller.get('/api/v1/temperatures/probes', {
                     action: 'get',
-                    delay: 1000
+                    delay: 250
                 });
 
                 myPoller.promise.then(null, null, function (response) {
                     // console.log(response['data']);
-
-                    var i, lastActive = 0;
-                    for (i=0; i<$scope.probes.length; i++) {
-                        if ( $scope.probes[i].active ) {
-                            lastActive = i;
-                            break
-                        }
-                    }
-
                     $scope.probes = response['data'];
-
-                    for (i=0; i<$scope.probes.length; i++) {
-                        $scope.probes[i].index = i;
-                        if ( i == lastActive ) {
-                            $scope.probes[i].active = true;
-                        }
-                    }
-
-                    $scope.active = true;
+                    // $scope.probes[0].warning = "High temperature limit exceeded: actual=378 °C > threshold=360 °C";
+                    $scope.carouselActive = true;
                     // console.log("Probe " + lastActive + " is active");
                 });
             });

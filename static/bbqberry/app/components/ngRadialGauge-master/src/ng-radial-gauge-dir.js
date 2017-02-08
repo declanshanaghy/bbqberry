@@ -68,7 +68,7 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
              var minorGraduationColor = attrs.minorGraduationColor || "#707070";
              var majorGraduationTextColor = attrs.majorGraduationTextColor || "#FFFFFF";
              var needleColor = attrs.needleColor || "#FFFFFF";
-             var valueVerticalOffset = Math.round((view.width * 20) / 300);
+             var valueVerticalOffset = Math.round((view.width * 30) / 300);
              var inactiveColor = "#D7D7D7";
              var transitionMs = parseInt(attrs.transitionMs) || 750;
              var majorGraduationTextSize = parseInt(attrs.majorGraduationTextSize);

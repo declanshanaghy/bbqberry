@@ -1,12 +1,25 @@
 /* app css stylesheet */
-.nav, .pagination, .carousel, .panel-title a {
-    cursor: pointer;
+/*.nav, .pagination, .carousel, .panel-title a {*/
+    /*cursor: pointer;*/
+/*}*/
+
+.probe-danger {
+    position: absolute;
+    z-index: 10;
+}
+
+.probe-danger:empty {
+    display: none;
 }
 
 .probe-label {
+    padding: 0;
+    bottom: 10px;
 }
 
 .probe-carousel {
+    height:100%;
+    min-height: 250px;
 }
 
 .probe-slide {
