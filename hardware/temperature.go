@@ -118,7 +118,7 @@ func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 	r1 := int32(((hwCfg.VCC * hwCfg.VDivR2) / vOut) - hwCfg.VDivR2)
 
 	tempK, tempC, tempF := adafruitAD8495ThermocoupleVtoKCF(vOut)
-	log.Debugf("probe=%d A=%d R=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
+	log.Infof("probe=%d A=%d R=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
 		probe, analog, r1, vOut, tempK, tempC, tempF, hwCfg.MinTempWarnCelsius, hwCfg.MaxTempWarnCelsius)
 	
 	if tempC < hwCfg.MinTempWarnCelsius {
