@@ -212,6 +212,7 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
                  var lastGraduationValue = majorGraduationValues[majorGraduationValues.length - 1];
                  var textSize = isNaN(majorGraduationTextSize) ? (view.width * 12) / 300 : majorGraduationTextSize;
                  var fontStyle = textSize + "px Courier";
+                 // var fontStyle = textSize + "px";
 
                  var dummyText = svg.append("text")
                      .attr("x", centerX)
@@ -282,8 +283,10 @@ angular.module("ngRadialGauge",[]).directive('ngRadialGauge', ['$window', '$time
                          needleLen = needleLen - majorGraduationLength - majorGraduationMarginTop;
                      }
                      var needleRadius = (view.width * 2.5) / 300;
-                     var textSize = isNaN(needleValueTextSize) ? (view.width * 12) / 300 : needleValueTextSize;
-                     var fontStyle = textSize + "px Courier";
+                     // var textSize = isNaN(needleValueTextSize) ? (view.width * 12) / 300 : needleValueTextSize;
+                     var textSize = 0.75;
+                     // var fontStyle = textSize; + "px Courier";
+                     var fontStyle = textSize; + "em";
 
                      if (value >= minLimit && value <= maxLimit) {
                          var lineData = [
