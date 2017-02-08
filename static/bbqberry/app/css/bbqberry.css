@@ -3,28 +3,40 @@
     cursor: pointer;
 }
 
+
+/*#slides_control > div{*/
+    /*height: 200px;*/
+/*}*/
+
+/*#slides_control {*/
+    /*border: 1px solid white;*/
+    /*position:absolute;*/
+    /*width: 400px;*/
+    /*left:50%;*/
+    /*top:20px;*/
+    /*margin-left:-200px;*/
+/*}*/
+
+.probe-carousel {
+    /*height: 450px;*/
+}
+
+.probe-slide {
+    height: 300px;
+}
+
+.probe-guage {
+    width: 80%;
+    margin: 0 auto;
+    alignment: center;
+}
+
 .navbar-image {
     background-image: url('../img/navbar-brand.png');
     background-repeat: no-repeat;
 }
 
 .navbar-brand {
-}
-
-.guage-list {
-    width: 100%;
-}
-
-.guage {
-    width: 380px;
-    margin: 0 auto;
-    alignment: center;
-}
-
-.guage-label {
-    width: 50%;
-    margin: 0 auto;
-    text-align: center;
 }
 
 .menu {
@@ -53,4 +65,5 @@
 
 body {
     padding: 10px;
+    width: 410px;
 }

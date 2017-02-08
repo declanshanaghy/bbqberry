@@ -5,7 +5,6 @@ USER root
 EXPOSE 80
 
 COPY /tmp/bin/bbqberry /go/bin/
-COPY skel/templates/static /var/www/static
-COPY static /var/www/static
+COPY static /var/www/
 
 CMD ["/go/bin/bbqberry", "--host=0.0.0.0", "--port=80", "--static=/var/www/static"]

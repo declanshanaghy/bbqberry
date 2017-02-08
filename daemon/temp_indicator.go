@@ -91,11 +91,11 @@ func getTempColor(temp int32) int {
 	max := framework.Constants.Hardware.MaxTempWarnCelsius
 
 	if temp < min {
-		log.Warningf("Temp (%0.2f) < min (%0.2f)...clamping", temp, min)
+		log.Warningf("Temp (%d) < min (%d)...clamping", temp, min)
 		temp = min
 	}
 	if temp > max {
-		log.Warningf("Temp (%0.2f) > max (%0.2f)...clamping", temp, max)
+		log.Warningf("Temp (%d) > max (%d)...clamping", temp, max)
 		temp = max
 	}
 

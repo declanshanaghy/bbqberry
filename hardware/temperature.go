@@ -3,6 +3,7 @@ package hardware
 import (
 	"fmt"
 	"time"
+	"math/rand"
 
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/framework"
@@ -14,13 +15,17 @@ import (
 
 // FakeTemps can be set to return specific analog readings during tests
 var FakeTemps = make(map[int32]int32, 0)
+const stubMaxA = 750
+const stubMinA = 360
 
 func init() {
 	hardware := framework.Constants.Hardware
 
 	if framework.Constants.Stub {
 		for i := int32(1); i <= hardware.NumTemperatureProbes; i++ {
-			FakeTemps[i] = 360
+			v := int32(rand.Intn(stubMinA) + (stubMaxA - stubMinA))
+			log.Infof("probe %d init to %d", i, v)
+			FakeTemps[i] = v
 		}
 	}
 }
@@ -73,10 +78,10 @@ func (s *temperatureReader) readProbe(probe int32) (v int32, err error) {
 	}
 	if framework.Constants.Stub {
 		v = FakeTemps[probe]
-		if v == 750 {
-			v = 360
+		if v >= stubMaxA {
+			v = stubMinA
 		}
-		FakeTemps[probe] = v + 1
+		FakeTemps[probe] = v + int32(rand.Intn(10))
 	} else {
 		iv, err := s.adc.AnalogValueAt(int(probe - 1))
 		v = int32(iv)

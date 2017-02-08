@@ -11,15 +11,21 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
 
     .controller('GlanceController', ['$scope', '$http', 'poller', 'd3Service',
         function ($scope, $http, poller, d3Service) {
+            $scope.interval = 0;
+            $scope.noWrapSlides = false;
+            $scope.active = false;
+            $scope.probes = [];
+
             d3Service.d3().then(function (d3) {
                 var min = 0;
-                var max = 700;
+                var max = 800;
                 var colorStep = 1;
                 var gradStep = 100;
                 var steps = (max - min) / colorStep;
 
                 var grads = d3.scale.linear()
                     .range([min, max])
+                    .clamp(true)
                     .interpolate(d3.interpolateRound);
 
                 var color = d3.scale.linear()
@@ -42,14 +48,22 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
                 $scope.upperLimit = $scope.ranges[$scope.ranges.length - 1].max;
                 $scope.majorGraduations = ((max - min) / gradStep) + 1;
 
-
                 var myPoller = poller.get('/api/v1/temperatures/probes', {
                     action: 'get',
-                    delay: 5000
+                    delay: 1000
                 });
 
+                var lastActive = 0;
                 myPoller.promise.then(null, null, function (response) {
                     $scope.probes = response['data'];
+                    for (var i=0; i<$scope.probes.length; i++) {
+                        $scope.probes[i].index = i;
+                        if ( i == lastActive ) {
+                            $scope.probes[i].active = true;
+                        }
+                    }
+
+                    $scope.active = true;
                 });
             });
         }]);
