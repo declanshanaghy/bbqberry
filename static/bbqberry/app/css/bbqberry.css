@@ -3,30 +3,18 @@
     cursor: pointer;
 }
 
-
-/*#slides_control > div{*/
-    /*height: 200px;*/
-/*}*/
-
-/*#slides_control {*/
-    /*border: 1px solid white;*/
-    /*position:absolute;*/
-    /*width: 400px;*/
-    /*left:50%;*/
-    /*top:20px;*/
-    /*margin-left:-200px;*/
-/*}*/
+.probe-label {
+}
 
 .probe-carousel {
-    /*height: 450px;*/
 }
 
 .probe-slide {
-    height: 300px;
 }
 
 .probe-guage {
-    width: 80%;
+    width: 75%;
+    max-width: 500px;
     margin: 0 auto;
     alignment: center;
 }
@@ -65,5 +53,4 @@
 
 body {
     padding: 10px;
-    width: 410px;
 }

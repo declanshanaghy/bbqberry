@@ -15,7 +15,7 @@ import (
 
 // FakeTemps can be set to return specific analog readings during tests
 var FakeTemps = make(map[int32]int32, 0)
-const stubMaxA = 750
+const stubMaxA = 1023
 const stubMinA = 360
 
 func init() {
