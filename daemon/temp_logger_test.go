@@ -56,16 +56,14 @@ var _ = Describe("Temperature daemon", func() {
 			t := strfmt.DateTime(time.Now())
 			p := 10 * i
 			a := p + 1
-			r := p + 3
-			v := float32(p + 3)
-			k := p + 4
-			c := p + 5
-			f := p + 6
+			v := float32(p + 2)
+			k := p + 3
+			c := p + 4
+			f := p + 5
 			readings = append(readings, &models.TemperatureReading{
 				Probe:      &i,
 				Analog:     &a,
 				DateTime:   &t,
-				Resistance: &r,
 				Voltage:    &v,
 				Kelvin:     &k,
 				Celsius:    &c,
@@ -76,6 +74,5 @@ var _ = Describe("Temperature daemon", func() {
 		err := temperatureLogger.logTemperatureMetrics(&readings)
 
 		Expect(err).ToNot(HaveOccurred())
-
 	})
 })

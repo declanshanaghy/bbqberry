@@ -20,11 +20,8 @@ import (
 // NewGetProbeReadingsParams creates a new GetProbeReadingsParams object
 // with the default values initialized.
 func NewGetProbeReadingsParams() *GetProbeReadingsParams {
-	var (
-		probeDefault = int32(0)
-	)
+	var ()
 	return &GetProbeReadingsParams{
-		Probe: &probeDefault,
 
 		timeout: cr.DefaultTimeout,
 	}
@@ -33,11 +30,8 @@ func NewGetProbeReadingsParams() *GetProbeReadingsParams {
 // NewGetProbeReadingsParamsWithTimeout creates a new GetProbeReadingsParams object
 // with the default values initialized, and the ability to set a timeout on a request
 func NewGetProbeReadingsParamsWithTimeout(timeout time.Duration) *GetProbeReadingsParams {
-	var (
-		probeDefault = int32(0)
-	)
+	var ()
 	return &GetProbeReadingsParams{
-		Probe: &probeDefault,
 
 		timeout: timeout,
 	}
@@ -46,11 +40,8 @@ func NewGetProbeReadingsParamsWithTimeout(timeout time.Duration) *GetProbeReadin
 // NewGetProbeReadingsParamsWithContext creates a new GetProbeReadingsParams object
 // with the default values initialized, and the ability to set a context for a request
 func NewGetProbeReadingsParamsWithContext(ctx context.Context) *GetProbeReadingsParams {
-	var (
-		probeDefault = int32(0)
-	)
+	var ()
 	return &GetProbeReadingsParams{
-		Probe: &probeDefault,
 
 		Context: ctx,
 	}
@@ -62,7 +53,7 @@ for the get probe readings operation typically these are written to a http.Reque
 type GetProbeReadingsParams struct {
 
 	/*Probe
-	  The termerature probe to read from (or all probes if the given probe number is 0 or not specified)
+	  The termerature probe to read from (or all probes if not provided)
 
 	*/
 	Probe *int32

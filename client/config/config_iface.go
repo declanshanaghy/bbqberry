@@ -6,7 +6,7 @@ import (
 
 // Interface for client methods
 type ClientInterface interface {
-	GetConfig(params *GetConfigParams) (*GetConfigOK, error)
+	GetHardwareConfig(params *GetHardwareConfigParams) (*GetHardwareConfigOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }

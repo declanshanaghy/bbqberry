@@ -33,8 +33,8 @@ func NewBbqberryAPI(spec *loads.Document) *BbqberryAPI {
 		ServeError:      errors.ServeError,
 		JSONConsumer:    runtime.JSONConsumer(),
 		JSONProducer:    runtime.JSONProducer(),
-		ConfigGetConfigHandler: config.GetConfigHandlerFunc(func(params config.GetConfigParams) middleware.Responder {
-			return middleware.NotImplemented("operation ConfigGetConfig has not yet been implemented")
+		ConfigGetHardwareConfigHandler: config.GetHardwareConfigHandlerFunc(func(params config.GetHardwareConfigParams) middleware.Responder {
+			return middleware.NotImplemented("operation ConfigGetHardwareConfig has not yet been implemented")
 		}),
 		TemperatureGetMonitorsHandler: temperature.GetMonitorsHandlerFunc(func(params temperature.GetMonitorsParams) middleware.Responder {
 			return middleware.NotImplemented("operation TemperatureGetMonitors has not yet been implemented")
@@ -63,8 +63,8 @@ type BbqberryAPI struct {
 	// JSONProducer registers a producer for a "application/json" mime type
 	JSONProducer runtime.Producer
 
-	// ConfigGetConfigHandler sets the operation handler for the get config operation
-	ConfigGetConfigHandler config.GetConfigHandler
+	// ConfigGetHardwareConfigHandler sets the operation handler for the get hardware config operation
+	ConfigGetHardwareConfigHandler config.GetHardwareConfigHandler
 	// TemperatureGetMonitorsHandler sets the operation handler for the get monitors operation
 	TemperatureGetMonitorsHandler temperature.GetMonitorsHandler
 	// TemperatureGetProbeReadingsHandler sets the operation handler for the get probe readings operation
@@ -134,8 +134,8 @@ func (o *BbqberryAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
-	if o.ConfigGetConfigHandler == nil {
-		unregistered = append(unregistered, "config.GetConfigHandler")
+	if o.ConfigGetHardwareConfigHandler == nil {
+		unregistered = append(unregistered, "config.GetHardwareConfigHandler")
 	}
 
 	if o.TemperatureGetMonitorsHandler == nil {
@@ -233,7 +233,7 @@ func (o *BbqberryAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/config"] = config.NewGetConfig(o.context, o.ConfigGetConfigHandler)
+	o.handlers["GET"]["/hardware/config"] = config.NewGetHardwareConfig(o.context, o.ConfigGetHardwareConfigHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)

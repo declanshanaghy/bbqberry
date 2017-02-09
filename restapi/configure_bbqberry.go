@@ -12,6 +12,7 @@ import (
 	"github.com/Polarishq/middleware/framework"
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/Polarishq/middleware/handlers"
+	bbqframework "github.com/declanshanaghy/bbqberry/framework"
 	bbqhandlers "github.com/declanshanaghy/bbqberry/framework/handlers"
 	"github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/daemon"
@@ -19,6 +20,7 @@ import (
 	"github.com/declanshanaghy/bbqberry/restapi/operations"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/config"
 	"github.com/go-openapi/swag"
 	// Unsure why this is suppressed
 	_ "github.com/docker/go-units"
@@ -65,10 +67,14 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 	
 	api.JSONConsumer = runtime.JSONConsumer()
 	api.JSONProducer = runtime.JSONProducer()
-	
+
 	api.HealthHealthHandler = health.HealthHandlerFunc(
 		func(params health.HealthParams) middleware.Responder {
 			return framework.HandleAPIRequestWithError(backend.Health())
+		})
+	api.ConfigGetHardwareConfigHandler = config.GetHardwareConfigHandlerFunc(
+		func(params config.GetHardwareConfigParams) middleware.Responder {
+			return framework.HandleAPIRequestWithError(bbqframework.Constants.Hardware, nil)
 		})
 	api.TemperatureGetProbeReadingsHandler = temperature.GetProbeReadingsHandlerFunc(
 		func(params temperature.GetProbeReadingsParams) middleware.Responder {

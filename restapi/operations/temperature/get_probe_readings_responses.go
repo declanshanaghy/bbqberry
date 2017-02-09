@@ -20,7 +20,7 @@ type GetProbeReadingsOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *models.TemperatureReading `json:"body,omitempty"`
+	Payload models.TemperatureReadings `json:"body,omitempty"`
 }
 
 // NewGetProbeReadingsOK creates GetProbeReadingsOK with default headers values
@@ -29,13 +29,13 @@ func NewGetProbeReadingsOK() *GetProbeReadingsOK {
 }
 
 // WithPayload adds the payload to the get probe readings o k response
-func (o *GetProbeReadingsOK) WithPayload(payload *models.TemperatureReading) *GetProbeReadingsOK {
+func (o *GetProbeReadingsOK) WithPayload(payload models.TemperatureReadings) *GetProbeReadingsOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get probe readings o k response
-func (o *GetProbeReadingsOK) SetPayload(payload *models.TemperatureReading) {
+func (o *GetProbeReadingsOK) SetPayload(payload models.TemperatureReadings) {
 	o.Payload = payload
 }
 
@@ -43,12 +43,15 @@ func (o *GetProbeReadingsOK) SetPayload(payload *models.TemperatureReading) {
 func (o *GetProbeReadingsOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(200)
-	if o.Payload != nil {
-		payload := o.Payload
-		if err := producer.Produce(rw, payload); err != nil {
-			panic(err) // let the recovery middleware deal with this
-		}
+	payload := o.Payload
+	if payload == nil {
+		payload = make(models.TemperatureReadings, 0, 50)
 	}
+
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
+
 }
 
 /*GetProbeReadingsDefault Unexpected error

@@ -41,7 +41,7 @@ func NewStrandController() WS2801 {
 	config := framework.Constants.Hardware
 
 	bus := newSPIBus(0)
-	return newWS2801(config.NumLEDPixels, bus)
+	return newWS2801(*config.NumLedPixels, bus)
 }
 
 // NewTemperatureReader provides an abstracted interface to the temperature probes
@@ -49,7 +49,7 @@ func NewTemperatureReader() TemperatureReader {
 	config := framework.Constants.Hardware
 
 	bus := newSPIBus(1)
-	return newTemperatureReader(config.NumTemperatureProbes, bus)
+	return newTemperatureReader(int32(len(config.Probes)), bus)
 }
 
 func newSPIBus(channel byte) embd.SPIBus {

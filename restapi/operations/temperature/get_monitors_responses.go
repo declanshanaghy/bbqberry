@@ -44,6 +44,10 @@ func (o *GetMonitorsOK) WriteResponse(rw http.ResponseWriter, producer runtime.P
 
 	rw.WriteHeader(200)
 	payload := o.Payload
+	if payload == nil {
+		payload = make(models.TemperatureMonitors, 0, 50)
+	}
+
 	if err := producer.Produce(rw, payload); err != nil {
 		panic(err) // let the recovery middleware deal with this
 	}

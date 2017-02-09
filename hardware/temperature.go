@@ -16,15 +16,15 @@ import (
 // FakeTemps can be set to return specific analog readings during tests
 var FakeTemps = make(map[int32]int32, 0)
 
-const stubMaxA = 1023
 const stubMinA = 360
 
 func init() {
-	hardware := framework.Constants.Hardware
+	hwCfg := framework.Constants.Hardware
 
 	if framework.Constants.Stub {
-		for i := int32(1); i <= hardware.NumTemperatureProbes; i++ {
-			v := int32(rand.Intn(stubMinA) + (stubMaxA - stubMinA))
+		max := int32(len(hwCfg.Probes))
+		for i := int32(0); i < max; i++ {
+			v := int32(rand.Intn(stubMinA) + int(*hwCfg.AnalogMax-int32(stubMinA)))
 			log.Infof("probe %d init to %d", i, v)
 			FakeTemps[i] = v
 		}
@@ -79,7 +79,7 @@ func (s *temperatureReader) readProbe(probe int32) (v int32, err error) {
 	}
 	if framework.Constants.Stub {
 		v = FakeTemps[probe]
-		if v >= stubMaxA {
+		if v >= *framework.Constants.Hardware.AnalogMax {
 			v = stubMinA
 		}
 		FakeTemps[probe] = v + int32(rand.Intn(10))
@@ -100,36 +100,24 @@ func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 		return err
 	}
 
-	/*
-		Voltage divider configuration
-			vcc	(3.3v)
-		    /\
-			|
-			r1	(Temp Sensor)
-			|
-			|------> vOut
-			|
-			r2	(1k)
-			|
-		   ---
-			gnd	(0v)
-	*/
 	hwCfg := framework.Constants.Hardware
-	vOut := float32(analog) * hwCfg.AnalogVoltsPerUnit
-	r1 := int32(((hwCfg.VCC * hwCfg.VDivR2) / vOut) - hwCfg.VDivR2)
+	vOut := ConvertAnalogToVoltage(analog)
+
+	physProbe := hwCfg.Probes[probe-1]
+	probeLimits := physProbe.TempLimits
 
 	tempK, tempC, tempF := adafruitAD8495ThermocoupleVtoKCF(vOut)
-	log.Infof("probe=%d A=%d R=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
-		probe, analog, r1, vOut, tempK, tempC, tempF, hwCfg.MinTempWarnCelsius, hwCfg.MaxTempWarnCelsius)
+	log.Infof("probe=%d A=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
+		probe, analog, vOut, tempK, tempC, tempF, probeLimits.MinWarnCelsius, probeLimits.MaxWarnCelsius)
 
-	if tempC < hwCfg.MinTempWarnCelsius {
-		_, f := convertCToKF(float32(hwCfg.MinTempWarnCelsius))
-		reading.Warning = fmt.Sprintf("Low temperature limit exceeded: actual=%d °F < threshold=%d °F",
+	if tempC < *probeLimits.MinWarnCelsius {
+		_, f := convertCToKF(float32(*probeLimits.MinWarnCelsius))
+		reading.Warning = fmt.Sprintf("Low temperature limit exceeded: %d °F exceeds limit of °F",
 			tempF, int32(f))
 	}
-	if tempC > hwCfg.MaxTempWarnCelsius {
-		_, f := convertCToKF(float32(hwCfg.MaxTempWarnCelsius))
-		reading.Warning = fmt.Sprintf("High temperature limit exceeded: actual=%d °F > threshold=%d °F",
+	if tempC > *probeLimits.MaxWarnCelsius {
+		_, f := convertCToKF(float32(*probeLimits.MaxWarnCelsius))
+		reading.Warning = fmt.Sprintf("High temperature limit exceeded: %d °F  exceeds limit of %d °F",
 			tempF, int32(f))
 	}
 
@@ -138,7 +126,6 @@ func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 	reading.DateTime = &t
 	reading.Analog = &analog
 	reading.Voltage = &vOut
-	reading.Resistance = &r1
 	reading.Kelvin = &tempK
 	reading.Celsius = &tempC
 	reading.Fahrenheit = &tempF
@@ -163,6 +150,47 @@ func adafruitAD8495ThermocoupleVtoKCF(v float32) (tempK int32, tempC int32, temp
 	tempF = int32(fTempF)
 	tempK = int32(fTempK)
 	return
+}
+
+// ConvertVoltageToTemperature converts the given voltage value to its corresponding temperature values
+func ConvertVoltageToTemperature(v float32) (tempK int32, tempC int32, tempF int32) {
+	return adafruitAD8495ThermocoupleVtoKCF(v)
+}
+
+// ConvertAnalogToVoltage converts an analog reading to a voltage value
+func ConvertAnalogToVoltage(analog int32) float32 {
+	hwCfg := framework.Constants.Hardware
+	vcc := *hwCfg.Vcc
+	// volts per analog unit = VCC / Analog max
+	amax := float32(*hwCfg.AnalogMax)
+	avpu := vcc / amax
+	return float32(analog) * avpu
+}
+
+// ConvertCelsiusToAnalog converts the given voltage to its corresponding analog value
+func ConvertVoltageToAnalog(v float32) (a int32) {
+	hwCfg := framework.Constants.Hardware
+	vcc := *hwCfg.Vcc
+	amax := float32(*hwCfg.AnalogMax)
+	// volts per analog unit = VCC / Analog max
+	avpu := vcc / amax
+	// Therefore:
+	// 	analog = volts / avpu
+	return int32(v / avpu)
+}
+
+// ConvertCelsiusToAnalog converts an celsius templerate value to voltage
+func ConvertCelsiusToVoltage(c int32) (v float32) {
+	// According to adafruitAD8495ThermocoupleVtoKCF
+	// 	c = (v - 1.25 ) / 0.005
+	// Therefore:
+	v = float32(c)*0.005 + 1.25
+	return
+}
+
+// ConvertCelsiusToAnalog converts the given temperature to its corresponding analog reading
+func ConvertCelsiusToAnalog(c int32) (a int32) {
+	return ConvertVoltageToAnalog(ConvertCelsiusToVoltage(c))
 }
 
 // convertCToKF converts a celsius temperature to kelvin and fahrenheit

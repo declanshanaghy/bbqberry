@@ -5,7 +5,6 @@ package models
 
 import (
 	strfmt "github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/validate"
@@ -42,11 +41,6 @@ type TemperatureReading struct {
 	// Maximum: 7
 	// Minimum: 0
 	Probe *int32 `json:"probe"`
-
-	// resistance
-	// Maximum: 1e+06
-	// Minimum: 0
-	Resistance *int32 `json:"resistance,omitempty"`
 
 	// voltage
 	// Required: true
@@ -88,11 +82,6 @@ func (m *TemperatureReading) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateProbe(formats); err != nil {
-		// prop
-		res = append(res, err)
-	}
-
-	if err := m.validateResistance(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
@@ -172,23 +161,6 @@ func (m *TemperatureReading) validateProbe(formats strfmt.Registry) error {
 	}
 
 	if err := validate.MaximumInt("probe", "body", int64(*m.Probe), 7, false); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *TemperatureReading) validateResistance(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Resistance) { // not required
-		return nil
-	}
-
-	if err := validate.MinimumInt("resistance", "body", int64(*m.Resistance), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("resistance", "body", int64(*m.Resistance), 1e+06, false); err != nil {
 		return err
 	}
 

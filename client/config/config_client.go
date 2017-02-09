@@ -23,30 +23,30 @@ type Client struct {
 }
 
 /*
-GetConfig gets current configuration settings
+GetHardwareConfig gets current configuration settings
 */
-func (a *Client) GetConfig(params *GetConfigParams) (*GetConfigOK, error) {
+func (a *Client) GetHardwareConfig(params *GetHardwareConfigParams) (*GetHardwareConfigOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewGetConfigParams()
+		params = NewGetHardwareConfigParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "getConfig",
+		ID:                 "getHardwareConfig",
 		Method:             "GET",
-		PathPattern:        "/config",
+		PathPattern:        "/hardware/config",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &GetConfigReader{formats: a.formats},
+		Reader:             &GetHardwareConfigReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetConfigOK), nil
+	return result.(*GetHardwareConfigOK), nil
 
 }
 

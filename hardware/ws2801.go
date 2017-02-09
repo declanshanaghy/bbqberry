@@ -9,12 +9,12 @@ import (
 
 // WS2801 privdes an interface for communicating with an LED strip which uses the WS2801 chip
 type WS2801 interface {
-	GetNumPixels() int
+	GetNumPixels() int32
 	Close() error
 	Off() error
 	Update() error
-	SetPixelRGB(n int, r uint8, g uint8, b uint8) error
-	SetPixelColor(n int, color int) error
+	SetPixelRGB(n int32, r uint8, g uint8, b uint8) error
+	SetPixelColor(n int32, color int) error
 	SetAllPixels(color int) error
 }
 
@@ -25,21 +25,21 @@ type ws2801Strand struct {
 }
 
 // newWS2801 creates a new object capable of communicating with a WS2801 LED strip
-func newWS2801(nPixels int, bus embd.SPIBus) WS2801 {
+func newWS2801(nPixels int32, bus embd.SPIBus) WS2801 {
 	return &ws2801Strand{
 		bus:    bus,
-		pixels: make([]uint8, nPixels*3),
-		data:   make([]uint8, nPixels*3),
+		pixels: make([]uint8, int(nPixels)*3),
+		data:   make([]uint8, int(nPixels)*3),
 	}
 }
 
-func (s *ws2801Strand) GetNumPixels() int {
-	return len(s.pixels) / 3
+func (s *ws2801Strand) GetNumPixels() int32 {
+	return int32(len(s.pixels) / 3)
 }
 
 func (s *ws2801Strand) Off() error {
 	log.Infof("action=Off nPixels=%d", s.GetNumPixels())
-	for i := 0; i < s.GetNumPixels(); i++ {
+	for i := int32(0); i < s.GetNumPixels(); i++ {
 		s.SetPixelColor(i, 0)
 	}
 	return s.Update()
@@ -57,7 +57,7 @@ func (s *ws2801Strand) Update() error {
 	return s.bus.TransferAndReceiveData(s.data)
 }
 
-func (s *ws2801Strand) SetPixelColor(n int, color int) error {
+func (s *ws2801Strand) SetPixelColor(n int32, color int) error {
 	log.Debugf("action=SetPixelColor n=%d, color=%#06x", n, color)
 	return s.SetPixelRGB(n, uint8(color>>16&0xFF), uint8(color>>8&0xFF), uint8(color&0xFF))
 }
@@ -67,7 +67,7 @@ func (s *ws2801Strand) SetAllPixels(color int) error {
 	r := uint8(color >> 16 & 0xFF)
 	g := uint8(color >> 8 & 0xFF)
 	b := uint8(color & 0xFF)
-	for i := 0; i < s.GetNumPixels(); i++ {
+	for i := int32(0); i < s.GetNumPixels(); i++ {
 		if err := s.SetPixelRGB(i, r, g, b); err != nil {
 			return err
 		}
@@ -75,7 +75,7 @@ func (s *ws2801Strand) SetAllPixels(color int) error {
 	return nil
 }
 
-func (s *ws2801Strand) SetPixelRGB(n int, r uint8, g uint8, b uint8) error {
+func (s *ws2801Strand) SetPixelRGB(n int32, r uint8, g uint8, b uint8) error {
 	if err := s.validatePixel(n); err != nil {
 		return err
 	}
@@ -87,8 +87,8 @@ func (s *ws2801Strand) SetPixelRGB(n int, r uint8, g uint8, b uint8) error {
 	return nil
 }
 
-func (s *ws2801Strand) validatePixel(n int) (err error) {
-	if n < 0 || n > s.GetNumPixels() {
+func (s *ws2801Strand) validatePixel(n int32) (err error) {
+	if n < int32(0) || n > s.GetNumPixels() {
 		err = fmt.Errorf("action=invalid pixel=%d, max=%d", n, s.GetNumPixels())
 	}
 	return err

@@ -18,12 +18,8 @@ import (
 // NewGetProbeReadingsParams creates a new GetProbeReadingsParams object
 // with the default values initialized.
 func NewGetProbeReadingsParams() GetProbeReadingsParams {
-	var (
-		probeDefault = int32(0)
-	)
-	return GetProbeReadingsParams{
-		Probe: &probeDefault,
-	}
+	var ()
+	return GetProbeReadingsParams{}
 }
 
 // GetProbeReadingsParams contains all the bound params for the get probe readings operation
@@ -35,11 +31,10 @@ type GetProbeReadingsParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request
 
-	/*The termerature probe to read from (or all probes if the given probe number is 0 or not specified)
-	  Maximum: 3
+	/*The termerature probe to read from (or all probes if not provided)
+	  Maximum: 7
 	  Minimum: 0
 	  In: query
-	  Default: 0
 	*/
 	Probe *int32
 }
@@ -69,8 +64,6 @@ func (o *GetProbeReadingsParams) bindProbe(rawData []string, hasKey bool, format
 		raw = rawData[len(rawData)-1]
 	}
 	if raw == "" { // empty values pass all other validations
-		var probeDefault int32 = int32(0)
-		o.Probe = &probeDefault
 		return nil
 	}
 
@@ -93,7 +86,7 @@ func (o *GetProbeReadingsParams) validateProbe(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := validate.MaximumInt("probe", "query", int64(*o.Probe), 3, false); err != nil {
+	if err := validate.MaximumInt("probe", "query", int64(*o.Probe), 7, false); err != nil {
 		return err
 	}
 

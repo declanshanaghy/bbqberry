@@ -37,7 +37,7 @@ type GetMonitorsParams struct {
 
 	/*The termerature probe for which to retrieve configured monitors (or all probes if the given probe number is 0 or not specified)
 	  Required: true
-	  Maximum: 3
+	  Maximum: 7
 	  Minimum: 0
 	  In: query
 	  Default: 0
@@ -95,7 +95,7 @@ func (o *GetMonitorsParams) validateProbe(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := validate.MaximumInt("probe", "query", int64(o.Probe), 3, false); err != nil {
+	if err := validate.MaximumInt("probe", "query", int64(o.Probe), 7, false); err != nil {
 		return err
 	}
 

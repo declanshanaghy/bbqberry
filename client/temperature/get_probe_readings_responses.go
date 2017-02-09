@@ -52,7 +52,7 @@ func NewGetProbeReadingsOK() *GetProbeReadingsOK {
 Temperature was read successfully
 */
 type GetProbeReadingsOK struct {
-	Payload *models.TemperatureReading
+	Payload models.TemperatureReadings
 }
 
 func (o *GetProbeReadingsOK) Error() string {
@@ -61,10 +61,8 @@ func (o *GetProbeReadingsOK) Error() string {
 
 func (o *GetProbeReadingsOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.TemperatureReading)
-
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 
