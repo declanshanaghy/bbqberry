@@ -20,7 +20,7 @@ var _ = Describe("Temperature package", func() {
 			}
 
 			for c, answer := range conversions {
-				k, f := convertCToKF(c)
+				k, f := ConvertCToKF(c)
 				Expect(k).To(BeNumerically("~", answer[0], precision))
 				Expect(f).To(BeNumerically("~", answer[1], precision))
 			}

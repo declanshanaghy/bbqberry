@@ -11,6 +11,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/kidoman/embd"
 	"github.com/kidoman/embd/convertors/mcp3008"
+	"github.com/declanshanaghy/bbqberry/util"
 )
 
 // FakeTemps can be set to return specific analog readings during tests
@@ -111,12 +112,12 @@ func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 		probe, analog, vOut, tempK, tempC, tempF, probeLimits.MinWarnCelsius, probeLimits.MaxWarnCelsius)
 
 	if tempC < *probeLimits.MinWarnCelsius {
-		_, f := convertCToKF(float32(*probeLimits.MinWarnCelsius))
-		reading.Warning = fmt.Sprintf("Low temperature limit exceeded: %d °F exceeds limit of °F",
+		_, f := ConvertCToKF(float32(*probeLimits.MinWarnCelsius))
+		reading.Warning = fmt.Sprintf("Low temperature limit exceeded: %d °F exceeds limit of %d °F",
 			tempF, int32(f))
 	}
 	if tempC > *probeLimits.MaxWarnCelsius {
-		_, f := convertCToKF(float32(*probeLimits.MaxWarnCelsius))
+		_, f := ConvertCToKF(float32(*probeLimits.MaxWarnCelsius))
 		reading.Warning = fmt.Sprintf("High temperature limit exceeded: %d °F  exceeds limit of %d °F",
 			tempF, int32(f))
 	}
@@ -145,10 +146,10 @@ func adafruitAD8495ThermocoupleVtoKCF(v float32) (tempK int32, tempC int32, temp
 	// The temperature is (1.5 - 1.25) / 0.005 = 50°C
 
 	fTempC := (v - 1.25) / 0.005
-	tempC = int32(fTempC)
-	fTempK, fTempF := convertCToKF(fTempC)
-	tempF = int32(fTempF)
-	tempK = int32(fTempK)
+	tempC = util.RoundFloat32ToInt32(fTempC)
+	fTempK, fTempF := ConvertCToKF(fTempC)
+	tempF = util.RoundFloat32ToInt32(fTempF)
+	tempK = util.RoundFloat32ToInt32(fTempK)
 	return
 }
 
@@ -176,7 +177,8 @@ func ConvertVoltageToAnalog(v float32) (a int32) {
 	avpu := vcc / amax
 	// Therefore:
 	// 	analog = volts / avpu
-	return int32(v / avpu)
+	a = util.RoundFloat32ToInt32(v / avpu)
+	return
 }
 
 // ConvertCelsiusToAnalog converts an celsius templerate value to voltage
@@ -184,17 +186,18 @@ func ConvertCelsiusToVoltage(c int32) (v float32) {
 	// According to adafruitAD8495ThermocoupleVtoKCF
 	// 	c = (v - 1.25 ) / 0.005
 	// Therefore:
-	v = float32(c)*0.005 + 1.25
+	v = float32(c) * 0.005 + 1.25
 	return
 }
 
 // ConvertCelsiusToAnalog converts the given temperature to its corresponding analog reading
 func ConvertCelsiusToAnalog(c int32) (a int32) {
-	return ConvertVoltageToAnalog(ConvertCelsiusToVoltage(c))
+	v := ConvertCelsiusToVoltage(c)
+	return ConvertVoltageToAnalog(v)
 }
 
-// convertCToKF converts a celsius temperature to kelvin and fahrenheit
-func convertCToKF(tempC float32) (tempK float32, tempF float32) {
+// ConvertCToKF converts a celsius temperature to kelvin and fahrenheit
+func ConvertCToKF(tempC float32) (tempK float32, tempF float32) {
 	tempK = tempC + 273.15 // C to K
 	tempF = tempC*1.8 + 32 // C to F
 	return

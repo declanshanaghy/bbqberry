@@ -7,6 +7,7 @@ import (
 	"github.com/declanshanaghy/bbqberry/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"fmt"
 )
 
 var _ = Describe("Hardware package", func() {
@@ -41,6 +42,7 @@ var _ = Describe("Hardware package", func() {
 		max := *lim.MaxWarnCelsius
 		lowAnalogBoundary := hardware.ConvertCelsiusToAnalog(min)
 		highAnalogBoundary := hardware.ConvertCelsiusToAnalog(max)
+		analog1Degree := hardware.ConvertCelsiusToAnalog(1) - hardware.ConvertCelsiusToAnalog(0)
 
 		It("should return a warning on low temp reading", func() {
 			reader := hardware.NewTemperatureReader()
@@ -67,18 +69,19 @@ var _ = Describe("Hardware package", func() {
 			reader := hardware.NewTemperatureReader()
 			reading := models.TemperatureReading{}
 
-			hardware.FakeTemps[1] = highAnalogBoundary
+			hardware.FakeTemps[1] = highAnalogBoundary + analog1Degree
 			reader.GetTemperatureReading(1, &reading)
 
-			Expect(reading.Warning).To(Equal("High temperature limit exceeded: " +
-				"609 °F exceeds limit of 608 °F"))
+			_, maxF := hardware.ConvertCToKF(float32(max))
+			msg := fmt.Sprintf("High temperature limit exceeded: 609 °F exceeds limit of %d °F", maxF)
+			Expect(reading.Warning).To(Equal(msg))
 			Expect(*reading.Celsius).To(BeNumerically(">", max))
 		})
 		It("should return no warnings when below the high limit", func() {
 			reader := hardware.NewTemperatureReader()
 			reading := models.TemperatureReading{}
 
-			hardware.FakeTemps[1] = highAnalogBoundary - 1
+			hardware.FakeTemps[1] = highAnalogBoundary
 			reader.GetTemperatureReading(1, &reading)
 
 			Expect(reading.Warning).To(Equal(""))
