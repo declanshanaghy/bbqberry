@@ -2,7 +2,7 @@ package util
 
 import "math"
 
-// Rounds the given number to the requested precision
+// Round rounds the given number to the requested precision
 func Round(val float64, roundOn float64, places int) (newVal float64) {
 	var round float64
 	pow := math.Pow(10, float64(places))
@@ -17,7 +17,7 @@ func Round(val float64, roundOn float64, places int) (newVal float64) {
 	return
 }
 
-// Rounds the given float as per standard math rounding rules
+// RoundFloat32ToInt32 the given float as per standard math rounding rules
 func RoundFloat32ToInt32(v float32) int32 {
 	return int32(Round(float64(v), .5, 0))
 }

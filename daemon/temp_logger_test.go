@@ -45,7 +45,7 @@ var _ = Describe("Temperature daemon", func() {
 
 		Expect(len(*readings)).To(Equal(int(temperatureLogger.reader.GetNumProbes())))
 		for i, r := range *readings {
-			Expect(*r.Probe).To(Equal(int32(i + 1)))
+			Expect(*r.Probe).To(Equal(int32(i)))
 		}
 	})
 	It("should log temperature readings successfully", func() {

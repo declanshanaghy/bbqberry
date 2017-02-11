@@ -44,7 +44,7 @@ var _ = Describe("Termperatures API", func() {
 	It("should return all temperature readings when not given a probe number", func() {
 		started := time.Now()
 
-		probe := int32(0)
+		probe := int32(-1)
 		params := temperature.GetProbeReadingsParams{
 			Probe: &probe,
 		}
@@ -56,7 +56,7 @@ var _ = Describe("Termperatures API", func() {
 			"Incorrect number of readings returneds")
 
 		for i, reading := range m {
-			Expect(int32(i+1)).To(
+			Expect(int32(i)).To(
 				Equal(*reading.Probe),
 				fmt.Sprintf("Probe %d has incorrect number", i))
 			dt, err := strfmt.ParseDateTime(reading.DateTime.String())

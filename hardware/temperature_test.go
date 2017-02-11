@@ -1,31 +1,30 @@
 package hardware_test
 
 import (
+	"fmt"
+
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"fmt"
 )
 
 var _ = Describe("Hardware package", func() {
+	probe := int32(0)
+	hwCfg := framework.Constants.Hardware
+	lim := hwCfg.Probes[probe].TempLimits
+	minC := *lim.MinWarnCelsius
+	maxC := *lim.MaxWarnCelsius
+	minA := hardware.ConvertCelsiusToAnalog(minC)
+	maxA := hardware.ConvertCelsiusToAnalog(maxC)
+	_, minF := hardware.ConvertCToKFInt32(float32(minC))
+	_, maxF := hardware.ConvertCToKFInt32(float32(maxC))
+
+	log.Infof("minC=%d minA=%d maxC=%d maxA=%d", minC, minA, maxC, maxA)
+
 	Context("conversion functions", func() {
-		It("convert celsius to analog successfully", func() {
-			hwCfg := framework.Constants.Hardware
-			lim := hwCfg.Probes[0].TempLimits
-			min := *lim.MinAbsCelsius
-			max := *lim.MaxAbsCelsius
-
-			l := hardware.ConvertCelsiusToAnalog(min)
-			log.Infof("MIN=%d, l=%d", min, l)
-			h := hardware.ConvertCelsiusToAnalog(max)
-			log.Infof("MAX=%d h=%d", max, h)
-
-			Expect(l).To(Equal(int32(310)))
-			Expect(h).To(Equal(int32(1008)))
-		})
 		//It("convert analog to voltage successfully", func() {
 		//	v := hardware.ConvertAnalogToVoltage(0)
 		//	Expect(v).To(Equal(0))
@@ -36,56 +35,51 @@ var _ = Describe("Hardware package", func() {
 		})
 	})
 	Context("TemperatureReader object", func() {
-		hwCfg := framework.Constants.Hardware
-		lim := hwCfg.Probes[0].TempLimits
-		min := *lim.MinWarnCelsius
-		max := *lim.MaxWarnCelsius
-		lowAnalogBoundary := hardware.ConvertCelsiusToAnalog(min)
-		highAnalogBoundary := hardware.ConvertCelsiusToAnalog(max)
-		analog1Degree := hardware.ConvertCelsiusToAnalog(1) - hardware.ConvertCelsiusToAnalog(0)
-
 		It("should return a warning on low temp reading", func() {
 			reader := hardware.NewTemperatureReader()
 			reading := models.TemperatureReading{}
 
-			hardware.FakeTemps[1] = lowAnalogBoundary - 1
-			reader.GetTemperatureReading(1, &reading)
+			actualA := minA - 1
+			_, actualF := hardware.ConvertAnalogToCF(actualA)
+			hardware.FakeTemps[probe] = actualA
+			reader.GetTemperatureReading(probe, &reading)
 
-			Expect(reading.Warning).To(Equal("Low temperature limit exceeded: " +
-				"-41 °F exceeds limit of -40 °F"))
-			Expect(*reading.Celsius).To(BeNumerically("<", min))
+			msg := fmt.Sprintf("Low temperature limit exceeded: %d °F exceeds limit of %d °F", actualF, minF)
+			Expect(reading.Warning).To(Equal(msg))
+			Expect(*reading.Celsius).To(BeNumerically("<", minC))
 		})
 		It("should return no warnings when above the low limit", func() {
 			reader := hardware.NewTemperatureReader()
 			reading := models.TemperatureReading{}
 
-			hardware.FakeTemps[1] = lowAnalogBoundary
-			reader.GetTemperatureReading(1, &reading)
+			hardware.FakeTemps[probe] = minA
+			reader.GetTemperatureReading(probe, &reading)
 
 			Expect(reading.Warning).To(Equal(""))
-			Expect(*reading.Celsius).To(Equal(min))
+			Expect(*reading.Celsius).To(Equal(minC))
 		})
 		It("should return a warning on high temp reading", func() {
 			reader := hardware.NewTemperatureReader()
 			reading := models.TemperatureReading{}
 
-			hardware.FakeTemps[1] = highAnalogBoundary + analog1Degree
-			reader.GetTemperatureReading(1, &reading)
+			actualA := maxA + 2
+			_, actualF := hardware.ConvertAnalogToCF(actualA)
+			hardware.FakeTemps[probe] = actualA
+			reader.GetTemperatureReading(probe, &reading)
 
-			_, maxF := hardware.ConvertCToKF(float32(max))
-			msg := fmt.Sprintf("High temperature limit exceeded: 609 °F exceeds limit of %d °F", maxF)
+			msg := fmt.Sprintf("High temperature limit exceeded: %d °F exceeds limit of %d °F", actualF, maxF)
 			Expect(reading.Warning).To(Equal(msg))
-			Expect(*reading.Celsius).To(BeNumerically(">", max))
+			Expect(*reading.Celsius).To(BeNumerically(">", maxC))
 		})
 		It("should return no warnings when below the high limit", func() {
 			reader := hardware.NewTemperatureReader()
 			reading := models.TemperatureReading{}
 
-			hardware.FakeTemps[1] = highAnalogBoundary
-			reader.GetTemperatureReading(1, &reading)
+			hardware.FakeTemps[probe] = maxA
+			reader.GetTemperatureReading(probe, &reading)
 
 			Expect(reading.Warning).To(Equal(""))
-			Expect(*reading.Celsius).To(Equal(max))
+			Expect(*reading.Celsius).To(Equal(maxC))
 		})
 	})
 })
