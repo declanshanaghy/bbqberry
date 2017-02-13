@@ -47,8 +47,8 @@ var _ = Describe("Termperatures API", func() {
 		params := temperature.GetProbeReadingsParams{}
 		m, err := GetTemperatureProbeReadings(&params)
 
-		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings " +
-				"should not have returned an error")
+		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings "+
+			"should not have returned an error")
 		Expect(m).To(HaveLen(len(hwCfg.Probes)), "Incorrect number of readings returneds")
 
 		for i, reading := range m {
@@ -70,7 +70,7 @@ var _ = Describe("Termperatures API", func() {
 		m, err := GetTemperatureProbeReadings(&params)
 
 		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings should not have returned an error")
-		Expect(m).To(HaveLen(len(hwCfg.Probes)),"Incorrect number of readings returneds")
+		Expect(m).To(HaveLen(len(hwCfg.Probes)), "Incorrect number of readings returneds")
 
 		for i, reading := range m {
 			Expect(int32(i)).To(

@@ -26,18 +26,22 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
             };
 
             var setupProbeSlide = function(d3, probe) {
+                var freeze = celsiusToFahrenheit(0);
+
                 var limits = probe.tempLimits;
-                var minAbs = limits.minAbsCelsius;
-                var maxWarn = limits.maxWarnCelsius;
-                var maxAbs = limits.maxAbsCelsius;
-                var colorStep = 1;
-                var gradStep = 50;
+                var minAbs = celsiusToFahrenheit(limits.minAbsCelsius);
+                if (minAbs < 0)
+                    minAbs = 0;
+                var maxWarn = celsiusToFahrenheit(limits.maxWarnCelsius);
+                var maxAbs = roundUpTo100(celsiusToFahrenheit(limits.maxAbsCelsius));
+                var colorStep = 10;
+                var gradStep = 100;
                 var steps = (maxAbs - minAbs) / colorStep;
 
                 var grads = d3.scale.linear()
                     .range([minAbs, maxAbs])
                     .clamp(true)
-                    .interpolate(d3.interpolateRound);
+                    .interpolate(d3.interpolate);
 
                 var subZero = d3.scale.linear()
                     .range(["#0000ff", "#00ff00"])
@@ -55,8 +59,8 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
                     var mx = colorStep + mn;
 
                     var c = color(i);
-                    if (mx < 0) {
-                        c = subZero(i * 5);
+                    if (mx < freeze) {
+                        c = subZero(i * 25);
                     }
                     if (mn > maxWarn) {
                         c = "#FF0000"
