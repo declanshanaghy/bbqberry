@@ -8,7 +8,7 @@
     z-index: 10;
 }
 
-.probe-danger:empty {
+.hide-empty:empty {
     display: none;
 }
 
@@ -23,6 +23,7 @@
 }
 
 .probe-slide {
+    text-align: center;
 }
 
 .probe-guage {

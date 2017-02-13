@@ -20,11 +20,8 @@ import (
 // NewGetMonitorsParams creates a new GetMonitorsParams object
 // with the default values initialized.
 func NewGetMonitorsParams() *GetMonitorsParams {
-	var (
-		probeDefault = int32(0)
-	)
+	var ()
 	return &GetMonitorsParams{
-		Probe: probeDefault,
 
 		timeout: cr.DefaultTimeout,
 	}
@@ -33,11 +30,8 @@ func NewGetMonitorsParams() *GetMonitorsParams {
 // NewGetMonitorsParamsWithTimeout creates a new GetMonitorsParams object
 // with the default values initialized, and the ability to set a timeout on a request
 func NewGetMonitorsParamsWithTimeout(timeout time.Duration) *GetMonitorsParams {
-	var (
-		probeDefault = int32(0)
-	)
+	var ()
 	return &GetMonitorsParams{
-		Probe: probeDefault,
 
 		timeout: timeout,
 	}
@@ -46,11 +40,8 @@ func NewGetMonitorsParamsWithTimeout(timeout time.Duration) *GetMonitorsParams {
 // NewGetMonitorsParamsWithContext creates a new GetMonitorsParams object
 // with the default values initialized, and the ability to set a context for a request
 func NewGetMonitorsParamsWithContext(ctx context.Context) *GetMonitorsParams {
-	var (
-		probeDefault = int32(0)
-	)
+	var ()
 	return &GetMonitorsParams{
-		Probe: probeDefault,
 
 		Context: ctx,
 	}
@@ -62,7 +53,7 @@ for the get monitors operation typically these are written to a http.Request
 type GetMonitorsParams struct {
 
 	/*Probe
-	  The termerature probe for which to retrieve configured monitors (or all probes if the given probe number is 0 or not specified)
+	  The termerature probe for which to retrieve configured monitors (or all probes if the given probe number is not provided)
 
 	*/
 	Probe int32

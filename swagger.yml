@@ -36,11 +36,10 @@ paths:
         - name: probe
           in: query
           description: The termerature probe for which to retrieve configured monitors (or all probes if the
-            given probe number is 0 or not specified)
+            given probe number is not provided)
           required: true
           type: integer
           format: int32
-          default: 0
           minimum: 0
           maximum: 7
       responses:

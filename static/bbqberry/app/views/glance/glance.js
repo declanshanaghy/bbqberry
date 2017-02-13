@@ -9,41 +9,33 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
         })
     }])
 
-    .controller('GlanceController', ['$scope', '$http', 'poller', 'd3Service',
-        function ($scope, $http, poller, d3Service) {
-            $scope.carouselInterval = 0;
-            $scope.carouselNoWrap = false;
-            $scope.carouselActive = false;
-            $scope.activeSlide = 0;
-            $scope.probes = [];
+    .controller('GlanceController', ['$q', '$scope', '$http', 'poller', 'd3Service',
+        function ($q, $scope, $http, poller, d3Service) {
+            var pollProbeData = function() {
+                var myPoller = poller.get('/api/v1/temperatures/probes', {
+                    action: 'get',
+                    delay: 1000
+                });
 
-            $scope.swipeLeft = function() {
-                // console.log('swipe left: curr=' + $scope.activeSlide);
-                var curr = $scope.activeSlide + 1;
-                if ( curr > $scope.probes.length - 1 )
-                    curr = $scope.probes.length - 1;
-                $scope.activeSlide = curr;
-                // console.log('swipe left: new=' + $scope.activeSlide);
-            };
-            $scope.swipeRight = function() {
-                // console.log('swipe right: curr=' + $scope.activeSlide);
-                var curr = $scope.activeSlide - 1;
-                if ( curr < 0 )
-                    curr = 0;
-                $scope.activeSlide = curr;
-                // console.log('swipe right: new=' + $scope.activeSlide);
+                myPoller.promise.then(null, null, function (response) {
+                    for (var i = 0; i < $scope.probes.length; i++) {
+                        $scope.probes[i].reading = response.data[i];
+                    }
+                    $scope.carouselActive = true;
+                });
             };
 
-            d3Service.d3().then(function (d3) {
-                var min = 0;
-                var warn = 600;
-                var max = 800;
+            var setupProbeSlide = function(d3, probe) {
+                var limits = probe.tempLimits;
+                var minAbs = limits.minAbsCelsius;
+                var maxWarn = limits.maxWarnCelsius;
+                var maxAbs = limits.maxAbsCelsius;
                 var colorStep = 1;
-                var gradStep = 100;
-                var steps = (max - min) / colorStep;
+                var gradStep = 50;
+                var steps = (maxAbs - minAbs) / colorStep;
 
                 var grads = d3.scale.linear()
-                    .range([min, max])
+                    .range([minAbs, maxAbs])
                     .clamp(true)
                     .interpolate(d3.interpolateRound);
 
@@ -54,41 +46,87 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
                     .range(["#00ff00", "#FF5F05"])
                     .interpolate(d3.interpolateHcl);
 
-                $scope.ranges = [];
+                var guage = {};
+                probe.guage = guage;
+                guage.ranges = [];
 
                 for (var i = 0; i <= 1; i += 1.0 / steps) {
                     var mn = grads(i);
                     var mx = colorStep + mn;
 
                     var c = color(i);
-                    if ( mx < 32 ) {
-                        c = subZero(i * 25);
+                    if (mx < 0) {
+                        c = subZero(i * 5);
                     }
-                    if ( mn > warn ) {
+                    if (mn > maxWarn) {
                         c = "#FF0000"
                     }
 
-                    $scope.ranges[$scope.ranges.length] = {
+                    guage.ranges[guage.ranges.length] = {
                         min: mn,
                         max: mx,
                         color: c
                     };
                 }
-                $scope.lowerLimit = min;
-                $scope.upperLimit = $scope.ranges[$scope.ranges.length - 1].max;
-                $scope.majorGraduations = ((max - min) / gradStep) + 1;
+                guage.lowerLimit = minAbs;
+                guage.upperLimit = maxAbs;
+                guage.majorGraduations = ((maxAbs - minAbs) / gradStep) + 1;
+            };
 
-                var myPoller = poller.get('/api/v1/temperatures/probes', {
-                    action: 'get',
-                    delay: 1000
+            var getHardwareConfig = function() {
+                return $q(function(resolve, reject) {
+                    $http({
+                        method: 'GET',
+                        url: '/api/v1/hardware/config'
+                    }).then(function successCallback(response) {
+                        $scope.probes = response['data'].probes;
+                        for (var i = 0; i < $scope.probes.length; i++) {
+                            $scope.probes[i].index = i;
+                        }
+                        resolve();
+                    }, function errorCallback(response) {
+                        reject(response['data']);
+                    });
                 });
+            };
 
-                myPoller.promise.then(null, null, function (response) {
-                    // console.log(response['data']);
-                    $scope.probes = response['data'];
-                    // $scope.probes[0].warning = "High temperature limit exceeded: actual=378 °C > threshold=360 °C";
-                    $scope.carouselActive = true;
-                    // console.log("Probe " + lastActive + " is active");
-                });
+            $scope.carouselInterval = 0;
+            $scope.carouselNoWrap = false;
+            $scope.carouselActive = false;
+            $scope.activeSlide = 0;
+            $scope.probes = [];
+
+            $scope.swipeLeft = function() {
+                var curr = $scope.activeSlide + 1;
+                if ( curr > $scope.probes.length - 1 ) {
+                    if ( $scope.carouselNoWrap )
+                        curr = $scope.probes.length - 1;
+                    else
+                        curr = 0;
+                }
+                $scope.activeSlide = curr;
+            };
+            $scope.swipeRight = function() {
+                var curr = $scope.activeSlide - 1;
+                if ( curr < 0 ) {
+                    if ( $scope.carouselNoWrap )
+                        curr = 0;
+                    else
+                        curr = $scope.probes.length - 1;
+                }
+                $scope.activeSlide = curr;
+            };
+
+            d3Service.d3().then(function (d3) {
+                getHardwareConfig().then(function() {
+                        for (var i = 0; i < $scope.probes.length; i++) {
+                            setupProbeSlide(d3, $scope.probes[i]);
+                        }
+                        pollProbeData();
+                    },
+                    function (data) {
+                        $scope.$parent.$glblwarning = data;
+                    }
+                )
             });
         }]);

@@ -18,12 +18,8 @@ import (
 // NewGetMonitorsParams creates a new GetMonitorsParams object
 // with the default values initialized.
 func NewGetMonitorsParams() GetMonitorsParams {
-	var (
-		probeDefault = int32(0)
-	)
-	return GetMonitorsParams{
-		Probe: probeDefault,
-	}
+	var ()
+	return GetMonitorsParams{}
 }
 
 // GetMonitorsParams contains all the bound params for the get monitors operation
@@ -35,12 +31,11 @@ type GetMonitorsParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request
 
-	/*The termerature probe for which to retrieve configured monitors (or all probes if the given probe number is 0 or not specified)
+	/*The termerature probe for which to retrieve configured monitors (or all probes if the given probe number is not provided)
 	  Required: true
 	  Maximum: 7
 	  Minimum: 0
 	  In: query
-	  Default: 0
 	*/
 	Probe int32
 }

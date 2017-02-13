@@ -23,8 +23,8 @@ func init() {
 	hwCfg := framework.Constants.Hardware
 
 	if framework.Constants.Stub {
-		max := int32(len(hwCfg.Probes))
-		for i := int32(0); i < max; i++ {
+		nProbes := int32(len(hwCfg.Probes))
+		for i := int32(0); i < nProbes; i++ {
 			v := int32(rand.Intn(stubMinA) + int(*hwCfg.AnalogMax-int32(stubMinA)))
 			log.Infof("probe %d init to %d", i, v)
 			FakeTemps[i] = v
@@ -186,7 +186,7 @@ func ConvertCelsiusToVoltage(c int32) (v float32) {
 	// According to adafruitAD8495ThermocoupleVtoKCF
 	// 	c = (v - 1.25 ) / 0.005
 	// Therefore:
-	v = float32(c)*0.005 + 1.25
+	v = float32(c) * 0.005 + 1.25
 	return
 }
 
@@ -206,7 +206,7 @@ func ConvertAnalogToCF(a int32) (int32, int32) {
 // ConvertCToKF converts a celsius temperature to kelvin and fahrenheit
 func ConvertCToKF(tempC float32) (tempK, tempF float32) {
 	tempK = tempC + 273.15 // C to K
-	tempF = tempC*1.8 + 32 // C to F
+	tempF = tempC * 1.8 + 32 // C to F
 	return
 }
 

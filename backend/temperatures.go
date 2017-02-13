@@ -15,7 +15,7 @@ func GetTemperatureProbeReadings(params *temperature.GetProbeReadingsParams) (m 
 	var probes []int32
 	var i int32
 
-	if *params.Probe < 0 {
+	if params.Probe == nil || *params.Probe < 0 {
 		probes = make([]int32, tReader.GetNumProbes())
 		for i = 0; i < tReader.GetNumProbes(); i++ {
 			probes[i] = i
