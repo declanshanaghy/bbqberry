@@ -44,7 +44,7 @@ var _ = Describe("Hardware package", func() {
 			hardware.FakeTemps[probe] = actualA
 			reader.GetTemperatureReading(probe, &reading)
 
-			msg := fmt.Sprintf("Low temperature limit exceeded: %d °F exceeds limit of %d °F", actualF, minF)
+			msg := fmt.Sprintf("%d °F exceeds low temperature limit of %d °F", actualF, minF)
 			Expect(reading.Warning).To(Equal(msg))
 			Expect(*reading.Celsius).To(BeNumerically("<", minC))
 		})
@@ -67,7 +67,7 @@ var _ = Describe("Hardware package", func() {
 			hardware.FakeTemps[probe] = actualA
 			reader.GetTemperatureReading(probe, &reading)
 
-			msg := fmt.Sprintf("High temperature limit exceeded: %d °F exceeds limit of %d °F", actualF, maxF)
+			msg := fmt.Sprintf("%d °F exceeds high temperature limit of %d °F", actualF, maxF)
 			Expect(reading.Warning).To(Equal(msg))
 			Expect(*reading.Celsius).To(BeNumerically(">", maxC))
 		})

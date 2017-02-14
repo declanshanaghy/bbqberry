@@ -5,7 +5,7 @@
         <div class="alert alert-danger probe-danger hide-empty">{{probe.reading.warning}}</div>
         <div class="probe-guage"
              ng-radial-gauge ranges="probe.guage.ranges" value="probe.reading.celsius"
-             value-unit="'° C'" precision="0"
+             value-unit="'° F'" precision="0"
              major-graduations="{{probe.guage.majorGraduations}}"
              lower-limit="probe.guage.lowerLimit" upper-limit="probe.guage.upperLimit">
         </div>

@@ -34,9 +34,9 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
                     minAbs = 0;
                 var maxWarn = celsiusToFahrenheit(limits.maxWarnCelsius);
                 var maxAbs = roundUpTo100(celsiusToFahrenheit(limits.maxAbsCelsius));
-                var colorStep = 10;
+                var colorStep = 1;
                 var gradStep = 100;
-                var steps = (maxAbs - minAbs) / colorStep;
+                var steps = ((maxAbs - minAbs) / colorStep) - 1;
 
                 var grads = d3.scale.linear()
                     .range([minAbs, maxAbs])
@@ -54,15 +54,15 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
                 probe.guage = guage;
                 guage.ranges = [];
 
-                for (var i = 0; i <= 1; i += 1.0 / steps) {
-                    var mn = grads(i);
-                    var mx = colorStep + mn;
+                for (var i=0, j=0; i <= 1; i+=(1.0 / steps), j++) {
+                    var mn = minAbs + (j * colorStep);
+                    var mx = mn + colorStep;
 
                     var c = color(i);
-                    if (mx < freeze) {
+                    if (mn < freeze) {
                         c = subZero(i * 25);
                     }
-                    if (mn > maxWarn) {
+                    if (mn >= maxWarn) {
                         c = "#FF0000"
                     }
 
@@ -72,6 +72,7 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
                         color: c
                     };
                 }
+
                 guage.lowerLimit = minAbs;
                 guage.upperLimit = maxAbs;
                 guage.majorGraduations = ((maxAbs - minAbs) / gradStep) + 1;
