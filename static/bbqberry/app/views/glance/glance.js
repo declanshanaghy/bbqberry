@@ -12,7 +12,7 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
     .controller('GlanceController', ['$q', '$scope', '$http', 'poller', 'd3Service',
         function ($q, $scope, $http, poller, d3Service) {
             var pollProbeData = function() {
-                var myPoller = poller.get('/api/probes', {
+                var myPoller = poller.get('/api/temperatures', {
                     action: 'get',
                     delay: 250
                 });

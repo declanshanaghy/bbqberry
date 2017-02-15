@@ -7,7 +7,7 @@ import (
 
 // CreateMonitor reads all configured temperature monitors
 func CreateMonitor(params *monitors.CreateMonitorParams) (m models.TemperatureMonitors,
-		err error) {
+	err error) {
 	return m, err
 }
 

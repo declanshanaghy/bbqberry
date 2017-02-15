@@ -26,7 +26,7 @@ func init() {
 			limit := framework.Constants.Hardware.Probes[probe].TempLimits
 			min := ConvertCelsiusToAnalog(-15)
 			max := ConvertCelsiusToAnalog(*limit.MaxAbsCelsius)
-			a := int32(rand.Intn(int(min)) + int(max - min))
+			a := int32(rand.Intn(int(min)) + int(max-min))
 			log.Infof("probe %d init to %d", probe, a)
 			FakeTemps[probe] = a
 		}
