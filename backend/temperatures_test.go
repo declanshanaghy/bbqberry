@@ -8,7 +8,7 @@ import (
 	. "github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/hardware"
-	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/temperatures"
 	"github.com/declanshanaghy/bbqberry/stubs/stubembd"
 	"github.com/go-openapi/strfmt"
 	. "github.com/onsi/ginkgo"
@@ -33,7 +33,7 @@ var _ = Describe("Termperatures API", func() {
 		data[2] = 0
 
 		probe := int32(1)
-		params := temperature.GetProbeReadingsParams{
+		params := temperatures.GetTemperaturesParams{
 			Probe: &probe,
 		}
 		m, err := GetTemperatureProbeReadings(&params)
@@ -44,7 +44,7 @@ var _ = Describe("Termperatures API", func() {
 	It("should return all temperature readings when not given a probe number", func() {
 		started := time.Now()
 
-		params := temperature.GetProbeReadingsParams{}
+		params := temperatures.GetTemperaturesParams{}
 		m, err := GetTemperatureProbeReadings(&params)
 
 		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings "+
@@ -64,7 +64,7 @@ var _ = Describe("Termperatures API", func() {
 		started := time.Now()
 
 		probe := int32(-1)
-		params := temperature.GetProbeReadingsParams{
+		params := temperatures.GetTemperaturesParams{
 			Probe: &probe,
 		}
 		m, err := GetTemperatureProbeReadings(&params)

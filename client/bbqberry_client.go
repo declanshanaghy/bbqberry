@@ -12,9 +12,10 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	"github.com/declanshanaghy/bbqberry/client/config"
+	"github.com/declanshanaghy/bbqberry/client/hardware"
 	"github.com/declanshanaghy/bbqberry/client/health"
-	"github.com/declanshanaghy/bbqberry/client/temperature"
+	"github.com/declanshanaghy/bbqberry/client/monitors"
+	"github.com/declanshanaghy/bbqberry/client/temperatures"
 )
 
 // Default bbqberry HTTP client.
@@ -26,7 +27,7 @@ const (
 	DefaultHost string = "localhost"
 	// DefaultBasePath is the default BasePath
 	// found in Meta (info) section of spec file
-	DefaultBasePath string = "/api/v1"
+	DefaultBasePath string = "/api"
 )
 
 // DefaultSchemes are the default schemes found in Meta (info) section of spec file
@@ -58,11 +59,13 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Bbqberry {
 	cli := new(Bbqberry)
 	cli.Transport = transport
 
-	cli.Config = config.New(transport, formats)
+	cli.Hardware = hardware.New(transport, formats)
 
 	cli.Health = health.New(transport, formats)
 
-	cli.Temperature = temperature.New(transport, formats)
+	cli.Monitors = monitors.New(transport, formats)
+
+	cli.Temperatures = temperatures.New(transport, formats)
 
 	return cli
 }
@@ -125,11 +128,13 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // Bbqberry is a client for bbqberry
 type Bbqberry struct {
-	Config *config.Client
+	Hardware *hardware.Client
 
 	Health *health.Client
 
-	Temperature *temperature.Client
+	Monitors *monitors.Client
+
+	Temperatures *temperatures.Client
 
 	Transport runtime.ClientTransport
 }
@@ -138,10 +143,12 @@ type Bbqberry struct {
 func (c *Bbqberry) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 
-	c.Config.SetTransport(transport)
+	c.Hardware.SetTransport(transport)
 
 	c.Health.SetTransport(transport)
 
-	c.Temperature.SetTransport(transport)
+	c.Monitors.SetTransport(transport)
+
+	c.Temperatures.SetTransport(transport)
 
 }

@@ -12,7 +12,7 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
     .controller('GlanceController', ['$q', '$scope', '$http', 'poller', 'd3Service',
         function ($q, $scope, $http, poller, d3Service) {
             var pollProbeData = function() {
-                var myPoller = poller.get('/api/v1/temperatures/probes', {
+                var myPoller = poller.get('/api/probes', {
                     action: 'get',
                     delay: 250
                 });
@@ -105,7 +105,7 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
                 return $q(function(resolve, reject) {
                     $http({
                         method: 'GET',
-                        url: '/api/v1/hardware/config'
+                        url: '/api/hardware'
                     }).then(function successCallback(response) {
                         $scope.probes = response['data'].probes;
                         for (var i = 0; i < $scope.probes.length; i++) {

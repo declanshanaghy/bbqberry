@@ -69,16 +69,16 @@ func init() {
 	chamber := "Chamber"
 	pa := "Probe A"
 	pb := "Probe B"
-	probes := models.TemperatureProbes{
-		&models.TemperatureProbe{
+	probes := models.TemperatureSettings{
+		&models.TemperatureSetting{
 			Label:      &chamber,
 			TempLimits: &ambient,
 		},
-		&models.TemperatureProbe{
+		&models.TemperatureSetting{
 			Label:      &pa,
 			TempLimits: &cooking,
 		},
-		&models.TemperatureProbe{
+		&models.TemperatureSetting{
 			Label:      &pb,
 			TempLimits: &cooking,
 		},

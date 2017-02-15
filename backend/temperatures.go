@@ -3,12 +3,11 @@ package backend
 import (
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/models"
-	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/temperatures"
 )
 
 // GetTemperatureProbeReadings reads the current sensor values from the onboard temperature sensors
-func GetTemperatureProbeReadings(params *temperature.GetProbeReadingsParams) (m models.TemperatureReadings,
-	err error) {
+func GetTemperatureProbeReadings(params *temperatures.GetTemperaturesParams) (m models.TemperatureReadings, err error) {
 
 	tReader := hardware.NewTemperatureReader()
 
