@@ -14,7 +14,7 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
             var pollProbeData = function() {
                 var myPoller = poller.get('/api/v1/temperatures/probes', {
                     action: 'get',
-                    delay: 1000
+                    delay: 250
                 });
 
                 myPoller.promise.then(null, null, function (response) {
@@ -36,22 +36,25 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
                 var maxAbs = roundUpTo100(celsiusToFahrenheit(limits.maxAbsCelsius));
                 var colorStep = 1;
                 var gradStep = 100;
-                var steps = ((maxAbs - minAbs) / colorStep) - 1;
+                var steps = ((maxWarn - minAbs) / colorStep) - 1;
 
                 var grads = d3.scale.linear()
-                    .range([minAbs, maxAbs])
+                    .range([minAbs, maxWarn])
                     .clamp(true)
                     .interpolate(d3.interpolate);
 
+                // d3.scale.linear().range([0, 1]).domain([minLimit, maxLimit]);
                 var subZero = d3.scale.linear()
-                    .range(["#0000ff", "#00ff00"])
+                    .range(["#0000FF", "#00FF00"])
                     .interpolate(d3.interpolateHcl);
                 var color = d3.scale.linear()
-                    .range(["#00ff00", "#FF5F05"])
+                    .range(["#00ff00", "#FF0000"])
                     .interpolate(d3.interpolateHcl);
 
                 var guage = {};
                 probe.guage = guage;
+                probe.reading = {};
+                probe.reading.fahrenheit = 0;
                 guage.ranges = [];
 
                 for (var i=0, j=0; i <= 1; i+=(1.0 / steps), j++) {
@@ -60,22 +63,36 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
 
                     var c = color(i);
                     if (mn < freeze) {
-                        c = subZero(i * 25);
+                        c = subZero(i * (maxWarn - freeze) / (freeze - minAbs));
                     }
-                    if (mn >= maxWarn) {
-                        c = "#FF0000"
+                    else if ( mn == freeze || mn == freeze ) {
+                        c = "#000000";
                     }
-
                     guage.ranges[guage.ranges.length] = {
                         min: mn,
                         max: mx,
-                        color: c
+                        color: c,
+                        stroke: c
                     };
                 }
+
+                guage.ranges[guage.ranges.length - 1] = {
+                    min: guage.ranges[guage.ranges.length - 1].max,
+                    max: guage.ranges[guage.ranges.length - 1].max + 1,
+                    color: "#000000",
+                    stroke: "#FF0000"
+                };
+                guage.ranges[guage.ranges.length - 1] = {
+                    min: guage.ranges[guage.ranges.length - 1].max,
+                    max: maxAbs,
+                    color: "url(#CrossHatch)",
+                    stroke: "#FF0000"
+                };
 
                 guage.lowerLimit = minAbs;
                 guage.upperLimit = maxAbs;
                 guage.majorGraduations = ((maxAbs - minAbs) / gradStep) + 1;
+                guage.minorGraduations = 10;
             };
 
             var getHardwareConfig = function() {

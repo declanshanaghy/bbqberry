@@ -1,12 +1,29 @@
+<svg height="8" width="8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+    <defs>
+        <pattern id="CrossHatch" style="stroke: #FF0000;"
+                 patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+            <rect width='6' height='6' fill="#ff9900"/>
+            <line x1="5" y1="0" x2="5" y2="10" stroke-width="0.75"/>
+            <line x1="0" y1="5" x2="10" y2="5" stroke-width="0.75"/>
+        </pattern>
+        <pattern id="Honeycomb" width="56" height="100" patternTransform="scale(0.5, 0.5)">
+            <rect width='56' height='100' fill='#f8d203'/>
+            <path d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='#fff629' stroke-width='2'/>
+            <path d='M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34' fill='none' stroke='#ffe503' stroke-width='2'/>
+        </pattern>
+    </defs>
+</svg>
 <div class="probe-carousel" uib-carousel
      active="activeSlide" interval="carouselInterval" no-wrap="carouselNoWrap"
      ng-swipe-right="swipeRight()" ng-swipe-left="swipeLeft()">
     <div class="probe-slide" uib-slide ng-repeat="probe in probes track by probe.index" index="probe.index">
         <div class="alert alert-danger probe-danger hide-empty">{{probe.reading.warning}}</div>
         <div class="probe-guage"
-             ng-radial-gauge ranges="probe.guage.ranges" value="probe.reading.celsius"
+             ng-radial-gauge
              value-unit="'° F'" precision="0"
+             ranges="probe.guage.ranges" value="probe.reading.fahrenheit"
              major-graduations="{{probe.guage.majorGraduations}}"
+             minor-graduations="{{probe.guage.minorGraduations}}"
              lower-limit="probe.guage.lowerLimit" upper-limit="probe.guage.upperLimit">
         </div>
         <div class="carousel-caption probe-label">

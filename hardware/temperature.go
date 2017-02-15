@@ -17,17 +17,18 @@ import (
 // FakeTemps can be set to return specific analog readings during tests
 var FakeTemps = make(map[int32]int32, 0)
 
-const stubMinA = 360
-
 func init() {
 	hwCfg := framework.Constants.Hardware
 
 	if framework.Constants.Stub {
 		nProbes := int32(len(hwCfg.Probes))
-		for i := int32(0); i < nProbes; i++ {
-			v := int32(rand.Intn(stubMinA) + int(*hwCfg.AnalogMax-int32(stubMinA)))
-			log.Infof("probe %d init to %d", i, v)
-			FakeTemps[i] = v
+		for probe := int32(0); probe < nProbes; probe++ {
+			limit := framework.Constants.Hardware.Probes[probe].TempLimits
+			min := ConvertCelsiusToAnalog(-15)
+			max := ConvertCelsiusToAnalog(*limit.MaxAbsCelsius)
+			a := int32(rand.Intn(int(min)) + int(max - min))
+			log.Infof("probe %d init to %d", probe, a)
+			FakeTemps[probe] = a
 		}
 	}
 }
@@ -74,25 +75,29 @@ func (s *temperatureReader) errorCheckProbeNumber(probe int32) error {
 	return nil
 }
 
-func (s *temperatureReader) readProbe(probe int32) (v int32, err error) {
+func (s *temperatureReader) readProbe(probe int32) (a int32, err error) {
 	if err := s.errorCheckProbeNumber(probe); err != nil {
 		return 0, err
 	}
 	if framework.Constants.Stub {
-		v = FakeTemps[probe]
-		if v >= *framework.Constants.Hardware.AnalogMax {
-			v = stubMinA
+		limit := framework.Constants.Hardware.Probes[probe].TempLimits
+		min := ConvertCelsiusToAnalog(-15)
+		max := ConvertCelsiusToAnalog(*limit.MaxAbsCelsius)
+		a = FakeTemps[probe]
+
+		if a >= max {
+			a = min
 		}
-		FakeTemps[probe] = v + int32(rand.Intn(10))
+		FakeTemps[probe] = a + int32(rand.Intn(10))
 	} else {
 		iv, err := s.adc.AnalogValueAt(int(probe))
-		v = int32(iv)
+		a = int32(iv)
 		if err != nil {
 			return 0, err
 		}
 	}
-	log.Debugf("action=readProbe probe=%v v=%v", probe, v)
-	return int32(v), err
+	log.Debugf("action=readProbe probe=%d a=%d", probe, a)
+	return int32(a), err
 }
 
 func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.TemperatureReading) error {
