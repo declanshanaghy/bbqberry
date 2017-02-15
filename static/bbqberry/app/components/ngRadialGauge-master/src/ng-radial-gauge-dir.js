@@ -68,6 +68,7 @@ angular.module("ngRadialGauge", []).directive('ngRadialGauge', ['$window', '$tim
                 var minorGraduationColor = attrs.minorGraduationColor || "#707070";
                 var majorGraduationTextColor = attrs.majorGraduationTextColor || "#FFFFFF";
                 var needleColor = attrs.needleColor || "#FFFFFF";
+                var needleStroke = attrs.needleStroke || "#DDDDDD";
                 var valueVerticalOffset = Math.round((view.width * 30) / 300);
                 var inactiveColor = "#D7D7D7";
                 var transitionMs = parseInt(attrs.transitionMs) || 750;
@@ -270,12 +271,14 @@ angular.module("ngRadialGauge", []).directive('ngRadialGauge', ['$window', '$tim
 
                     var centerX = view.width / 2;
                     var centerY = view.width / 2;
-                    var centerColor;
+                    var centerColor, centerStroke;
 
                     if (typeof value === 'undefined') {
                         centerColor = inactiveColor;
+                        centerStroke = inactiveColor;
                     } else {
                         centerColor = needleColor;
+                        centerStroke = needleStroke;
                         var needleAngle = getNewAngle(value);
                         var needleLen = innerRadius;
                         if (displayGraduationDatails()) {
@@ -297,9 +300,11 @@ angular.module("ngRadialGauge", []).directive('ngRadialGauge', ['$window', '$tim
                             var pointerLine = d3.svg.line().interpolate('monotone');
                             var pg = svg.append('g').data([lineData])
                                 .attr('class', 'mtt-graduation-needle')
+                                .style("stroke", needleStroke)
                                 .style("fill", needleColor)
                                 .attr('transform', 'translate(' + centerX + ',' + centerY + ')');
                             needle = pg.append('path')
+                                .attr('class', 'mtt-graduation-needle')
                                 .attr('d', pointerLine)
                                 .attr('transform', 'rotate(' + needleAngle + ')');
                         }
@@ -322,6 +327,7 @@ angular.module("ngRadialGauge", []).directive('ngRadialGauge', ['$window', '$tim
                         .attr("cy", centerX)
                         .attr("cx", centerY)
                         .attr("fill", centerColor)
+                        .style("stroke", centerStroke)
                         .attr("class", "mtt-graduation-needle-center");
                 };
                 var renderGraduations = function () {
@@ -413,6 +419,11 @@ angular.module("ngRadialGauge", []).directive('ngRadialGauge', ['$window', '$tim
                             .attr('transform', 'rotate(' + needleAngle + ')');
                         svg.selectAll('.mtt-graduationValueText')
                             .text(pValue.toFixed(pPrecision) + pValueUnit);
+
+                        svg.selectAll('.mtt-graduation-needle').attr("fill", "#ff0000");
+                        svg.selectAll('.mtt-graduationValueText').attr("fill",  "#ff0000");
+                        svg.selectAll('.mtt-graduation-needle-center').attr("fill", "#ff0000");
+
                     } else {
                         svg.selectAll('.mtt-graduation-needle').remove();
                         svg.selectAll('.mtt-graduationValueText').remove();
