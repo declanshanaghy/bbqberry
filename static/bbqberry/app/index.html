@@ -34,6 +34,8 @@
 <body>
     <bbqberry-nav></bbqberry-nav>
 
+    <div class="alert alert-warning hide-empty">{{glblwarning}}</div>
+
     <div ng-view></div>
 
     <!--[if lt IE 7]>
@@ -63,5 +65,8 @@
     <script src="views/glance/glance.js"></script>
     <script src="views/view1/view1.js"></script>
     <script src="views/view2/view2.js"></script>
+
+    <!--Other backend scrips-->
+    <script src="js/util.js"></script>
 </body>
 </html>

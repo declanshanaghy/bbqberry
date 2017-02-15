@@ -3,7 +3,7 @@ info:
   description: "Rest API definition for BBQ Berry"
   version: "v1"
   title: "BBQ Berry"
-basePath: /api/v1
+basePath: /api
 schemes:
   - http
 consumes:
@@ -11,38 +11,21 @@ consumes:
 produces:
   - application/json
 paths:
-  /config:
-    get:
-      operationId: getConfig
+  /monitors:
+    post:
+      operationId: createMonitor
       tags:
-        - Config
-      summary: "Get current configuration settings"
-      responses:
-        200:
-          description: "The config was retrieved successfully"
-          schema:
-            $ref: "#/definitions/Config"
-        default:
-          description: Unexpected error
-          schema:
-            $ref: "#/definitions/Error"
-  /temperatures/monitors:
-    get:
-      operationId: getMonitors
-      tags:
-        - Temperature
+        - Monitors
       summary: "Get monitor settings for the requested probe"
       parameters:
         - name: probe
           in: query
-          description: The termerature probe for which to retrieve configured monitors (or all probes if the
-            given probe number is 0 or not specified)
+          description: The termerature probe to monitor
           required: true
           type: integer
           format: int32
-          default: 0
           minimum: 0
-          maximum: 3
+          maximum: 7
       responses:
         200:
           description: "The currently configured monitor(s) were retrieved successfully"
@@ -52,28 +35,65 @@ paths:
           description: Unexpected error
           schema:
             $ref: "#/definitions/Error"
-  /temperatures/probes:
     get:
-      operationId: getProbeReadings
+      operationId: getMonitors
       tags:
-        - Temperature
+        - Monitors
+      summary: "Get monitor settings for the requested probe"
+      parameters:
+        - name: probe
+          in: query
+          description: The termerature probe for which to retrieve configured monitors (or all probes if the
+            given probe number is not provided)
+          required: true
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 7
+      responses:
+        200:
+          description: "The currently configured monitor(s) were retrieved successfully"
+          schema:
+            $ref: "#/definitions/TemperatureMonitors"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+  /temperatures:
+    get:
+      operationId: getTemperatures
+      tags:
+        - Temperatures
       summary: "Get the current temperature reading from the requested probe(s)"
       parameters:
         - name: probe
           in: query
-          description: The termerature probe to read from (or all probes if the given probe
-            number is 0 or not specified)
+          description: The termerature probe to read from (or all probes if not provided)
           required: false
           type: integer
           format: int32
-          default: 0
           minimum: 0
-          maximum: 3
+          maximum: 7
       responses:
         200:
           description: "Temperature was read successfully"
           schema:
-            $ref: "#/definitions/TemperatureReading"
+            $ref: "#/definitions/TemperatureReadings"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+  /hardware:
+    get:
+      operationId: getHardware
+      tags:
+        - Hardware
+      summary: "Get current configuration settings"
+      responses:
+        200:
+          description: "The config was retrieved successfully"
+          schema:
+            $ref: "#/definitions/HardwareConfig"
         default:
           description: Unexpected error
           schema:
@@ -98,23 +118,79 @@ paths:
             $ref: "#/definitions/Error"
 
 definitions:
-  Config:
+  TemperatureLimits:
     type: object
     required:
-      - num-probes
+      - probeType
+      - minWarnCelsius
+      - maxWarnCelsius
+      - minAbsCelsius
+      - maxAbsCelsius
     properties:
-      num-probes:
+      probeType:
+        type: string
+      minWarnCelsius:
+        type: integer
+        format: int32
+      maxWarnCelsius:
+        type: integer
+        format: int32
+      minAbsCelsius:
+        type: integer
+        format: int32
+      maxAbsCelsius:
+        type: integer
+        format: int32
+  TemperatureSetting:
+    type: object
+    required:
+      - label
+      - tempLimits
+    properties:
+      label:
+        type: string
+      tempLimits:
+        type: object
+        $ref: "#/definitions/TemperatureLimits"
+  TemperatureSettings:
+    type: array
+    items:
+      $ref: "#/definitions/TemperatureSetting"
+  HardwareConfig:
+    type: object
+    required:
+      - numLedPixels
+      - vcc
+      - analogMax
+      - probes
+    properties:
+      numLedPixels:
         type: integer
         format: int32
         minimum: 0
-        maximum: 8
         default: 0
+      vcc:
+        type: number
+        format: float
+        default: 3.3
+      analogMax:
+        type: integer
+        format: int32
+        minimum: 0
+        default: 1024
+      analogVoltsPerUnit:
+        description: "The amount the voltage will increase to reflect a unit increase in analog reading"
+        type: number
+        format: float
+        minimum: 0.0
+        default: 1000.0
+      probes:
+        type: object
+        $ref: "#/definitions/TemperatureSettings"
   TemperatureMonitors:
-    type: object
-    additionalProperties:
-      type: array
-      items:
-        $ref: "#/definitions/TemperatureMonitor"
+    type: array
+    items:
+      $ref: "#/definitions/TemperatureMonitor"
   TemperatureMonitor:
     type: object
     required:
@@ -138,7 +214,7 @@ definitions:
         type: integer
         format: int32
         minimum: 0
-        maximum: 3
+        maximum: 7
         default: 0
   TemperatureReadings:
     type: array
@@ -184,11 +260,6 @@ definitions:
         format: float
         minimum: 0
         maximum: 3.3
-      resistance:
-        type: integer
-        format: int32
-        minimum: 0
-        maximum: 1000000
       warning:
         type: string
       probe:

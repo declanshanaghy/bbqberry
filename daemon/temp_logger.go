@@ -78,7 +78,7 @@ func (tl *temperatureLogger) collectTemperatureMetrics() (*models.TemperatureRea
 	defer log.Debug("action=method_exit")
 
 	readings := models.TemperatureReadings{}
-	for i := int32(1); i <= tl.reader.GetNumProbes(); i++ {
+	for i := int32(0); i < tl.reader.GetNumProbes(); i++ {
 		log.Debugf("action=iterate probe=%d", i)
 		reading := models.TemperatureReading{}
 		if err := tl.reader.GetTemperatureReading(i, &reading); err != nil {

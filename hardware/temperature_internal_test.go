@@ -20,7 +20,7 @@ var _ = Describe("Temperature package", func() {
 			}
 
 			for c, answer := range conversions {
-				k, f := convertCToKF(c)
+				k, f := ConvertCToKF(c)
 				Expect(k).To(BeNumerically("~", answer[0], precision))
 				Expect(f).To(BeNumerically("~", answer[1], precision))
 			}
@@ -31,8 +31,8 @@ var _ = Describe("Temperature package", func() {
 
 			// Format is [v] = [k, c, f]
 			conversions := map[float32][3]float32{
-				0.0:       {23, -250, -418},
-				hwCfg.VCC: {683, 410, 770},
+				0.0:        {23, -250, -418},
+				*hwCfg.Vcc: {683, 410, 770},
 			}
 
 			for v, answer := range conversions {

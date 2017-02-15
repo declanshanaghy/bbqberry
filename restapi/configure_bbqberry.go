@@ -12,13 +12,16 @@ import (
 	"github.com/Polarishq/middleware/framework"
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/Polarishq/middleware/handlers"
+	bbqframework "github.com/declanshanaghy/bbqberry/framework"
 	bbqhandlers "github.com/declanshanaghy/bbqberry/framework/handlers"
 	"github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/daemon"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/restapi/operations"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
-	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/temperatures"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/monitors"
+	opshardware "github.com/declanshanaghy/bbqberry/restapi/operations/hardware"
 	"github.com/go-openapi/swag"
 	// Unsure why this is suppressed
 	_ "github.com/docker/go-units"
@@ -65,20 +68,28 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 	
 	api.JSONConsumer = runtime.JSONConsumer()
 	api.JSONProducer = runtime.JSONProducer()
-	
+
 	api.HealthHealthHandler = health.HealthHandlerFunc(
 		func(params health.HealthParams) middleware.Responder {
 			return framework.HandleAPIRequestWithError(backend.Health())
 		})
-	api.TemperatureGetProbeReadingsHandler = temperature.GetProbeReadingsHandlerFunc(
-		func(params temperature.GetProbeReadingsParams) middleware.Responder {
+	api.HardwareGetHardwareHandler = opshardware.GetHardwareHandlerFunc(
+		func(params opshardware.GetHardwareParams) middleware.Responder {
+			return framework.HandleAPIRequestWithError(bbqframework.Constants.Hardware, nil)
+		})
+	api.TemperaturesGetTemperaturesHandler = temperatures.GetTemperaturesHandlerFunc(
+		func(params temperatures.GetTemperaturesParams) middleware.Responder {
 			return framework.HandleAPIRequestWithError(backend.GetTemperatureProbeReadings(&params))
 		})
-	api.TemperatureGetMonitorsHandler = temperature.GetMonitorsHandlerFunc(
-		func(params temperature.GetMonitorsParams) middleware.Responder {
-			return framework.HandleAPIRequestWithError(backend.GetTemperatureMonitors(&params))
+	api.MonitorsCreateMonitorHandler = monitors.CreateMonitorHandlerFunc(
+		func(params monitors.CreateMonitorParams) middleware.Responder {
+			return framework.HandleAPIRequestWithError(backend.CreateMonitor(&params))
 		})
-	
+	api.MonitorsGetMonitorsHandler = monitors.GetMonitorsHandlerFunc(
+		func(params monitors.GetMonitorsParams) middleware.Responder {
+			return framework.HandleAPIRequestWithError(backend.GetMonitors(&params))
+		})
+
 	globalMiddleware := setupGlobalMiddleware(api.Serve(setupMiddlewares))
 	
 	globalStartup()

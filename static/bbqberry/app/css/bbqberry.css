@@ -5,10 +5,11 @@
 
 .probe-danger {
     position: absolute;
+    width: 100%;
     z-index: 10;
 }
 
-.probe-danger:empty {
+.hide-empty:empty {
     display: none;
 }
 
@@ -23,6 +24,7 @@
 }
 
 .probe-slide {
+    text-align: center;
 }
 
 .probe-guage {

@@ -26,7 +26,7 @@ var _ = Describe("WS2801", func() {
 
 		It("should return correct pixel count", func() {
 			numPixels := strand.GetNumPixels()
-			Expect(hwCfg.NumLEDPixels).To(Equal(numPixels))
+			Expect(*hwCfg.NumLedPixels).To(Equal(numPixels))
 		})
 		It("should fail on exceeding max pixel count", func() {
 			numPixels := strand.GetNumPixels()

@@ -8,7 +8,7 @@ import (
 	. "github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/hardware"
-	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/temperatures"
 	"github.com/declanshanaghy/bbqberry/stubs/stubembd"
 	"github.com/go-openapi/strfmt"
 	. "github.com/onsi/ginkgo"
@@ -33,7 +33,7 @@ var _ = Describe("Termperatures API", func() {
 		data[2] = 0
 
 		probe := int32(1)
-		params := temperature.GetProbeReadingsParams{
+		params := temperatures.GetTemperaturesParams{
 			Probe: &probe,
 		}
 		m, err := GetTemperatureProbeReadings(&params)
@@ -44,19 +44,36 @@ var _ = Describe("Termperatures API", func() {
 	It("should return all temperature readings when not given a probe number", func() {
 		started := time.Now()
 
-		probe := int32(0)
-		params := temperature.GetProbeReadingsParams{
+		params := temperatures.GetTemperaturesParams{}
+		m, err := GetTemperatureProbeReadings(&params)
+
+		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings "+
+			"should not have returned an error")
+		Expect(m).To(HaveLen(len(hwCfg.Probes)), "Incorrect number of readings returneds")
+
+		for i, reading := range m {
+			Expect(int32(i)).To(
+				Equal(*reading.Probe),
+				fmt.Sprintf("Probe %d has incorrect number", i))
+			dt, err := strfmt.ParseDateTime(reading.DateTime.String())
+			Expect(err).ToNot(HaveOccurred())
+			Expect(time.Time(dt)).Should(BeTemporally("~", started, time.Second))
+		}
+	})
+	It("should return all temperature readings when not given a negative probe number", func() {
+		started := time.Now()
+
+		probe := int32(-1)
+		params := temperatures.GetTemperaturesParams{
 			Probe: &probe,
 		}
 		m, err := GetTemperatureProbeReadings(&params)
 
 		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings should not have returned an error")
-		Expect(m).To(
-			HaveLen(int(hwCfg.NumTemperatureProbes)),
-			"Incorrect number of readings returneds")
+		Expect(m).To(HaveLen(len(hwCfg.Probes)), "Incorrect number of readings returneds")
 
 		for i, reading := range m {
-			Expect(int32(i+1)).To(
+			Expect(int32(i)).To(
 				Equal(*reading.Probe),
 				fmt.Sprintf("Probe %d has incorrect number", i))
 			dt, err := strfmt.ParseDateTime(reading.DateTime.String())

@@ -6,7 +6,7 @@ Rest API definition for BBQ Berry
     Schemes:
       http
     Host: localhost
-    BasePath: /api/v1
+    BasePath: /api
     Version: v1
 
     Consumes:

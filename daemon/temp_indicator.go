@@ -60,13 +60,21 @@ func (ti *temperatureIndicator) tick() bool {
 	log.Debug("action=tick")
 	defer log.Debug("action=tick")
 
-	avg, err := framework.QueryAverageTemperature(ti.getPeriod(), framework.Constants.Hardware.AmbientProbeNumber)
+	// Assuming that the ambient probe is #0
+	ambientProbeNumber := int32(0)
+
+	avg, err := framework.QueryAverageTemperature(ti.getPeriod(), ambientProbeNumber)
 	if err != nil {
 		log.Error(err.Error())
 		return true
 	}
 
-	color := getTempColor(*avg.Celsius)
+	probe := framework.Constants.Hardware.Probes[ambientProbeNumber]
+	min := *probe.TempLimits.MinWarnCelsius
+	max := *probe.TempLimits.MaxWarnCelsius
+
+	color := getTempColor(*avg.Celsius, min, max)
+
 	if err := ti.strip.SetAllPixels(color); err != nil {
 		log.Error(err.Error())
 	}
@@ -77,7 +85,7 @@ func (ti *temperatureIndicator) tick() bool {
 	return true
 }
 
-func getTempColor(temp int32) int {
+func getTempColor(temp, min, max int32) int {
 	// Map the temperature to a color to be displayed on the LED pixels.
 	// cold / min = blue	( 0x0000FF ) =
 	// hot / max = red ( 0xFF0000 )
@@ -87,8 +95,6 @@ func getTempColor(temp int32) int {
 	// 		avg temp <= min = pure blue
 	// 		avg temp >= max = pure red
 	// If the max limit is exceeded a visual indicator should be displayed (i.e. flashing)
-	min := framework.Constants.Hardware.MinTempWarnCelsius
-	max := framework.Constants.Hardware.MaxTempWarnCelsius
 
 	if temp < min {
 		log.Warningf("Temp (%d) < min (%d)...clamping", temp, min)

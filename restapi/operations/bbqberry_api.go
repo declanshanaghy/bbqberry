@@ -16,9 +16,10 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/declanshanaghy/bbqberry/restapi/operations/config"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/hardware"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
-	"github.com/declanshanaghy/bbqberry/restapi/operations/temperature"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/monitors"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/temperatures"
 )
 
 // NewBbqberryAPI creates a new Bbqberry instance
@@ -33,14 +34,17 @@ func NewBbqberryAPI(spec *loads.Document) *BbqberryAPI {
 		ServeError:      errors.ServeError,
 		JSONConsumer:    runtime.JSONConsumer(),
 		JSONProducer:    runtime.JSONProducer(),
-		ConfigGetConfigHandler: config.GetConfigHandlerFunc(func(params config.GetConfigParams) middleware.Responder {
-			return middleware.NotImplemented("operation ConfigGetConfig has not yet been implemented")
+		MonitorsCreateMonitorHandler: monitors.CreateMonitorHandlerFunc(func(params monitors.CreateMonitorParams) middleware.Responder {
+			return middleware.NotImplemented("operation MonitorsCreateMonitor has not yet been implemented")
 		}),
-		TemperatureGetMonitorsHandler: temperature.GetMonitorsHandlerFunc(func(params temperature.GetMonitorsParams) middleware.Responder {
-			return middleware.NotImplemented("operation TemperatureGetMonitors has not yet been implemented")
+		HardwareGetHardwareHandler: hardware.GetHardwareHandlerFunc(func(params hardware.GetHardwareParams) middleware.Responder {
+			return middleware.NotImplemented("operation HardwareGetHardware has not yet been implemented")
 		}),
-		TemperatureGetProbeReadingsHandler: temperature.GetProbeReadingsHandlerFunc(func(params temperature.GetProbeReadingsParams) middleware.Responder {
-			return middleware.NotImplemented("operation TemperatureGetProbeReadings has not yet been implemented")
+		MonitorsGetMonitorsHandler: monitors.GetMonitorsHandlerFunc(func(params monitors.GetMonitorsParams) middleware.Responder {
+			return middleware.NotImplemented("operation MonitorsGetMonitors has not yet been implemented")
+		}),
+		TemperaturesGetTemperaturesHandler: temperatures.GetTemperaturesHandlerFunc(func(params temperatures.GetTemperaturesParams) middleware.Responder {
+			return middleware.NotImplemented("operation TemperaturesGetTemperatures has not yet been implemented")
 		}),
 		HealthHealthHandler: health.HealthHandlerFunc(func(params health.HealthParams) middleware.Responder {
 			return middleware.NotImplemented("operation HealthHealth has not yet been implemented")
@@ -63,12 +67,14 @@ type BbqberryAPI struct {
 	// JSONProducer registers a producer for a "application/json" mime type
 	JSONProducer runtime.Producer
 
-	// ConfigGetConfigHandler sets the operation handler for the get config operation
-	ConfigGetConfigHandler config.GetConfigHandler
-	// TemperatureGetMonitorsHandler sets the operation handler for the get monitors operation
-	TemperatureGetMonitorsHandler temperature.GetMonitorsHandler
-	// TemperatureGetProbeReadingsHandler sets the operation handler for the get probe readings operation
-	TemperatureGetProbeReadingsHandler temperature.GetProbeReadingsHandler
+	// MonitorsCreateMonitorHandler sets the operation handler for the create monitor operation
+	MonitorsCreateMonitorHandler monitors.CreateMonitorHandler
+	// HardwareGetHardwareHandler sets the operation handler for the get hardware operation
+	HardwareGetHardwareHandler hardware.GetHardwareHandler
+	// MonitorsGetMonitorsHandler sets the operation handler for the get monitors operation
+	MonitorsGetMonitorsHandler monitors.GetMonitorsHandler
+	// TemperaturesGetTemperaturesHandler sets the operation handler for the get temperatures operation
+	TemperaturesGetTemperaturesHandler temperatures.GetTemperaturesHandler
 	// HealthHealthHandler sets the operation handler for the health operation
 	HealthHealthHandler health.HealthHandler
 
@@ -134,16 +140,20 @@ func (o *BbqberryAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
-	if o.ConfigGetConfigHandler == nil {
-		unregistered = append(unregistered, "config.GetConfigHandler")
+	if o.MonitorsCreateMonitorHandler == nil {
+		unregistered = append(unregistered, "monitors.CreateMonitorHandler")
 	}
 
-	if o.TemperatureGetMonitorsHandler == nil {
-		unregistered = append(unregistered, "temperature.GetMonitorsHandler")
+	if o.HardwareGetHardwareHandler == nil {
+		unregistered = append(unregistered, "hardware.GetHardwareHandler")
 	}
 
-	if o.TemperatureGetProbeReadingsHandler == nil {
-		unregistered = append(unregistered, "temperature.GetProbeReadingsHandler")
+	if o.MonitorsGetMonitorsHandler == nil {
+		unregistered = append(unregistered, "monitors.GetMonitorsHandler")
+	}
+
+	if o.TemperaturesGetTemperaturesHandler == nil {
+		unregistered = append(unregistered, "temperatures.GetTemperaturesHandler")
 	}
 
 	if o.HealthHealthHandler == nil {
@@ -230,20 +240,25 @@ func (o *BbqberryAPI) initHandlerCache() {
 		o.handlers = make(map[string]map[string]http.Handler)
 	}
 
-	if o.handlers["GET"] == nil {
-		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)
+	if o.handlers["POST"] == nil {
+		o.handlers[strings.ToUpper("POST")] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/config"] = config.NewGetConfig(o.context, o.ConfigGetConfigHandler)
+	o.handlers["POST"]["/monitors"] = monitors.NewCreateMonitor(o.context, o.MonitorsCreateMonitorHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/temperatures/monitors"] = temperature.NewGetMonitors(o.context, o.TemperatureGetMonitorsHandler)
+	o.handlers["GET"]["/hardware"] = hardware.NewGetHardware(o.context, o.HardwareGetHardwareHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/temperatures/probes"] = temperature.NewGetProbeReadings(o.context, o.TemperatureGetProbeReadingsHandler)
+	o.handlers["GET"]["/monitors"] = monitors.NewGetMonitors(o.context, o.MonitorsGetMonitorsHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/temperatures"] = temperatures.NewGetTemperatures(o.context, o.TemperaturesGetTemperaturesHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)
