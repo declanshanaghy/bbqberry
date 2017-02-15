@@ -67,10 +67,10 @@ angular.module("ngRadialGauge", []).directive('ngRadialGauge', ['$window', '$tim
                 var majorGraduationColor = attrs.majorGraduationColor || "#FFFFFF";
                 var minorGraduationColor = attrs.minorGraduationColor || "#707070";
                 var majorGraduationTextColor = attrs.majorGraduationTextColor || "#FFFFFF";
-                var needleColor = attrs.needleColor || "#FFFFFF";
-                var needleStroke = attrs.needleStroke || "#DDDDDD";
-                var valueVerticalOffset = Math.round((view.width * 30) / 300);
                 var inactiveColor = "#D7D7D7";
+                var needleColor = attrs.needleColor || inactiveColor;
+                var needleStroke = attrs.needleStroke || "#000000";
+                var valueVerticalOffset = Math.round((view.width * 30) / 300);
                 var transitionMs = parseInt(attrs.transitionMs) || 750;
                 var majorGraduationTextSize = parseInt(attrs.majorGraduationTextSize);
                 var needleValueTextSize = parseInt(attrs.needleValueTextSize);
@@ -300,7 +300,7 @@ angular.module("ngRadialGauge", []).directive('ngRadialGauge', ['$window', '$tim
                             var pointerLine = d3.svg.line().interpolate('monotone');
                             var pg = svg.append('g').data([lineData])
                                 .attr('class', 'mtt-graduation-needle')
-                                .style("stroke", needleStroke)
+                                // .style("stroke", needleStroke)
                                 .style("fill", needleColor)
                                 .attr('transform', 'translate(' + centerX + ',' + centerY + ')');
                             needle = pg.append('path')
@@ -408,10 +408,18 @@ angular.module("ngRadialGauge", []).directive('ngRadialGauge', ['$window', '$tim
 
                 };
 
-                var onValueChanged = function (pValue, pPrecision, pValueUnit) {
+                var onValueChanged = function (pValue, pPrecision, pValueUnit, ranges) {
                     if (typeof pValue === 'undefined' || pValue == null) return;
 
                     if (needle && pValue >= minLimit && pValue <= maxLimit) {
+                        var range;
+                        for (var i in ranges) {
+                            if (value >= ranges[i].min && value <= ranges[i].max) {
+                                range = ranges[i];
+                                break;
+                            }
+                        }
+
                         var needleAngle = getNewAngle(pValue);
                         needle.transition()
                             .duration(transitionMs)
@@ -420,9 +428,15 @@ angular.module("ngRadialGauge", []).directive('ngRadialGauge', ['$window', '$tim
                         svg.selectAll('.mtt-graduationValueText')
                             .text(pValue.toFixed(pPrecision) + pValueUnit);
 
-                        svg.selectAll('.mtt-graduation-needle').attr("fill", "#ff0000");
-                        svg.selectAll('.mtt-graduationValueText').attr("fill",  "#ff0000");
-                        svg.selectAll('.mtt-graduation-needle-center').attr("fill", "#ff0000");
+                        svg.selectAll('.mtt-graduation-needle')
+                            .style("fill", range.needleColor)
+                            .style("stroke", range.needleStroke);
+                        svg.selectAll('.mtt-graduation-needle-center')
+                            .style("fill", range.needleColor)
+                            .style("stroke", range.needleStroke);
+                        svg.selectAll('.mtt-graduationValueText')
+                            .style("fill",  range.needleColor);
+                            // .style("stroke",  majorGraduationColor);
 
                     } else {
                         svg.selectAll('.mtt-graduation-needle').remove();
@@ -433,7 +447,7 @@ angular.module("ngRadialGauge", []).directive('ngRadialGauge', ['$window', '$tim
                 scope.$watchCollection('[value, data.value]', function () {
                     if (!initialized) return;
                     updateInternalData();
-                    onValueChanged(value, precision, valueUnit);
+                    onValueChanged(value, precision, valueUnit, ranges);
                 }, true);
             }
         };

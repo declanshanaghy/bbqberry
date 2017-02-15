@@ -65,28 +65,34 @@ angular.module('bbqberry.glance', ['d3', 'ngRadialGauge', 'ngRoute', 'emguo.poll
                     if (mn < freeze) {
                         c = subZero(i * (maxWarn - freeze) / (freeze - minAbs));
                     }
-                    else if ( mn == freeze || mn == freeze ) {
-                        c = "#000000";
-                    }
+                    // else if ( mn == freeze || mn == freeze ) {
+                    //     c = "#000000";
+                    // }
                     guage.ranges[guage.ranges.length] = {
                         min: mn,
                         max: mx,
                         color: c,
-                        stroke: c
+                        stroke: c,
+                        needleColor: c,
+                        needleStroke: "#FFFFFF"
                     };
                 }
 
-                guage.ranges[guage.ranges.length - 1] = {
-                    min: guage.ranges[guage.ranges.length - 1].max,
-                    max: guage.ranges[guage.ranges.length - 1].max + 1,
-                    color: "#000000",
-                    stroke: "#FF0000"
-                };
+                // guage.ranges[guage.ranges.length - 1] = {
+                //     min: guage.ranges[guage.ranges.length - 1].max,
+                //     max: guage.ranges[guage.ranges.length - 1].max + 1,
+                //     color: "#000000",
+                //     stroke: "#FF0000",
+                //     needleColor: guage.ranges[guage.ranges.length - 1].needleColor,
+                //     needleStroke: guage.ranges[guage.ranges.length - 1].needleStroke
+                // };
                 guage.ranges[guage.ranges.length - 1] = {
                     min: guage.ranges[guage.ranges.length - 1].max,
                     max: maxAbs,
                     color: "url(#CrossHatch)",
-                    stroke: "#FF0000"
+                    stroke: color(1),
+                    needleColor: "#FF0000",
+                    needleStroke: "#FFFFFF"
                 };
 
                 guage.lowerLimit = minAbs;
