@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/declanshanaghy/bbqberry/influxdb"
+	"github.com/declanshanaghy/bbqberry/db/influxdb"
 	"fmt"
 	"io"
 	"encoding/json"

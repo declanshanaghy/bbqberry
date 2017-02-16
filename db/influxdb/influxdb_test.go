@@ -1,7 +1,7 @@
 package influxdb_test
 
 import (
-	. "github.com/declanshanaghy/bbqberry/influxdb"
+	. "github.com/declanshanaghy/bbqberry/db/influxdb"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

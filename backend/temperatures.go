@@ -7,8 +7,8 @@ import (
 )
 
 // GetTemperatureProbeReadings reads the current sensor values from the onboard temperature sensors
-func GetTemperatureProbeReadings(params *temperatures.GetTemperaturesParams) (m models.TemperatureReadings, err error) {
-
+func GetTemperatureProbeReadings(params *temperatures.GetTemperaturesParams) (*models.TemperatureReadings, error) {
+	m := models.TemperatureReadings{}
 	tReader := hardware.NewTemperatureReader()
 
 	var probes []int32
@@ -35,5 +35,5 @@ func GetTemperatureProbeReadings(params *temperatures.GetTemperaturesParams) (m 
 		m = append(m, &reading)
 	}
 
-	return m, err
+	return &m, nil
 }

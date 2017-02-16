@@ -14,6 +14,10 @@ import (
 // swagger:model TemperatureMonitor
 type TemperatureMonitor struct {
 
+	// Unique ID for this temperature monitor
+	// Required: true
+	ID *string `json:"id"`
+
 	// The maximium temperature, below which an alert will be generated
 	// Required: true
 	Max *float32 `json:"max"`
@@ -36,6 +40,11 @@ type TemperatureMonitor struct {
 // Validate validates this temperature monitor
 func (m *TemperatureMonitor) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateID(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
 
 	if err := m.validateMax(formats); err != nil {
 		// prop
@@ -60,6 +69,15 @@ func (m *TemperatureMonitor) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *TemperatureMonitor) validateID(formats strfmt.Registry) error {
+
+	if err := validate.Required("id", "body", m.ID); err != nil {
+		return err
+	}
+
 	return nil
 }
 

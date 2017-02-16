@@ -30,7 +30,7 @@ type TemperatureLimits struct {
 	// Required: true
 	MinWarnCelsius *int32 `json:"minWarnCelsius"`
 
-	// probe type
+	// Ambient probes measure air temperature. Cooking probes measure food temperature
 	// Required: true
 	ProbeType *string `json:"probeType"`
 }

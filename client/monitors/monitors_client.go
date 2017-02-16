@@ -51,7 +51,7 @@ func (a *Client) CreateMonitor(params *CreateMonitorParams) (*CreateMonitorOK, e
 }
 
 /*
-GetMonitors gets monitor settings for the requested probe
+GetMonitors gets monitors for the requested probe
 */
 func (a *Client) GetMonitors(params *GetMonitorsParams) (*GetMonitorsOK, error) {
 	// TODO: Validate the params before sending

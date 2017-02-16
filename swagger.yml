@@ -39,13 +39,12 @@ paths:
       operationId: getMonitors
       tags:
         - Monitors
-      summary: "Get monitor settings for the requested probe"
+      summary: "Get monitors for the requested probe"
       parameters:
         - name: probe
           in: query
-          description: The termerature probe for which to retrieve configured monitors (or all probes if the
-            given probe number is not provided)
-          required: true
+          description: The probe for which to retrieve active monitors (or all probes if omitted)
+          required: false
           type: integer
           format: int32
           minimum: 0
@@ -68,7 +67,7 @@ paths:
       parameters:
         - name: probe
           in: query
-          description: The termerature probe to read from (or all probes if not provided)
+          description: The termerature probe to read from (or all probes if omitted)
           required: false
           type: integer
           format: int32
@@ -129,6 +128,7 @@ definitions:
     properties:
       probeType:
         type: string
+        description: Ambient probes measure air temperature. Cooking probes measure food temperature
       minWarnCelsius:
         type: integer
         format: int32
@@ -194,11 +194,21 @@ definitions:
   TemperatureMonitor:
     type: object
     required:
+      - id
       - probe
       - scale
       - min
       - max
     properties:
+      id:
+        type: string
+        description: Unique ID for this temperature monitor
+      probe:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 7
+        default: 0
       scale:
         type: string
         description: The temperature scale
@@ -210,12 +220,6 @@ definitions:
         type: number
         format: float
         description: The maximium temperature, below which an alert will be generated
-      probe:
-        type: integer
-        format: int32
-        minimum: 0
-        maximum: 7
-        default: 0
   TemperatureReadings:
     type: array
     items:

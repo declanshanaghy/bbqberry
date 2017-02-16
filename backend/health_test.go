@@ -6,7 +6,7 @@ import (
 	. "github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/framework/errorcodes"
-	"github.com/declanshanaghy/bbqberry/influxdb"
+	"github.com/declanshanaghy/bbqberry/db/influxdb"
 	"github.com/declanshanaghy/bbqberry/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -29,7 +29,7 @@ var _ = Describe("Health API", func() {
 				ServiceInfo: &si,
 			}
 
-			Expect(h).To(Equal(health))
+			Expect(*health).To(Equal(h))
 		})
 	})
 	Context("in an incorrectly configured environment", func() {
@@ -68,7 +68,7 @@ var _ = Describe("Health API", func() {
 			}
 			h.Error = &e
 
-			Expect(h).To(Equal(health))
+			Expect(*health).To(Equal(h))
 		})
 	})
 })
