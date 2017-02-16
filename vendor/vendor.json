@@ -140,10 +140,10 @@
 			"revisionTime": "2016-11-19T16:27:01Z"
 		},
 		{
-			"checksumSHA1": "PQlZEPlLlFFdFuSF55CbqrfXjoU=",
+			"checksumSHA1": "aL6ElW1r0zs0ROvjOYougO8xAl4=",
 			"path": "github.com/go-openapi/strfmt",
-			"revision": "34fc3ba7c0f5fb615fda47a2b4fbd4c641b215f2",
-			"revisionTime": "2016-11-05T16:27:06Z"
+			"revision": "bf5b18a89572c3ae2474b537f0c3d92bc78ababa",
+			"revisionTime": "2017-01-21T21:53:05Z"
 		},
 		{
 			"checksumSHA1": "m0K4IKzz/y8TEE4tePRUVzKISH4=",

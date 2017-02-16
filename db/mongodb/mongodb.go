@@ -16,7 +16,6 @@ var Settings *mongoDBSettings
 type mongoDBSettings struct {
 	Database string
 	Host     string
-	URL 	string
 }
 
 func init() {
@@ -36,19 +35,19 @@ func LoadConfig() {
 	}
 
 	Settings = &mongoDBSettings{
-		Host: host,
+		Host:     host,
 		Database: database,
 	}
-	log.Infof("action=LoadConfig mongoDBSettings=%+v", Settings )
+	log.Infof("action=LoadConfig mongoDBSettings=%+v", Settings)
 }
 
 // GetSession establishes a connection to the mongo database and returns the default database along with the session.
 // The session must be closed by the caller.
-func GetSession() (*mgo.Session, *mgo.Database, error){
+func GetSession() (*mgo.Session, *mgo.Database, error) {
 	session, err := mgo.DialWithTimeout(Settings.Host, defaultTimeout)
-	if ( err != nil ) {
+	if err != nil {
 		return nil, nil, err
 	}
-	db := session.DB("test")
+	db := session.DB(Settings.Database)
 	return session, db, nil
 }

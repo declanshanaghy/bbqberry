@@ -1,9 +1,12 @@
 package backend
 
 import (
+	"fmt"
+
+	"github.com/declanshanaghy/bbqberry/db/mongodb"
 	"github.com/declanshanaghy/bbqberry/models"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/monitors"
-	"github.com/declanshanaghy/bbqberry/db/mongodb"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const collection = "monitors"
@@ -15,20 +18,27 @@ func CreateMonitor(params *monitors.CreateMonitorParams) (*models.TemperatureMon
 		return nil, err
 	}
 	defer session.Close()
+	defer db.Logout()
 
 	c := db.C(collection)
-	err = c.Insert(&params)
+
+	result := new(models.TemperatureMonitor)
+
+	err = c.Find(bson.M{"probe": params.Monitor.Probe}).One(result)
+	if err == nil && result.Probe != nil {
+		return nil, fmt.Errorf("Monitor already exists for the requested probe")
+	}
+
+	if err = c.Insert(params.Monitor); err != nil {
+		return nil, err
+	}
+
+	err = c.Find(bson.M{"probe": params.Monitor.Probe}).One(result)
 	if err != nil {
 		return nil, err
 	}
 
-	ID := "bollox"
-	m := models.TemperatureMonitor{
-		Probe: &params.Probe,
-		ID: &ID,
-	}
-
-	return &m, nil
+	return result, nil
 }
 
 // GetMonitors reads all configured temperature monitors

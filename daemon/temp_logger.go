@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/Polarishq/middleware/framework/log"
-	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/db/influxdb"
+	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/models"
 )
 

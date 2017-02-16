@@ -33,8 +33,8 @@ var _ = Describe("Termperatures API", func() {
 		}
 		m, err := backend.GetTemperatureProbeReadings(&params)
 
-		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings " +
-				"should not have returned an error")
+		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings "+
+			"should not have returned an error")
 		Expect(*m).To(HaveLen(1), "Incorrect number of readings returned")
 	})
 	It("should return all temperature readings when not given a probe number", func() {
@@ -43,8 +43,8 @@ var _ = Describe("Termperatures API", func() {
 		params := temperatures.GetTemperaturesParams{}
 		m, err := backend.GetTemperatureProbeReadings(&params)
 
-		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings " +
-				"should not have returned an error")
+		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings "+
+			"should not have returned an error")
 		Expect(*m).To(HaveLen(len(hwCfg.Probes)), "Incorrect number of readings returneds")
 
 		for i, reading := range *m {
@@ -65,8 +65,8 @@ var _ = Describe("Termperatures API", func() {
 		}
 		m, err := backend.GetTemperatureProbeReadings(&params)
 
-		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings " +
-				"should not have returned an error")
+		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings "+
+			"should not have returned an error")
 		Expect(*m).To(HaveLen(len(hwCfg.Probes)), "Incorrect number of readings returneds")
 
 		for i, reading := range *m {

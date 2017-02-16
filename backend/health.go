@@ -2,9 +2,9 @@ package backend
 
 import (
 	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/db/influxdb"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/framework/errorcodes"
-	"github.com/declanshanaghy/bbqberry/db/influxdb"
 	"github.com/declanshanaghy/bbqberry/models"
 )
 

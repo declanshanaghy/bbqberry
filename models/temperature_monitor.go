@@ -15,16 +15,20 @@ import (
 type TemperatureMonitor struct {
 
 	// Unique ID for this temperature monitor
+	// Read Only: true
+	ID string `json:"id,omitempty"`
+
+	// label
 	// Required: true
-	ID *string `json:"id"`
+	Label *string `json:"label"`
 
 	// The maximium temperature, below which an alert will be generated
 	// Required: true
-	Max *float32 `json:"max"`
+	Max *int32 `json:"max"`
 
 	// The minimum temperature, below which an alert will be generated
 	// Required: true
-	Min *float32 `json:"min"`
+	Min *int32 `json:"min"`
 
 	// probe
 	// Required: true
@@ -41,7 +45,7 @@ type TemperatureMonitor struct {
 func (m *TemperatureMonitor) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateID(formats); err != nil {
+	if err := m.validateLabel(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
@@ -72,9 +76,9 @@ func (m *TemperatureMonitor) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *TemperatureMonitor) validateID(formats strfmt.Registry) error {
+func (m *TemperatureMonitor) validateLabel(formats strfmt.Registry) error {
 
-	if err := validate.Required("id", "body", m.ID); err != nil {
+	if err := validate.Required("label", "body", m.Label); err != nil {
 		return err
 	}
 

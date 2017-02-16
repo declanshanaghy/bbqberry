@@ -5,6 +5,8 @@ const (
 	ErrInfluxUnavailable = int32(900)
 	// ErrInfluxWrite is used when unable to write data to influxdb
 	ErrInfluxWrite = int32(910)
+	// ErrRecordExists is used when a duplicate record is requested to be created
+	ErrRecordExists = int32(920)
 )
 
 var messages = map[int32]string{

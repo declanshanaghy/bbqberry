@@ -18,14 +18,11 @@ paths:
         - Monitors
       summary: "Get monitor settings for the requested probe"
       parameters:
-        - name: probe
-          in: query
-          description: The termerature probe to monitor
+        - name: monitor
+          in: body
           required: true
-          type: integer
-          format: int32
-          minimum: 0
-          maximum: 7
+          schema:
+            $ref: "#/definitions/TemperatureMonitor"
       responses:
         200:
           description: "The currently configured monitor(s) were retrieved successfully"
@@ -194,15 +191,19 @@ definitions:
   TemperatureMonitor:
     type: object
     required:
-      - id
       - probe
+      - label
       - scale
       - min
       - max
     properties:
       id:
         type: string
+        format: ObjectId
         description: Unique ID for this temperature monitor
+        readOnly: true
+      label:
+        type: string
       probe:
         type: integer
         format: int32
@@ -213,12 +214,12 @@ definitions:
         type: string
         description: The temperature scale
       min:
-        type: number
-        format: float
+        type: integer
+        format: int32
         description: The minimum temperature, below which an alert will be generated
       max:
-        type: number
-        format: float
+        type: integer
+        format: int32
         description: The maximium temperature, below which an alert will be generated
   TemperatureReadings:
     type: array
