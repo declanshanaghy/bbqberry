@@ -1,4 +1,4 @@
-package framework
+package influxdb
 
 import (
 	"errors"
@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/Polarishq/middleware/framework/log"
-	"github.com/declanshanaghy/bbqberry/db/influxdb"
 	"github.com/declanshanaghy/bbqberry/models"
 )
 
@@ -23,7 +22,7 @@ func QueryAverageTemperature(period time.Duration, probe int32) (*models.Tempera
 	tq := `SELECT MEAN(Celsius) as Celsius, MEAN(Fahrenheit) as Fahrenheit, MEAN(Kelvin) as Kelvin FROM temp WHERE Probe='%d' AND time > '%s'`
 	q := fmt.Sprintf(tq, probe, ts)
 
-	response, err := influxdb.Query(q)
+	response, err := Query(q)
 	if err != nil {
 		return nil, err
 	}

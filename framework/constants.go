@@ -3,20 +3,16 @@ package framework
 import (
 	"os"
 
-	"github.com/Polarishq/middleware/framework/log"
-	"github.com/declanshanaghy/bbqberry/db/influxdb"
 	"github.com/declanshanaghy/bbqberry/models"
 )
+
+// DefaultDB is the default database name that should be used if an override is not provided
+const DefaultDB = "bbqberry_test"
 
 func init() {
 	stub := false
 	if os.Getenv("STUB") != "" {
 		stub = true
-		if os.Getenv("INFLUXDB") == "" {
-			log.Warningf("Hardware is stubbed, resetting influx database")
-			os.Setenv("INFLUXDB", "stub")
-			influxdb.LoadConfig()
-		}
 	}
 	/******************************** BEGIN PSEUDO CONSTANTS *********************************************/
 	/**/

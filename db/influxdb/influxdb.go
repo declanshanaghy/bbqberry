@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/framework"
+	"github.com/declanshanaghy/bbqberry/util"
 	clientv1 "github.com/influxdata/influxdb/client"
 	"github.com/influxdata/influxdb/client/v2"
 )
-
-var defaultTimeout = time.Second * 5
 
 // Settings holds all pertient connection parameters for InfluxDB
 var Settings *influxDBSettings
@@ -23,7 +23,6 @@ type influxDBSettings struct {
 	Database string
 	Host     string
 	HTTPPort string
-	UDPPort  string
 }
 
 func init() {
@@ -34,7 +33,7 @@ func init() {
 func LoadConfig() {
 	database := os.Getenv("INFLUXDB")
 	if database == "" {
-		database = "bbqberry"
+		database = framework.DefaultDB
 	}
 
 	host := os.Getenv("INFLUXDB_HOST")
@@ -50,11 +49,7 @@ func LoadConfig() {
 		panic(err)
 	}
 
-	UDPPort := os.Getenv("INFLUXDB_PORT_UDP")
-	if UDPPort == "" {
-		UDPPort = "8089"
-	}
-
+	timeout := util.GetEnvMillisAsDuration("DB_TIMEOUT_MILLIS", 5000)
 	username := os.Getenv("INFLUXDB_USERNAME")
 	password := os.Getenv("INFLUXDB_PASSWORD")
 
@@ -63,14 +58,19 @@ func LoadConfig() {
 			URL:      URL,
 			Username: username,
 			Password: password,
+			Timeout:  timeout,
 		},
 		Database: database,
 		Host:     host,
 		HTTPPort: HTTPPort,
-		UDPPort:  UDPPort,
 	}
-	log.Infof("action=LoadConfig influxDBSettings=%+v URL=%s, UDPPort=%s", Settings,
-		Settings.URL.String(), Settings.UDPPort)
+
+	log.WithFields(log.Fields{
+		"Database": Settings.Database,
+		"Host":     Settings.Host,
+		"Port":     Settings.HTTPPort,
+		"URL":      Settings.URL.String(),
+	}).Infof("Loaded configuration")
 }
 
 // NewClientWithTimeout will retry pinging the server until a specified timeout passes
@@ -142,7 +142,7 @@ func NewHTTPClient() (client.Client, error) {
 		Addr:     addr,
 		Username: Settings.Config.Username,
 		Password: Settings.Config.Password,
-		Timeout:  defaultTimeout,
+		Timeout:  Settings.Config.Timeout,
 	})
 	if err != nil {
 		return nil, err
@@ -150,14 +150,6 @@ func NewHTTPClient() (client.Client, error) {
 
 	log.Debugf("action=NewHTTPClient addr=%s username=%s", addr, Settings.Config.Username)
 	return c, nil
-}
-
-// NewUDPClient creates a client which will use UDP protocol to send data to the configured influxDB server.
-// NB: The configured database is not used in this client. The server configuration determines which database
-// UDP data goes into
-func NewUDPClient() (client.Client, error) {
-	config := client.UDPConfig{Addr: fmt.Sprintf("%s:%s", Settings.Host, Settings.UDPPort)}
-	return client.NewUDPClient(config)
 }
 
 // WritePoint writes a single point to the DB with the given name, tags and fields

@@ -16,7 +16,7 @@ type TemperatureMonitor struct {
 
 	// Unique ID for this temperature monitor
 	// Read Only: true
-	ID string `json:"id,omitempty"`
+	ID string `json:"_id,omitempty"`
 
 	// label
 	// Required: true
