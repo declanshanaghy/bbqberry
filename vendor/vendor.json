@@ -9,6 +9,12 @@
 			"revisionTime": "2017-01-04T19:06:07Z"
 		},
 		{
+			"checksumSHA1": "3LrGD7u30AJVrcEIWsA5mF9JBrI=",
+			"path": "github.com/Polarishq/middleware/framework/errors",
+			"revision": "37d3140fb142711bf0613b982dcbb42501b911b8",
+			"revisionTime": "2017-02-18T01:27:43Z"
+		},
+		{
 			"checksumSHA1": "C5F/3uNJvHFtNKXr1nJz2BU/kPc=",
 			"path": "github.com/Polarishq/middleware/framework/log",
 			"revision": "2aa6a3fcbb518b1f85b8ae242226e86e3c6b4b23",

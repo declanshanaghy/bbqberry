@@ -1,12 +1,11 @@
 package backend
 
 import (
-	"fmt"
-
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/db/mongodb"
 	"github.com/declanshanaghy/bbqberry/models"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/monitors"
+	"github.com/go-openapi/errors"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -50,7 +49,7 @@ func (m *MonitorsManager) CreateMonitor(params *monitors.CreateMonitorParams) (*
 
 	err := c.Find(bson.M{"probe": params.Monitor.Probe}).One(result)
 	if err == nil && result.Probe != nil {
-		return nil, fmt.Errorf("Monitor already exists for the probe number %d", params.Monitor.Probe)
+		return nil, errors.New(400, "Monitor already exists for probe %d", *params.Monitor.Probe)
 	}
 
 	monitor := params.Monitor
@@ -68,13 +67,13 @@ func (m *MonitorsManager) CreateMonitor(params *monitors.CreateMonitorParams) (*
 }
 
 // GetMonitors reads all configured temperature monitors
-func (m *MonitorsManager) GetMonitors(params *monitors.GetMonitorsParams) (*models.TemperatureMonitors, error) {
+func (m *MonitorsManager) GetMonitors(params *monitors.GetMonitorsParams) ([]*models.TemperatureMonitor, error) {
 
 	c := m.GetCollection()
 
 	log.Error("hello")
 
-	result := models.TemperatureMonitors{}
+	result := make([]*models.TemperatureMonitor, 0)
 	if params.Probe != nil {
 		if err := c.Find(bson.M{"probe": params.Probe}).All(&result); err != nil {
 			return nil, err
@@ -85,5 +84,5 @@ func (m *MonitorsManager) GetMonitors(params *monitors.GetMonitorsParams) (*mode
 		}
 	}
 
-	return &result, nil
+	return result, nil
 }

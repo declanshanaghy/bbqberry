@@ -101,6 +101,6 @@ var _ = Describe("Monitors backends", func() {
 		monitors, err := mgr.GetMonitors(&params)
 
 		Expect(err).ShouldNot(HaveOccurred(), "GetMonitors should not have returned an error")
-		Expect(*monitors).To(HaveLen(len(created)))
+		Expect(monitors).To(HaveLen(len(created)))
 	})
 })

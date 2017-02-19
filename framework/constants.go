@@ -7,7 +7,7 @@ import (
 )
 
 // DefaultDB is the default database name that should be used if an override is not provided
-const DefaultDB = "bbqberry_test"
+const DefaultDB = "bbqberry"
 
 func init() {
 	stub := false

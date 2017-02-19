@@ -4,6 +4,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
@@ -120,9 +122,41 @@ func (m *TemperatureMonitor) validateProbe(formats strfmt.Registry) error {
 	return nil
 }
 
+var temperatureMonitorTypeScalePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["fahrenheit","celsius"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		temperatureMonitorTypeScalePropEnum = append(temperatureMonitorTypeScalePropEnum, v)
+	}
+}
+
+const (
+	// TemperatureMonitorScaleFahrenheit captures enum value "fahrenheit"
+	TemperatureMonitorScaleFahrenheit string = "fahrenheit"
+	// TemperatureMonitorScaleCelsius captures enum value "celsius"
+	TemperatureMonitorScaleCelsius string = "celsius"
+)
+
+// prop value enum
+func (m *TemperatureMonitor) validateScaleEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, temperatureMonitorTypeScalePropEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *TemperatureMonitor) validateScale(formats strfmt.Registry) error {
 
 	if err := validate.Required("scale", "body", m.Scale); err != nil {
+		return err
+	}
+
+	// value enum
+	if err := m.validateScaleEnum("scale", "body", *m.Scale); err != nil {
 		return err
 	}
 
