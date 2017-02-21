@@ -35,7 +35,7 @@ var _ = Describe("Termperatures API", func() {
 
 		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings "+
 			"should not have returned an error")
-		Expect(*m).To(HaveLen(1), "Incorrect number of readings returned")
+		Expect(m).To(HaveLen(1), "Incorrect number of readings returned")
 	})
 	It("should return all temperature readings when not given a probe number", func() {
 		started := time.Now()
@@ -45,9 +45,9 @@ var _ = Describe("Termperatures API", func() {
 
 		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings "+
 			"should not have returned an error")
-		Expect(*m).To(HaveLen(len(hwCfg.Probes)), "Incorrect number of readings returneds")
+		Expect(m).To(HaveLen(len(hwCfg.Probes)), "Incorrect number of readings returneds")
 
-		for i, reading := range *m {
+		for i, reading := range m {
 			Expect(int32(i)).To(
 				Equal(*reading.Probe),
 				fmt.Sprintf("Probe %d has incorrect number", i))
@@ -67,9 +67,9 @@ var _ = Describe("Termperatures API", func() {
 
 		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings "+
 			"should not have returned an error")
-		Expect(*m).To(HaveLen(len(hwCfg.Probes)), "Incorrect number of readings returneds")
+		Expect(m).To(HaveLen(len(hwCfg.Probes)), "Incorrect number of readings returneds")
 
-		for i, reading := range *m {
+		for i, reading := range m {
 			Expect(int32(i)).To(
 				Equal(*reading.Probe),
 				fmt.Sprintf("Probe %d has incorrect number", i))

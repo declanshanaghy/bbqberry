@@ -73,11 +73,11 @@ func (tl *temperatureLogger) tick() bool {
 	return true
 }
 
-func (tl *temperatureLogger) collectTemperatureMetrics() (*models.TemperatureReadings, error) {
+func (tl *temperatureLogger) collectTemperatureMetrics() ([]*models.TemperatureReading, error) {
 	log.Debug("action=method_entry numProbes=%d", tl.reader.GetNumProbes())
 	defer log.Debug("action=method_exit")
 
-	readings := models.TemperatureReadings{}
+	readings := make([]*models.TemperatureReading, 0)
 	for i := int32(0); i < tl.reader.GetNumProbes(); i++ {
 		log.Debugf("action=iterate probe=%d", i)
 		reading := models.TemperatureReading{}
@@ -86,14 +86,14 @@ func (tl *temperatureLogger) collectTemperatureMetrics() (*models.TemperatureRea
 		}
 		readings = append(readings, &reading)
 	}
-	return &readings, nil
+	return readings, nil
 }
 
-func (tl *temperatureLogger) logTemperatureMetrics(readings *models.TemperatureReadings) error {
-	log.Debugf("action=method_entry numReadings=%d", len(*readings))
+func (tl *temperatureLogger) logTemperatureMetrics(readings []*models.TemperatureReading) error {
+	log.Debugf("action=method_entry numReadings=%d", len(readings))
 	defer log.Debug("action=method_exit")
 
-	for _, reading := range *readings {
+	for _, reading := range readings {
 		tags := map[string]string{
 			"Probe": fmt.Sprintf("%d", *reading.Probe),
 		}
