@@ -63,7 +63,7 @@ func (s *ws2801Strand) SetPixelColor(n int32, color int) error {
 }
 
 func (s *ws2801Strand) SetAllPixels(color int) error {
-	log.Debugf("action=SetAllPixels n=%d, color=%#06x", color)
+	log.Debugf("action=SetAllPixels n=%d, color=%#06x", s.GetNumPixels(),color)
 	r := uint8(color >> 16 & 0xFF)
 	g := uint8(color >> 8 & 0xFF)
 	b := uint8(color & 0xFF)
@@ -80,7 +80,8 @@ func (s *ws2801Strand) SetPixelRGB(n int32, r uint8, g uint8, b uint8) error {
 		return err
 	}
 	base := n * 3
-	log.Debugf("action=SetPixelRGB n=%d base=%d nPixels=%d r=%#02x g=%#02x b=%#02x", n, base, len(s.pixels), r, g, b)
+	log.Debugf("action=SetPixelRGB n=%d base=%d nPixels=%d r=%#02x g=%#02x b=%#02x",
+		n, base, len(s.pixels), r, g, b)
 	s.pixels[base] = r
 	s.pixels[base+1] = g
 	s.pixels[base+2] = b

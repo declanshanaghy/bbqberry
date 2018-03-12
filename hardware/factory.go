@@ -60,6 +60,6 @@ func newSPIBus(channel byte) embd.SPIBus {
 		}
 		return StubBus
 	}
-	log.Infof("action=NewSPIBus channel=%d", channel)
+	log.Debugf("action=NewSPIBus channel=%d", channel)
 	return embd.NewSPIBus(embd.SPIMode0, channel, 1000000, 8, 0)
 }

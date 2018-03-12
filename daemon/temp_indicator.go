@@ -35,7 +35,7 @@ func (ti *temperatureIndicator) StartBackground() error {
 }
 
 func (ti *temperatureIndicator) getPeriod() time.Duration {
-	return time.Second * 10
+	return time.Second
 }
 
 // GetName returns a human readable name for this background task
@@ -52,6 +52,12 @@ func (ti *temperatureIndicator) start() {
 // Stop performs cleanup when the goroutine is exiting
 func (ti *temperatureIndicator) stop() {
 	log.Debug("action=stop")
+
+	log.Info("Clearing all pixels")
+	if err := ti.strip.Close(); err != nil {
+		log.Error(err.Error())
+	}
+
 	defer log.Debug("action=stop")
 }
 
@@ -63,7 +69,7 @@ func (ti *temperatureIndicator) tick() bool {
 	// Assuming that the ambient probe is #0
 	ambientProbeNumber := int32(0)
 
-	avg, err := framework.QueryAverageTemperature(ti.getPeriod(), ambientProbeNumber)
+	avg, err := framework.QueryAverageTemperature(ti.getPeriod() * 10, ambientProbeNumber)
 	if err != nil {
 		log.Error(err.Error())
 		return true
@@ -115,8 +121,9 @@ func getTempColor(temp, min, max int32) int {
 
 	color := r<<16 | b
 
-	log.Infof("min=%d, max=%d rnge=%d temp=%d, corrected=%d scaled=%0.2f "+
+	log.Debugf("min=%d, max=%d rnge=%d temp=%d, corrected=%d scaled=%0.2f "+
 		"(r, b) = (%d, %d) = (%x, %x) color=%x", min, max, rnge, temp, corrected, scaled, r, b, r, b, color)
 
 	return color
+
 }

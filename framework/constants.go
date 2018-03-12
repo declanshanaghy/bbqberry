@@ -25,7 +25,7 @@ func init() {
 	analogMax := int32(1024)
 
 	// Accessories
-	nPixels := int32(26)
+	nPixels := int32(25)
 
 	// Absolute temperature limits
 	tempLimitAbsAmbientLowCelsius := int32(-50.0)
