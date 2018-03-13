@@ -53,7 +53,7 @@ for the get temperatures operation typically these are written to a http.Request
 type GetTemperaturesParams struct {
 
 	/*Probe
-	  The termerature probe to read from (or all probes if not provided)
+	  The termerature probe to read from (or all probes if omitted)
 
 	*/
 	Probe *int32

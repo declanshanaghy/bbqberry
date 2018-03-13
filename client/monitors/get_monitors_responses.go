@@ -52,7 +52,7 @@ func NewGetMonitorsOK() *GetMonitorsOK {
 The currently configured monitor(s) were retrieved successfully
 */
 type GetMonitorsOK struct {
-	Payload models.TemperatureMonitors
+	Payload []*models.TemperatureMonitor
 }
 
 func (o *GetMonitorsOK) Error() string {

@@ -6,7 +6,7 @@ import (
 
 // Interface for client methods
 type ClientInterface interface {
-	CreateMonitor(params *CreateMonitorParams) (*CreateMonitorOK, error)
+	CreateMonitor(params *CreateMonitorParams) (*CreateMonitorCreated, error)
 	GetMonitors(params *GetMonitorsParams) (*GetMonitorsOK, error)
 
 	SetTransport(transport runtime.ClientTransport)

@@ -25,7 +25,7 @@ type Client struct {
 /*
 CreateMonitor gets monitor settings for the requested probe
 */
-func (a *Client) CreateMonitor(params *CreateMonitorParams) (*CreateMonitorOK, error) {
+func (a *Client) CreateMonitor(params *CreateMonitorParams) (*CreateMonitorCreated, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewCreateMonitorParams()
@@ -46,12 +46,12 @@ func (a *Client) CreateMonitor(params *CreateMonitorParams) (*CreateMonitorOK, e
 	if err != nil {
 		return nil, err
 	}
-	return result.(*CreateMonitorOK), nil
+	return result.(*CreateMonitorCreated), nil
 
 }
 
 /*
-GetMonitors gets monitor settings for the requested probe
+GetMonitors gets monitors for the requested probe
 */
 func (a *Client) GetMonitors(params *GetMonitorsParams) (*GetMonitorsOK, error) {
 	// TODO: Validate the params before sending

@@ -1,6 +1,8 @@
 # BBQBerry Makefile
 
 
+export INFLUXDB=bbqberry_test
+export MONGODB=bbqberry_test
 export STUB=yes
 
 

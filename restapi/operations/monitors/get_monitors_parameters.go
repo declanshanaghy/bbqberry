@@ -31,13 +31,12 @@ type GetMonitorsParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request
 
-	/*The termerature probe for which to retrieve configured monitors (or all probes if the given probe number is not provided)
-	  Required: true
+	/*The probe for which to retrieve active monitors (or all probes if omitted)
 	  Maximum: 7
 	  Minimum: 0
 	  In: query
 	*/
-	Probe int32
+	Probe *int32
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -60,22 +59,19 @@ func (o *GetMonitorsParams) BindRequest(r *http.Request, route *middleware.Match
 }
 
 func (o *GetMonitorsParams) bindProbe(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	if !hasKey {
-		return errors.Required("probe", "query")
-	}
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
 	}
-	if err := validate.RequiredString("probe", "query", raw); err != nil {
-		return err
+	if raw == "" { // empty values pass all other validations
+		return nil
 	}
 
 	value, err := swag.ConvertInt32(raw)
 	if err != nil {
 		return errors.InvalidType("probe", "query", "int32", raw)
 	}
-	o.Probe = value
+	o.Probe = &value
 
 	if err := o.validateProbe(formats); err != nil {
 		return err
@@ -86,11 +82,11 @@ func (o *GetMonitorsParams) bindProbe(rawData []string, hasKey bool, formats str
 
 func (o *GetMonitorsParams) validateProbe(formats strfmt.Registry) error {
 
-	if err := validate.MinimumInt("probe", "query", int64(o.Probe), 0, false); err != nil {
+	if err := validate.MinimumInt("probe", "query", int64(*o.Probe), 0, false); err != nil {
 		return err
 	}
 
-	if err := validate.MaximumInt("probe", "query", int64(o.Probe), 7, false); err != nil {
+	if err := validate.MaximumInt("probe", "query", int64(*o.Probe), 7, false); err != nil {
 		return err
 	}
 

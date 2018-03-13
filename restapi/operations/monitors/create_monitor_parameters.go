@@ -4,15 +4,14 @@ package monitors
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"io"
 	"net/http"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/declanshanaghy/bbqberry/models"
 )
 
 // NewCreateMonitorParams creates a new CreateMonitorParams object
@@ -31,13 +30,11 @@ type CreateMonitorParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request
 
-	/*The termerature probe to monitor
+	/*
 	  Required: true
-	  Maximum: 7
-	  Minimum: 0
-	  In: query
+	  In: body
 	*/
-	Probe int32
+	Monitor *models.TemperatureMonitor
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -46,53 +43,32 @@ func (o *CreateMonitorParams) BindRequest(r *http.Request, route *middleware.Mat
 	var res []error
 	o.HTTPRequest = r
 
-	qs := runtime.Values(r.URL.Query())
+	if runtime.HasBody(r) {
+		defer r.Body.Close()
+		var body models.TemperatureMonitor
+		if err := route.Consumer.Consume(r.Body, &body); err != nil {
+			if err == io.EOF {
+				res = append(res, errors.Required("monitor", "body"))
+			} else {
+				res = append(res, errors.NewParseError("monitor", "body", "", err))
+			}
 
-	qProbe, qhkProbe, _ := qs.GetOK("probe")
-	if err := o.bindProbe(qProbe, qhkProbe, route.Formats); err != nil {
-		res = append(res, err)
+		} else {
+			if err := body.Validate(route.Formats); err != nil {
+				res = append(res, err)
+			}
+
+			if len(res) == 0 {
+				o.Monitor = &body
+			}
+		}
+
+	} else {
+		res = append(res, errors.Required("monitor", "body"))
 	}
 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (o *CreateMonitorParams) bindProbe(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	if !hasKey {
-		return errors.Required("probe", "query")
-	}
-	var raw string
-	if len(rawData) > 0 {
-		raw = rawData[len(rawData)-1]
-	}
-	if err := validate.RequiredString("probe", "query", raw); err != nil {
-		return err
-	}
-
-	value, err := swag.ConvertInt32(raw)
-	if err != nil {
-		return errors.InvalidType("probe", "query", "int32", raw)
-	}
-	o.Probe = value
-
-	if err := o.validateProbe(formats); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (o *CreateMonitorParams) validateProbe(formats strfmt.Registry) error {
-
-	if err := validate.MinimumInt("probe", "query", int64(o.Probe), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("probe", "query", int64(o.Probe), 7, false); err != nil {
-		return err
-	}
-
 	return nil
 }

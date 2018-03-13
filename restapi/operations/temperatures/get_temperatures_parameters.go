@@ -31,7 +31,7 @@ type GetTemperaturesParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request
 
-	/*The termerature probe to read from (or all probes if not provided)
+	/*The termerature probe to read from (or all probes if omitted)
 	  Maximum: 7
 	  Minimum: 0
 	  In: query

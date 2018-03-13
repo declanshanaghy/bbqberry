@@ -20,7 +20,7 @@ type GetTemperaturesOK struct {
 	/*
 	  In: Body
 	*/
-	Payload models.TemperatureReadings `json:"body,omitempty"`
+	Payload []*models.TemperatureReading `json:"body,omitempty"`
 }
 
 // NewGetTemperaturesOK creates GetTemperaturesOK with default headers values
@@ -29,13 +29,13 @@ func NewGetTemperaturesOK() *GetTemperaturesOK {
 }
 
 // WithPayload adds the payload to the get temperatures o k response
-func (o *GetTemperaturesOK) WithPayload(payload models.TemperatureReadings) *GetTemperaturesOK {
+func (o *GetTemperaturesOK) WithPayload(payload []*models.TemperatureReading) *GetTemperaturesOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get temperatures o k response
-func (o *GetTemperaturesOK) SetPayload(payload models.TemperatureReadings) {
+func (o *GetTemperaturesOK) SetPayload(payload []*models.TemperatureReading) {
 	o.Payload = payload
 }
 
@@ -45,7 +45,7 @@ func (o *GetTemperaturesOK) WriteResponse(rw http.ResponseWriter, producer runti
 	rw.WriteHeader(200)
 	payload := o.Payload
 	if payload == nil {
-		payload = make(models.TemperatureReadings, 0, 50)
+		payload = make([]*models.TemperatureReading, 0, 50)
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {

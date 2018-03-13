@@ -12,9 +12,10 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-	"github.com/go-openapi/swag"
 
 	strfmt "github.com/go-openapi/strfmt"
+
+	"github.com/declanshanaghy/bbqberry/models"
 )
 
 // NewCreateMonitorParams creates a new CreateMonitorParams object
@@ -52,11 +53,8 @@ for the create monitor operation typically these are written to a http.Request
 */
 type CreateMonitorParams struct {
 
-	/*Probe
-	  The termerature probe to monitor
-
-	*/
-	Probe int32
+	/*Monitor*/
+	Monitor *models.TemperatureMonitor
 
 	timeout    time.Duration
 	Context    context.Context
@@ -85,15 +83,15 @@ func (o *CreateMonitorParams) SetContext(ctx context.Context) {
 	o.Context = ctx
 }
 
-// WithProbe adds the probe to the create monitor params
-func (o *CreateMonitorParams) WithProbe(probe int32) *CreateMonitorParams {
-	o.SetProbe(probe)
+// WithMonitor adds the monitor to the create monitor params
+func (o *CreateMonitorParams) WithMonitor(monitor *models.TemperatureMonitor) *CreateMonitorParams {
+	o.SetMonitor(monitor)
 	return o
 }
 
-// SetProbe adds the probe to the create monitor params
-func (o *CreateMonitorParams) SetProbe(probe int32) {
-	o.Probe = probe
+// SetMonitor adds the monitor to the create monitor params
+func (o *CreateMonitorParams) SetMonitor(monitor *models.TemperatureMonitor) {
+	o.Monitor = monitor
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -102,13 +100,12 @@ func (o *CreateMonitorParams) WriteToRequest(r runtime.ClientRequest, reg strfmt
 	r.SetTimeout(o.timeout)
 	var res []error
 
-	// query param probe
-	qrProbe := o.Probe
-	qProbe := swag.FormatInt32(qrProbe)
-	if qProbe != "" {
-		if err := r.SetQueryParam("probe", qProbe); err != nil {
-			return err
-		}
+	if o.Monitor == nil {
+		o.Monitor = new(models.TemperatureMonitor)
+	}
+
+	if err := r.SetBodyParam(o.Monitor); err != nil {
+		return err
 	}
 
 	if len(res) > 0 {

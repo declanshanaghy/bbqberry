@@ -11,47 +11,22 @@ import (
 	"github.com/declanshanaghy/bbqberry/models"
 )
 
-/*CreateMonitorOK The currently configured monitor(s) were retrieved successfully
+/*CreateMonitorCreated The monitor was created successfully
 
-swagger:response createMonitorOK
+swagger:response createMonitorCreated
 */
-type CreateMonitorOK struct {
-
-	/*
-	  In: Body
-	*/
-	Payload models.TemperatureMonitors `json:"body,omitempty"`
+type CreateMonitorCreated struct {
 }
 
-// NewCreateMonitorOK creates CreateMonitorOK with default headers values
-func NewCreateMonitorOK() *CreateMonitorOK {
-	return &CreateMonitorOK{}
-}
-
-// WithPayload adds the payload to the create monitor o k response
-func (o *CreateMonitorOK) WithPayload(payload models.TemperatureMonitors) *CreateMonitorOK {
-	o.Payload = payload
-	return o
-}
-
-// SetPayload sets the payload to the create monitor o k response
-func (o *CreateMonitorOK) SetPayload(payload models.TemperatureMonitors) {
-	o.Payload = payload
+// NewCreateMonitorCreated creates CreateMonitorCreated with default headers values
+func NewCreateMonitorCreated() *CreateMonitorCreated {
+	return &CreateMonitorCreated{}
 }
 
 // WriteResponse to the client
-func (o *CreateMonitorOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+func (o *CreateMonitorCreated) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.WriteHeader(200)
-	payload := o.Payload
-	if payload == nil {
-		payload = make(models.TemperatureMonitors, 0, 50)
-	}
-
-	if err := producer.Produce(rw, payload); err != nil {
-		panic(err) // let the recovery middleware deal with this
-	}
-
+	rw.WriteHeader(201)
 }
 
 /*CreateMonitorDefault Unexpected error

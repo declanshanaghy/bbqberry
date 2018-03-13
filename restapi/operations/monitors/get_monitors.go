@@ -29,7 +29,7 @@ func NewGetMonitors(ctx *middleware.Context, handler GetMonitorsHandler) *GetMon
 
 /*GetMonitors swagger:route GET /monitors Monitors getMonitors
 
-Get monitor settings for the requested probe
+Get monitors for the requested probe
 
 */
 type GetMonitors struct {

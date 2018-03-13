@@ -43,14 +43,14 @@ var _ = Describe("Temperature daemon", func() {
 
 		Expect(err).ToNot(HaveOccurred())
 
-		Expect(len(*readings)).To(Equal(int(temperatureLogger.reader.GetNumProbes())))
-		for i, r := range *readings {
+		Expect(len(readings)).To(Equal(int(temperatureLogger.reader.GetNumProbes())))
+		for i, r := range readings {
 			Expect(*r.Probe).To(Equal(int32(i)))
 		}
 	})
 	It("should log temperature readings successfully", func() {
 		temperatureLogger := newTemperatureLogger()
-		readings := models.TemperatureReadings{}
+		readings := make([]*models.TemperatureReading, 0)
 
 		for i := int32(0); i < 5; i++ {
 			t := strfmt.DateTime(time.Now())
@@ -71,7 +71,7 @@ var _ = Describe("Temperature daemon", func() {
 			})
 		}
 
-		err := temperatureLogger.logTemperatureMetrics(&readings)
+		err := temperatureLogger.logTemperatureMetrics(readings)
 
 		Expect(err).ToNot(HaveOccurred())
 	})
