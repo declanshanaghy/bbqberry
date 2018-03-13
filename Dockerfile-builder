@@ -1,8 +1,6 @@
 # Start from the latest PolarisHQ skel-builder image
 FROM polarishq/skel-builder
 
-RUN go get -u github.com/influxdata/influxdb/cmd/influx
-
 # Set the WORKDIR to the project path in your GOPATH, e.g. /go/src/github.com/Polarishq/SERVICE_NAME/
 WORKDIR /go/src/github.com/declanshanaghy/bbqberry
 

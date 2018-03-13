@@ -13,7 +13,7 @@ import (
 
 // GetMonitorsURL generates an URL for the get monitors operation
 type GetMonitorsURL struct {
-	Probe int32
+	Probe *int32
 
 	_basePath string
 	// avoid unkeyed usage
@@ -49,7 +49,10 @@ func (o *GetMonitorsURL) Build() (*url.URL, error) {
 
 	qs := make(url.Values)
 
-	probe := swag.FormatInt32(o.Probe)
+	var probe string
+	if o.Probe != nil {
+		probe = swag.FormatInt32(*o.Probe)
+	}
 	if probe != "" {
 		qs.Set("probe", probe)
 	}

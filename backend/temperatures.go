@@ -7,25 +7,11 @@ import (
 )
 
 // GetTemperatureProbeReadings reads the current sensor values from the onboard temperature sensors
-func GetTemperatureProbeReadings(params *temperatures.GetTemperaturesParams) (m models.TemperatureReadings, err error) {
-
+func GetTemperatureProbeReadings(params *temperatures.GetTemperaturesParams) ([]*models.TemperatureReading, error) {
+	m := make([]*models.TemperatureReading, 0)
 	tReader := hardware.NewTemperatureReader()
 
-	var probes []int32
-	var i int32
-
-	if params.Probe == nil || *params.Probe < 0 {
-		probes = make([]int32, tReader.GetNumProbes())
-		for i = 0; i < tReader.GetNumProbes(); i++ {
-			probes[i] = i
-		}
-	} else {
-		probes = make([]int32, 1)
-		probes[0] = *params.Probe
-	}
-
-	for i := range probes {
-		probeNumber := int32(probes[i])
+	for _, probeNumber := range getProbeIndexes(params.Probe) {
 		reading := models.TemperatureReading{}
 		err := tReader.GetTemperatureReading(probeNumber, &reading)
 		if err != nil {
@@ -35,5 +21,5 @@ func GetTemperatureProbeReadings(params *temperatures.GetTemperaturesParams) (m 
 		m = append(m, &reading)
 	}
 
-	return m, err
+	return m, nil
 }

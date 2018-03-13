@@ -11,6 +11,9 @@ import (
 	"strings"
 )
 
+// Fields allows passing key value pairs to Logrus
+type Fields map[string]interface{}
+
 type contextHook struct{}
 
 func (hook contextHook) Levels() []logrus.Level {
@@ -39,6 +42,25 @@ func (hook contextHook) Fire(entry *logrus.Entry) error {
 func init() {
 	logrus.SetFormatter(&prefixed.TextFormatter{TimestampFormat: "Jan 02 03:04:05.000"})
 	logrus.AddHook(contextHook{})
+}
+
+// WithField adds a field to the logrus entry
+func WithField(key string, value interface{}) *logrus.Entry {
+	return logrus.WithField(key, value)
+}
+
+// WithFields add fields to the logrus entry
+func WithFields(fields Fields) *logrus.Entry {
+	sendfields := make(logrus.Fields)
+	for k, v := range fields {
+		sendfields[k] = v
+	}
+	return logrus.WithFields(sendfields)
+}
+
+// WithError adds an error field to the logrus entry
+func WithError(err error) *logrus.Entry {
+	return logrus.WithError(err)
 }
 
 // Debugf logs a message at level Debug on the standard logger.
@@ -116,5 +138,9 @@ func SetDebug(on bool) {
 // SetWarn sets the log level to warn
 func SetWarn() {
 	logrus.SetLevel(logrus.WarnLevel)
+}
 
+// SetError sets the log level to error
+func SetError() {
+	logrus.SetLevel(logrus.ErrorLevel)
 }

@@ -7,17 +7,11 @@ import (
 	"errors"
 	"net/url"
 	golangswaggerpaths "path"
-
-	"github.com/go-openapi/swag"
 )
 
 // CreateMonitorURL generates an URL for the create monitor operation
 type CreateMonitorURL struct {
-	Probe int32
-
 	_basePath string
-	// avoid unkeyed usage
-	_ struct{}
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
@@ -46,15 +40,6 @@ func (o *CreateMonitorURL) Build() (*url.URL, error) {
 		_basePath = "/api"
 	}
 	result.Path = golangswaggerpaths.Join(_basePath, _path)
-
-	qs := make(url.Values)
-
-	probe := swag.FormatInt32(o.Probe)
-	if probe != "" {
-		qs.Set("probe", probe)
-	}
-
-	result.RawQuery = qs.Encode()
 
 	return &result, nil
 }

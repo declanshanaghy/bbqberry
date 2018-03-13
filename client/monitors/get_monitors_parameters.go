@@ -53,10 +53,10 @@ for the get monitors operation typically these are written to a http.Request
 type GetMonitorsParams struct {
 
 	/*Probe
-	  The termerature probe for which to retrieve configured monitors (or all probes if the given probe number is not provided)
+	  The probe for which to retrieve active monitors (or all probes if omitted)
 
 	*/
-	Probe int32
+	Probe *int32
 
 	timeout    time.Duration
 	Context    context.Context
@@ -86,13 +86,13 @@ func (o *GetMonitorsParams) SetContext(ctx context.Context) {
 }
 
 // WithProbe adds the probe to the get monitors params
-func (o *GetMonitorsParams) WithProbe(probe int32) *GetMonitorsParams {
+func (o *GetMonitorsParams) WithProbe(probe *int32) *GetMonitorsParams {
 	o.SetProbe(probe)
 	return o
 }
 
 // SetProbe adds the probe to the get monitors params
-func (o *GetMonitorsParams) SetProbe(probe int32) {
+func (o *GetMonitorsParams) SetProbe(probe *int32) {
 	o.Probe = probe
 }
 
@@ -102,13 +102,20 @@ func (o *GetMonitorsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.R
 	r.SetTimeout(o.timeout)
 	var res []error
 
-	// query param probe
-	qrProbe := o.Probe
-	qProbe := swag.FormatInt32(qrProbe)
-	if qProbe != "" {
-		if err := r.SetQueryParam("probe", qProbe); err != nil {
-			return err
+	if o.Probe != nil {
+
+		// query param probe
+		var qrProbe int32
+		if o.Probe != nil {
+			qrProbe = *o.Probe
 		}
+		qProbe := swag.FormatInt32(qrProbe)
+		if qProbe != "" {
+			if err := r.SetQueryParam("probe", qProbe); err != nil {
+				return err
+			}
+		}
+
 	}
 
 	if len(res) > 0 {

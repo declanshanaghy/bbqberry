@@ -18,19 +18,14 @@ paths:
         - Monitors
       summary: "Get monitor settings for the requested probe"
       parameters:
-        - name: probe
-          in: query
-          description: The termerature probe to monitor
+        - name: monitor
+          in: body
           required: true
-          type: integer
-          format: int32
-          minimum: 0
-          maximum: 7
-      responses:
-        200:
-          description: "The currently configured monitor(s) were retrieved successfully"
           schema:
-            $ref: "#/definitions/TemperatureMonitors"
+            $ref: "#/definitions/TemperatureMonitor"
+      responses:
+        201:
+          description: "The monitor was created successfully"
         default:
           description: Unexpected error
           schema:
@@ -39,13 +34,12 @@ paths:
       operationId: getMonitors
       tags:
         - Monitors
-      summary: "Get monitor settings for the requested probe"
+      summary: "Get monitors for the requested probe"
       parameters:
         - name: probe
           in: query
-          description: The termerature probe for which to retrieve configured monitors (or all probes if the
-            given probe number is not provided)
-          required: true
+          description: The probe for which to retrieve active monitors (or all probes if omitted)
+          required: false
           type: integer
           format: int32
           minimum: 0
@@ -54,7 +48,9 @@ paths:
         200:
           description: "The currently configured monitor(s) were retrieved successfully"
           schema:
-            $ref: "#/definitions/TemperatureMonitors"
+            type: array
+            items:
+              $ref: "#/definitions/TemperatureMonitor"
         default:
           description: Unexpected error
           schema:
@@ -68,7 +64,7 @@ paths:
       parameters:
         - name: probe
           in: query
-          description: The termerature probe to read from (or all probes if not provided)
+          description: The termerature probe to read from (or all probes if omitted)
           required: false
           type: integer
           format: int32
@@ -78,7 +74,9 @@ paths:
         200:
           description: "Temperature was read successfully"
           schema:
-            $ref: "#/definitions/TemperatureReadings"
+            type: array
+            items:
+              $ref: "#/definitions/TemperatureReading"
         default:
           description: Unexpected error
           schema:
@@ -129,6 +127,7 @@ definitions:
     properties:
       probeType:
         type: string
+        description: Ambient probes measure air temperature. Cooking probes measure food temperature
       minWarnCelsius:
         type: integer
         format: int32
@@ -150,12 +149,7 @@ definitions:
       label:
         type: string
       tempLimits:
-        type: object
         $ref: "#/definitions/TemperatureLimits"
-  TemperatureSettings:
-    type: array
-    items:
-      $ref: "#/definitions/TemperatureSetting"
   HardwareConfig:
     type: object
     required:
@@ -185,41 +179,45 @@ definitions:
         minimum: 0.0
         default: 1000.0
       probes:
-        type: object
-        $ref: "#/definitions/TemperatureSettings"
-  TemperatureMonitors:
-    type: array
-    items:
-      $ref: "#/definitions/TemperatureMonitor"
+        type: array
+        items:
+          $ref: "#/definitions/TemperatureSetting"
   TemperatureMonitor:
     type: object
     required:
       - probe
+      - label
       - scale
       - min
       - max
     properties:
-      scale:
+      _id:
         type: string
-        description: The temperature scale
-      min:
-        type: number
-        format: float
-        description: The minimum temperature, below which an alert will be generated
-      max:
-        type: number
-        format: float
-        description: The maximium temperature, below which an alert will be generated
+        format: ObjectId
+        description: Unique ID for this temperature monitor
+        readOnly: true
+      label:
+        type: string
       probe:
         type: integer
         format: int32
         minimum: 0
         maximum: 7
         default: 0
-  TemperatureReadings:
-    type: array
-    items:
-      $ref: "#/definitions/TemperatureReading"
+      scale:
+        type: string
+        description: The temperature scale
+        enum:
+          - fahrenheit
+          - celsius
+      min:
+        type: integer
+        format: int32
+        description: The minimum temperature, below which an alert will be generated
+      max:
+        type: integer
+        format: int32
+        description: The maximium temperature, below which an alert will be generated
   TemperatureReading:
     type: object
     required:
@@ -233,17 +231,14 @@ definitions:
     properties:
       kelvin:
         type: number
-        format: integer
         format: int32
         description: Temperature reading in degrees Kelvin
       celsius:
         type: number
-        format: integer
         format: int32
         description: Temperature reading in degrees Celsius
       fahrenheit:
         type: number
-        format: integer
         format: int32
         description: Temperature reading in degrees Fahrenheit
       date-time:

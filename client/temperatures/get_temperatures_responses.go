@@ -52,7 +52,7 @@ func NewGetTemperaturesOK() *GetTemperaturesOK {
 Temperature was read successfully
 */
 type GetTemperaturesOK struct {
-	Payload models.TemperatureReadings
+	Payload []*models.TemperatureReading
 }
 
 func (o *GetTemperaturesOK) Error() string {

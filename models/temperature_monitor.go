@@ -4,6 +4,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
@@ -14,13 +16,21 @@ import (
 // swagger:model TemperatureMonitor
 type TemperatureMonitor struct {
 
+	// Unique ID for this temperature monitor
+	// Read Only: true
+	ID string `json:"_id,omitempty"`
+
+	// label
+	// Required: true
+	Label *string `json:"label"`
+
 	// The maximium temperature, below which an alert will be generated
 	// Required: true
-	Max *float32 `json:"max"`
+	Max *int32 `json:"max"`
 
 	// The minimum temperature, below which an alert will be generated
 	// Required: true
-	Min *float32 `json:"min"`
+	Min *int32 `json:"min"`
 
 	// probe
 	// Required: true
@@ -36,6 +46,11 @@ type TemperatureMonitor struct {
 // Validate validates this temperature monitor
 func (m *TemperatureMonitor) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateLabel(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
 
 	if err := m.validateMax(formats); err != nil {
 		// prop
@@ -60,6 +75,15 @@ func (m *TemperatureMonitor) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *TemperatureMonitor) validateLabel(formats strfmt.Registry) error {
+
+	if err := validate.Required("label", "body", m.Label); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -98,9 +122,41 @@ func (m *TemperatureMonitor) validateProbe(formats strfmt.Registry) error {
 	return nil
 }
 
+var temperatureMonitorTypeScalePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["fahrenheit","celsius"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		temperatureMonitorTypeScalePropEnum = append(temperatureMonitorTypeScalePropEnum, v)
+	}
+}
+
+const (
+	// TemperatureMonitorScaleFahrenheit captures enum value "fahrenheit"
+	TemperatureMonitorScaleFahrenheit string = "fahrenheit"
+	// TemperatureMonitorScaleCelsius captures enum value "celsius"
+	TemperatureMonitorScaleCelsius string = "celsius"
+)
+
+// prop value enum
+func (m *TemperatureMonitor) validateScaleEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, temperatureMonitorTypeScalePropEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *TemperatureMonitor) validateScale(formats strfmt.Registry) error {
 
 	if err := validate.Required("scale", "body", m.Scale); err != nil {
+		return err
+	}
+
+	// value enum
+	if err := m.validateScaleEnum("scale", "body", *m.Scale); err != nil {
 		return err
 	}
 

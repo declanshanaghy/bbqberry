@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/db/influxdb"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/hardware"
 )
@@ -63,7 +64,7 @@ func (ti *temperatureIndicator) tick() bool {
 	// Assuming that the ambient probe is #0
 	ambientProbeNumber := int32(0)
 
-	avg, err := framework.QueryAverageTemperature(ti.getPeriod(), ambientProbeNumber)
+	avg, err := influxdb.QueryAverageTemperature(ti.getPeriod(), ambientProbeNumber)
 	if err != nil {
 		log.Error(err.Error())
 		return true
@@ -105,8 +106,7 @@ func getTempColor(temp, min, max int32) int {
 		temp = max
 	}
 
-	rnge := (max - min)
-
+	rnge := max - min
 	corrected := temp - min
 	scaled := float32(corrected) / float32(rnge)
 

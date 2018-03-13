@@ -5,7 +5,7 @@ import (
 
 	"time"
 
-	. "github.com/declanshanaghy/bbqberry/backend"
+	"github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperatures"
@@ -27,25 +27,21 @@ var _ = Describe("Termperatures API", func() {
 	})
 
 	It("should return a single temperature reading when given a probe number", func() {
-		var data [3]uint8
-		data[0] = 1
-		data[1] = uint8(1)<<7 | uint8(1)<<4
-		data[2] = 0
-
 		probe := int32(1)
 		params := temperatures.GetTemperaturesParams{
 			Probe: &probe,
 		}
-		m, err := GetTemperatureProbeReadings(&params)
+		m, err := backend.GetTemperatureProbeReadings(&params)
 
-		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings should not have returned an error")
+		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings "+
+			"should not have returned an error")
 		Expect(m).To(HaveLen(1), "Incorrect number of readings returned")
 	})
 	It("should return all temperature readings when not given a probe number", func() {
 		started := time.Now()
 
 		params := temperatures.GetTemperaturesParams{}
-		m, err := GetTemperatureProbeReadings(&params)
+		m, err := backend.GetTemperatureProbeReadings(&params)
 
 		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings "+
 			"should not have returned an error")
@@ -60,16 +56,17 @@ var _ = Describe("Termperatures API", func() {
 			Expect(time.Time(dt)).Should(BeTemporally("~", started, time.Second))
 		}
 	})
-	It("should return all temperature readings when not given a negative probe number", func() {
+	It("should return all temperature readings when given a negative probe number", func() {
 		started := time.Now()
 
 		probe := int32(-1)
 		params := temperatures.GetTemperaturesParams{
 			Probe: &probe,
 		}
-		m, err := GetTemperatureProbeReadings(&params)
+		m, err := backend.GetTemperatureProbeReadings(&params)
 
-		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings should not have returned an error")
+		Expect(err).ShouldNot(HaveOccurred(), "GetTemperatureProbeReadings "+
+			"should not have returned an error")
 		Expect(m).To(HaveLen(len(hwCfg.Probes)), "Incorrect number of readings returneds")
 
 		for i, reading := range m {

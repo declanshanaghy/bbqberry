@@ -83,11 +83,23 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 		})
 	api.MonitorsCreateMonitorHandler = monitors.CreateMonitorHandlerFunc(
 		func(params monitors.CreateMonitorParams) middleware.Responder {
-			return framework.HandleAPIRequestWithError(backend.CreateMonitor(&params))
+			mgr, err := backend.NewMonitorsManager()
+			if err != nil {
+				return framework.HandleAPIRequestWithError(nil, err)
+			}
+			defer mgr.Close()
+
+			return framework.HandleAPIRequestWithError(mgr.CreateMonitor(&params))
 		})
 	api.MonitorsGetMonitorsHandler = monitors.GetMonitorsHandlerFunc(
 		func(params monitors.GetMonitorsParams) middleware.Responder {
-			return framework.HandleAPIRequestWithError(backend.GetMonitors(&params))
+			mgr, err := backend.NewMonitorsManager()
+			if err != nil {
+				return framework.HandleAPIRequestWithError(nil, err)
+			}
+			defer mgr.Close()
+
+			return framework.HandleAPIRequestWithError(mgr.GetMonitors(&params))
 		})
 
 	globalMiddleware := setupGlobalMiddleware(api.Serve(setupMiddlewares))
