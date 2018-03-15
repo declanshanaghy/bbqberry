@@ -47,6 +47,15 @@ func NewGetMonitorsParamsWithContext(ctx context.Context) *GetMonitorsParams {
 	}
 }
 
+// NewGetMonitorsParamsWithHTTPClient creates a new GetMonitorsParams object
+// with the default values initialized, and the ability to set a custom HTTPClient for a request
+func NewGetMonitorsParamsWithHTTPClient(client *http.Client) *GetMonitorsParams {
+	var ()
+	return &GetMonitorsParams{
+		HTTPClient: client,
+	}
+}
+
 /*GetMonitorsParams contains all the parameters to send to the API endpoint
 for the get monitors operation typically these are written to a http.Request
 */
@@ -85,6 +94,17 @@ func (o *GetMonitorsParams) SetContext(ctx context.Context) {
 	o.Context = ctx
 }
 
+// WithHTTPClient adds the HTTPClient to the get monitors params
+func (o *GetMonitorsParams) WithHTTPClient(client *http.Client) *GetMonitorsParams {
+	o.SetHTTPClient(client)
+	return o
+}
+
+// SetHTTPClient adds the HTTPClient to the get monitors params
+func (o *GetMonitorsParams) SetHTTPClient(client *http.Client) {
+	o.HTTPClient = client
+}
+
 // WithProbe adds the probe to the get monitors params
 func (o *GetMonitorsParams) WithProbe(probe *int32) *GetMonitorsParams {
 	o.SetProbe(probe)
@@ -99,7 +119,9 @@ func (o *GetMonitorsParams) SetProbe(probe *int32) {
 // WriteToRequest writes these params to a swagger request
 func (o *GetMonitorsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
-	r.SetTimeout(o.timeout)
+	if err := r.SetTimeout(o.timeout); err != nil {
+		return err
+	}
 	var res []error
 
 	if o.Probe != nil {

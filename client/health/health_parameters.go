@@ -46,6 +46,15 @@ func NewHealthParamsWithContext(ctx context.Context) *HealthParams {
 	}
 }
 
+// NewHealthParamsWithHTTPClient creates a new HealthParams object
+// with the default values initialized, and the ability to set a custom HTTPClient for a request
+func NewHealthParamsWithHTTPClient(client *http.Client) *HealthParams {
+
+	return &HealthParams{
+		HTTPClient: client,
+	}
+}
+
 /*HealthParams contains all the parameters to send to the API endpoint
 for the health operation typically these are written to a http.Request
 */
@@ -77,10 +86,23 @@ func (o *HealthParams) SetContext(ctx context.Context) {
 	o.Context = ctx
 }
 
+// WithHTTPClient adds the HTTPClient to the health params
+func (o *HealthParams) WithHTTPClient(client *http.Client) *HealthParams {
+	o.SetHTTPClient(client)
+	return o
+}
+
+// SetHTTPClient adds the HTTPClient to the health params
+func (o *HealthParams) SetHTTPClient(client *http.Client) {
+	o.HTTPClient = client
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *HealthParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
-	r.SetTimeout(o.timeout)
+	if err := r.SetTimeout(o.timeout); err != nil {
+		return err
+	}
 	var res []error
 
 	if len(res) > 0 {

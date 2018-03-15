@@ -48,6 +48,15 @@ func NewCreateMonitorParamsWithContext(ctx context.Context) *CreateMonitorParams
 	}
 }
 
+// NewCreateMonitorParamsWithHTTPClient creates a new CreateMonitorParams object
+// with the default values initialized, and the ability to set a custom HTTPClient for a request
+func NewCreateMonitorParamsWithHTTPClient(client *http.Client) *CreateMonitorParams {
+	var ()
+	return &CreateMonitorParams{
+		HTTPClient: client,
+	}
+}
+
 /*CreateMonitorParams contains all the parameters to send to the API endpoint
 for the create monitor operation typically these are written to a http.Request
 */
@@ -83,6 +92,17 @@ func (o *CreateMonitorParams) SetContext(ctx context.Context) {
 	o.Context = ctx
 }
 
+// WithHTTPClient adds the HTTPClient to the create monitor params
+func (o *CreateMonitorParams) WithHTTPClient(client *http.Client) *CreateMonitorParams {
+	o.SetHTTPClient(client)
+	return o
+}
+
+// SetHTTPClient adds the HTTPClient to the create monitor params
+func (o *CreateMonitorParams) SetHTTPClient(client *http.Client) {
+	o.HTTPClient = client
+}
+
 // WithMonitor adds the monitor to the create monitor params
 func (o *CreateMonitorParams) WithMonitor(monitor *models.TemperatureMonitor) *CreateMonitorParams {
 	o.SetMonitor(monitor)
@@ -97,7 +117,9 @@ func (o *CreateMonitorParams) SetMonitor(monitor *models.TemperatureMonitor) {
 // WriteToRequest writes these params to a swagger request
 func (o *CreateMonitorParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
-	r.SetTimeout(o.timeout)
+	if err := r.SetTimeout(o.timeout); err != nil {
+		return err
+	}
 	var res []error
 
 	if o.Monitor == nil {

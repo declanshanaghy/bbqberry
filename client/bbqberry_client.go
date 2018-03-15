@@ -4,9 +4,6 @@ package client
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"os"
-	"strings"
-
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 
@@ -14,6 +11,7 @@ import (
 
 	"github.com/declanshanaghy/bbqberry/client/hardware"
 	"github.com/declanshanaghy/bbqberry/client/health"
+	"github.com/declanshanaghy/bbqberry/client/lights"
 	"github.com/declanshanaghy/bbqberry/client/monitors"
 	"github.com/declanshanaghy/bbqberry/client/temperatures"
 )
@@ -63,6 +61,8 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Bbqberry {
 
 	cli.Health = health.New(transport, formats)
 
+	cli.Lights = lights.New(transport, formats)
+
 	cli.Monitors = monitors.New(transport, formats)
 
 	cli.Temperatures = temperatures.New(transport, formats)
@@ -73,27 +73,10 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Bbqberry {
 // DefaultTransportConfig creates a TransportConfig with the
 // default settings taken from the meta section of the spec file.
 func DefaultTransportConfig() *TransportConfig {
-	var scheme []string
-	var host string
-
-	envScheme := os.Getenv(strings.Replace(strings.ToUpper(DefaultSchemes[0]), "-", "_", -1) + "_SCHEME")
-	if len(envScheme) == 0 {
-		scheme = DefaultSchemes
-	} else {
-		scheme = []string{envScheme}
-	}
-
-	envHost := os.Getenv(strings.Replace(strings.ToUpper(DefaultHost), "-", "_", -1) + "_HOST")
-	if len(envHost) == 0 {
-		host = DefaultHost
-	} else {
-		host = envHost
-	}
-
 	return &TransportConfig{
-		Host:     host,
+		Host:     DefaultHost,
 		BasePath: DefaultBasePath,
-		Schemes:  scheme,
+		Schemes:  DefaultSchemes,
 	}
 }
 
@@ -132,6 +115,8 @@ type Bbqberry struct {
 
 	Health *health.Client
 
+	Lights *lights.Client
+
 	Monitors *monitors.Client
 
 	Temperatures *temperatures.Client
@@ -146,6 +131,8 @@ func (c *Bbqberry) SetTransport(transport runtime.ClientTransport) {
 	c.Hardware.SetTransport(transport)
 
 	c.Health.SetTransport(transport)
+
+	c.Lights.SetTransport(transport)
 
 	c.Monitors.SetTransport(transport)
 

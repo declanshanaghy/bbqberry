@@ -11,6 +11,9 @@ import (
 	"github.com/declanshanaghy/bbqberry/models"
 )
 
+// GetHardwareOKCode is the HTTP code returned for type GetHardwareOK
+const GetHardwareOKCode int = 200
+
 /*GetHardwareOK The config was retrieved successfully
 
 swagger:response getHardwareOK

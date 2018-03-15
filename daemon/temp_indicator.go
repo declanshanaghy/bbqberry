@@ -11,7 +11,7 @@ import (
 
 // temperatureIndicator collects and logs temperature metrics
 type temperatureIndicator struct {
-	runner
+	period     time.Duration
 	reader     hardware.TemperatureReader
 	strip      hardware.WS2801
 	errorCount int
@@ -19,58 +19,53 @@ type temperatureIndicator struct {
 
 // newTemperatureIndicator creates a new temperatureIndicator instance which can be
 // run in the background to check average temperature and indicate it visually on the LED strip
-func newTemperatureIndicator() *temperatureIndicator {
+func newTemperatureIndicator() Runnable {
 	log.Debug("action=method_entry")
 	defer log.Debug("action=method_exit")
-	return &temperatureIndicator{
-		reader: hardware.NewTemperatureReader(),
-		strip:  hardware.NewStrandController(),
-	}
+	return newRunnable(
+		&temperatureIndicator{
+			reader: hardware.NewTemperatureReader(),
+			strip:  hardware.NewStrandController(),
+			period: time.Second,
+		},
+	)
 }
 
-// StartBackground starts the commander in the background
-func (ti *temperatureIndicator) StartBackground() error {
-	log.Debug("action=method_entry")
-	defer log.Debug("action=method_exit")
-	return ti.runner.startBackground(ti)
+func (r *temperatureIndicator) getPeriod() time.Duration {
+	return r.period
 }
 
-func (ti *temperatureIndicator) getPeriod() time.Duration {
-	return time.Second
+func (r *temperatureIndicator) setPeriod(period time.Duration)  {
+	r.period = period
 }
 
 // GetName returns a human readable name for this background task
-func (ti *temperatureIndicator) GetName() string {
+func (r *temperatureIndicator) GetName() string {
 	return "temperatureIndicator"
 }
 
 // Start performs initialization before the first tick
-func (ti *temperatureIndicator) start() {
+func (r *temperatureIndicator) start() {
 	log.Debug("action=method_entry")
 	defer log.Debug("action=method_entry")
+	r.tick()
 }
 
 // Stop performs cleanup when the goroutine is exiting
-func (ti *temperatureIndicator) stop() {
+func (r *temperatureIndicator) stop() {
 	log.Debug("action=stop")
-
-	log.Info("Clearing all pixels")
-	if err := ti.strip.Close(); err != nil {
-		log.Error(err.Error())
-	}
-
 	defer log.Debug("action=stop")
 }
 
 // Tick executes on a ticker schedule
-func (ti *temperatureIndicator) tick() bool {
+func (r *temperatureIndicator) tick() bool {
 	log.Debug("action=tick")
 	defer log.Debug("action=tick")
 
 	// Assuming that the ambient probe is #0
 	ambientProbeNumber := int32(0)
 
-	avg, err := influxdb.QueryAverageTemperature(ti.getPeriod() * 10, ambientProbeNumber)
+	avg, err := influxdb.QueryAverageTemperature(r.getPeriod() * 10, ambientProbeNumber)
 
 	if err != nil {
 		log.Error(err.Error())
@@ -81,19 +76,16 @@ func (ti *temperatureIndicator) tick() bool {
 	min := *probe.TempLimits.MinWarnCelsius
 	max := *probe.TempLimits.MaxWarnCelsius
 
-	color := getTempColor(*avg.Celsius, min, max)
+	color := r.getTempColor(*avg.Celsius, min, max)
 
-	if err := ti.strip.SetAllPixels(color); err != nil {
-		log.Error(err.Error())
-	}
-	if err := ti.strip.Update(); err != nil {
+	if err := r.strip.SetAllPixels(color); err != nil {
 		log.Error(err.Error())
 	}
 
 	return true
 }
 
-func getTempColor(temp, min, max int32) int {
+func (r *temperatureIndicator) getTempColor(temp, min, max int32) int {
 	// Map the temperature to a color to be displayed on the LED pixels.
 	// cold / min = blue	( 0x0000FF ) =
 	// hot / max = red ( 0xFF0000 )
@@ -117,14 +109,20 @@ func getTempColor(temp, min, max int32) int {
 	corrected := temp - min
 	scaled := float32(corrected) / float32(rnge)
 
-	r := int(255 * scaled)
-	b := 0xFF - r
+	red := int(255 * scaled)
+	blu := 0xFF - red
 
-	color := r<<16 | b
+	color := red<<16 | blu
 
-	log.Debugf("min=%d, max=%d rnge=%d temp=%d, corrected=%d scaled=%0.2f "+
-		"(r, b) = (%d, %d) = (%x, %x) color=%x", min, max, rnge, temp, corrected, scaled, r, b, r, b, color)
+	log.WithFields(log.Fields{
+		"min": min,
+		"max": max,
+		"rnge": rnge,
+		"temp": temp,
+		"corrected": corrected,
+		"scaled": scaled,
+		"color": color,
+	}).Debugf("Calculating temperature color")
 
 	return color
-
 }

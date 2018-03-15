@@ -46,6 +46,15 @@ func NewGetHardwareParamsWithContext(ctx context.Context) *GetHardwareParams {
 	}
 }
 
+// NewGetHardwareParamsWithHTTPClient creates a new GetHardwareParams object
+// with the default values initialized, and the ability to set a custom HTTPClient for a request
+func NewGetHardwareParamsWithHTTPClient(client *http.Client) *GetHardwareParams {
+
+	return &GetHardwareParams{
+		HTTPClient: client,
+	}
+}
+
 /*GetHardwareParams contains all the parameters to send to the API endpoint
 for the get hardware operation typically these are written to a http.Request
 */
@@ -77,10 +86,23 @@ func (o *GetHardwareParams) SetContext(ctx context.Context) {
 	o.Context = ctx
 }
 
+// WithHTTPClient adds the HTTPClient to the get hardware params
+func (o *GetHardwareParams) WithHTTPClient(client *http.Client) *GetHardwareParams {
+	o.SetHTTPClient(client)
+	return o
+}
+
+// SetHTTPClient adds the HTTPClient to the get hardware params
+func (o *GetHardwareParams) SetHTTPClient(client *http.Client) {
+	o.HTTPClient = client
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *GetHardwareParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
-	r.SetTimeout(o.timeout)
+	if err := r.SetTimeout(o.timeout); err != nil {
+		return err
+	}
 	var res []error
 
 	if len(res) > 0 {

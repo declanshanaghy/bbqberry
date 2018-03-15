@@ -5,6 +5,12 @@ export INFLUXDB=bbqberry_test
 export MONGODB=bbqberry_test
 export STUB=yes
 
+APP_NAME := $(shell basename $(PWD))
+
+SWAGGER_YML := swagger.yml
+SWAGGER_SERVER ?= true
+SWAGGER_CLIENT ?= true
+SWAGGER_SUPPORT ?= true
 
 unittest_bbqberry: create_influxdb
 	@echo "Running Unit Tests..."
@@ -56,3 +62,56 @@ run_deployed:
 sync_web:
 	@echo "Syncing BBQBerry webapp..."
 	rsync -rv ./static/ pi@bbqberry-gaff:~/go/src/github.com/declanshanaghy/bbqberry/static/
+
+clean_swagger:
+#
+#__Deletes all swagger generated files__
+#
+	@find cmd/$(APP_NAME)-server ! -name 'main_test.go' -type f -exec rm -f {} +
+	@rm -rf models/ client/
+	@rm -rf restapi/operations restapi/doc.go restapi/embedded_spec.go restapi/server.go
+	@printf "Cleaned swagger\n"
+
+validate_swagger:
+#
+#__Validates swagger.yml__
+#
+# (if it exists)
+#
+	@if [ -f $(SWAGGER_YML) ]; then \
+	    swagger validate $(SWAGGER_YML); \
+	fi
+
+swagger: validate_swagger
+#
+#__Generates swagger source files__
+#
+#   The following components are generated:
+#* Server
+#* API Client library
+#* Support files (the main function and the api builder)
+#
+	@if [ -f $(SWAGGER_YML) ]; then \
+	    if [ "$(SWAGGER_SERVER)" = "true" ]; then \
+		    swagger generate server --name $(APP_NAME) --spec $(SWAGGER_YML); \
+		else \
+			printf "Swagger server disabled\n"; \
+        fi; \
+	    if [ "$(SWAGGER_SUPPORT)" = "true" ]; then \
+			swagger generate support --name $(APP_NAME) --spec $(SWAGGER_YML); \
+		else \
+			printf "Swagger support disabled\n"; \
+		fi; \
+	    if [ "$(SWAGGER_CLIENT)" = "true" ]; then \
+			swagger generate client --name $(APP_NAME) --spec $(SWAGGER_YML) \
+		else \
+			printf "Swagger client disabled\n"; \
+		fi; \
+	fi
+
+generate: swagger
+#
+#__Generates source code__
+#
+	@printf "Code generation completed\n"
+

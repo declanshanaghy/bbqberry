@@ -13,59 +13,60 @@ import (
 
 // temperatureLogger collects and logs temperature metrics
 type temperatureLogger struct {
-	runner
+	period time.Duration
 	reader hardware.TemperatureReader
 }
 
 // newTemperatureLogger creates a new temperatureLogger instance which can be
 // run in the background to collect and log temperature metrics
-func newTemperatureLogger() *temperatureLogger {
+func newTemperatureLogger() Runnable {
 	log.Debug("action=method_entry")
 	defer log.Debug("action=method_exit")
-	return &temperatureLogger{
-		reader: hardware.NewTemperatureReader(),
-	}
+	return newRunnable(
+		&temperatureLogger{
+			reader: hardware.NewTemperatureReader(),
+			period: time.Second * 1,
+		},
+	)
 }
 
-// StartBackground starts the commander in the background
-func (tl *temperatureLogger) StartBackground() error {
-	log.Debug("action=method_entry")
-	defer log.Debug("action=method_exit")
-	return tl.runner.startBackground(tl)
+func (r *temperatureLogger) getPeriod() time.Duration {
+	return r.period
 }
 
-func (tl *temperatureLogger) getPeriod() time.Duration {
-	return time.Second * 1
+func (r *temperatureLogger) setPeriod(period time.Duration)  {
+	r.period = period
 }
 
 // GetName returns a human readable name for this background task
-func (tl *temperatureLogger) GetName() string {
+func (r *temperatureLogger) GetName() string {
 	return "temperatureLogger"
 }
 
 // Start performs initialization before the first tick
-func (tl *temperatureLogger) start() {
+func (r *temperatureLogger) start() {
 	log.Debug("action=method_entry")
 	defer log.Debug("action=method_entry")
+	r.tick()
 }
 
 // Stop performs cleanup when the goroutine is exiting
-func (tl *temperatureLogger) stop() {
+func (r *temperatureLogger) stop() {
 	log.Debug("action=stop")
 	defer log.Debug("action=stop")
 }
 
 // Tick executes on a ticker schedule
-func (tl *temperatureLogger) tick() bool {
+func (r *temperatureLogger) tick() bool {
 	log.Debug("action=tick")
 	defer log.Debug("action=tick")
 
-	readings, err := tl.collectTemperatureMetrics()
+	readings, err := r.collectTemperatureMetrics()
 	if err != nil {
 		log.Error(err.Error())
 	}
 
-	err = tl.logTemperatureMetrics(readings)
+	err = r.logTemperatureMetrics(readings)
 	if err != nil {
 		log.Error(err.Error())
 	}
@@ -73,15 +74,15 @@ func (tl *temperatureLogger) tick() bool {
 	return true
 }
 
-func (tl *temperatureLogger) collectTemperatureMetrics() ([]*models.TemperatureReading, error) {
-	log.Debug("action=method_entry numProbes=%d", tl.reader.GetNumProbes())
+func (r *temperatureLogger) collectTemperatureMetrics() ([]*models.TemperatureReading, error) {
+	log.Debug("action=method_entry numProbes=%d", r.reader.GetNumProbes())
 	defer log.Debug("action=method_exit")
 
 	readings := make([]*models.TemperatureReading, 0)
-	for i := int32(0); i < tl.reader.GetNumProbes(); i++ {
+	for i := int32(0); i < r.reader.GetNumProbes(); i++ {
 		log.Debugf("action=iterate probe=%d", i)
 		reading := models.TemperatureReading{}
-		if err := tl.reader.GetTemperatureReading(i, &reading); err != nil {
+		if err := r.reader.GetTemperatureReading(i, &reading); err != nil {
 			return nil, err
 		}
 		readings = append(readings, &reading)
@@ -89,7 +90,7 @@ func (tl *temperatureLogger) collectTemperatureMetrics() ([]*models.TemperatureR
 	return readings, nil
 }
 
-func (tl *temperatureLogger) logTemperatureMetrics(readings []*models.TemperatureReading) error {
+func (r *temperatureLogger) logTemperatureMetrics(readings []*models.TemperatureReading) error {
 	log.Debugf("action=method_entry numReadings=%d", len(readings))
 	defer log.Debug("action=method_exit")
 

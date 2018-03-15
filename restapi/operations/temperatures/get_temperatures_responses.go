@@ -11,6 +11,9 @@ import (
 	"github.com/declanshanaghy/bbqberry/models"
 )
 
+// GetTemperaturesOKCode is the HTTP code returned for type GetTemperaturesOK
+const GetTemperaturesOKCode int = 200
+
 /*GetTemperaturesOK Temperature was read successfully
 
 swagger:response getTemperaturesOK
