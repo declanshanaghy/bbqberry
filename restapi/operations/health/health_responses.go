@@ -11,6 +11,9 @@ import (
 	"github.com/declanshanaghy/bbqberry/models"
 )
 
+// HealthOKCode is the HTTP code returned for type HealthOK
+const HealthOKCode int = 200
+
 /*HealthOK Service is operating normally
 
 swagger:response healthOK

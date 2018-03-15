@@ -11,6 +11,9 @@ import (
 	"github.com/declanshanaghy/bbqberry/models"
 )
 
+// CreateMonitorCreatedCode is the HTTP code returned for type CreateMonitorCreated
+const CreateMonitorCreatedCode int = 201
+
 /*CreateMonitorCreated The monitor was created successfully
 
 swagger:response createMonitorCreated

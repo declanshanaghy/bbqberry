@@ -11,6 +11,27 @@ consumes:
 produces:
   - application/json
 paths:
+  /lights/shifter:
+    put:
+      operationId: enableShifter
+      tags:
+        - Lights
+      summary: "Enable the simple shifter light show"
+      parameters:
+        - name: period
+          description: The time period between updates in milliseconds
+          in: query
+          required: true
+          type: integer
+          minimum: 0
+          maximum: 60000
+      responses:
+        201:
+          description: "The monitor was created successfully"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
   /monitors:
     post:
       operationId: createMonitor

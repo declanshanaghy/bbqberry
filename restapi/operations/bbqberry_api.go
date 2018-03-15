@@ -18,6 +18,7 @@ import (
 
 	"github.com/declanshanaghy/bbqberry/restapi/operations/hardware"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/lights"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/monitors"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperatures"
 )
@@ -36,6 +37,9 @@ func NewBbqberryAPI(spec *loads.Document) *BbqberryAPI {
 		JSONProducer:    runtime.JSONProducer(),
 		MonitorsCreateMonitorHandler: monitors.CreateMonitorHandlerFunc(func(params monitors.CreateMonitorParams) middleware.Responder {
 			return middleware.NotImplemented("operation MonitorsCreateMonitor has not yet been implemented")
+		}),
+		LightsEnableShifterHandler: lights.EnableShifterHandlerFunc(func(params lights.EnableShifterParams) middleware.Responder {
+			return middleware.NotImplemented("operation LightsEnableShifter has not yet been implemented")
 		}),
 		HardwareGetHardwareHandler: hardware.GetHardwareHandlerFunc(func(params hardware.GetHardwareParams) middleware.Responder {
 			return middleware.NotImplemented("operation HardwareGetHardware has not yet been implemented")
@@ -69,6 +73,8 @@ type BbqberryAPI struct {
 
 	// MonitorsCreateMonitorHandler sets the operation handler for the create monitor operation
 	MonitorsCreateMonitorHandler monitors.CreateMonitorHandler
+	// LightsEnableShifterHandler sets the operation handler for the enable shifter operation
+	LightsEnableShifterHandler lights.EnableShifterHandler
 	// HardwareGetHardwareHandler sets the operation handler for the get hardware operation
 	HardwareGetHardwareHandler hardware.GetHardwareHandler
 	// MonitorsGetMonitorsHandler sets the operation handler for the get monitors operation
@@ -142,6 +148,10 @@ func (o *BbqberryAPI) Validate() error {
 
 	if o.MonitorsCreateMonitorHandler == nil {
 		unregistered = append(unregistered, "monitors.CreateMonitorHandler")
+	}
+
+	if o.LightsEnableShifterHandler == nil {
+		unregistered = append(unregistered, "lights.EnableShifterHandler")
 	}
 
 	if o.HardwareGetHardwareHandler == nil {
@@ -241,27 +251,32 @@ func (o *BbqberryAPI) initHandlerCache() {
 	}
 
 	if o.handlers["POST"] == nil {
-		o.handlers[strings.ToUpper("POST")] = make(map[string]http.Handler)
+		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/monitors"] = monitors.NewCreateMonitor(o.context, o.MonitorsCreateMonitorHandler)
 
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/lights/shifter"] = lights.NewEnableShifter(o.context, o.LightsEnableShifterHandler)
+
 	if o.handlers["GET"] == nil {
-		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)
+		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/hardware"] = hardware.NewGetHardware(o.context, o.HardwareGetHardwareHandler)
 
 	if o.handlers["GET"] == nil {
-		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)
+		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/monitors"] = monitors.NewGetMonitors(o.context, o.MonitorsGetMonitorsHandler)
 
 	if o.handlers["GET"] == nil {
-		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)
+		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/temperatures"] = temperatures.NewGetTemperatures(o.context, o.TemperaturesGetTemperaturesHandler)
 
 	if o.handlers["GET"] == nil {
-		o.handlers[strings.ToUpper("GET")] = make(map[string]http.Handler)
+		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/health"] = health.NewHealth(o.context, o.HealthHealthHandler)
 

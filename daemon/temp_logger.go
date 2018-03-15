@@ -13,6 +13,7 @@ import (
 
 // temperatureLogger collects and logs temperature metrics
 type temperatureLogger struct {
+	period time.Duration
 	reader hardware.TemperatureReader
 }
 
@@ -24,12 +25,17 @@ func newTemperatureLogger() Runnable {
 	return newRunnable(
 		&temperatureLogger{
 			reader: hardware.NewTemperatureReader(),
+			period: time.Second * 1,
 		},
 	)
 }
 
 func (r *temperatureLogger) getPeriod() time.Duration {
-	return time.Second * 1
+	return r.period
+}
+
+func (r *temperatureLogger) setPeriod(period time.Duration)  {
+	r.period = period
 }
 
 // GetName returns a human readable name for this background task
@@ -41,6 +47,7 @@ func (r *temperatureLogger) GetName() string {
 func (r *temperatureLogger) start() {
 	log.Debug("action=method_entry")
 	defer log.Debug("action=method_entry")
+	r.tick()
 }
 
 // Stop performs cleanup when the goroutine is exiting

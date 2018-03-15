@@ -30,21 +30,15 @@ import (
 	"os"
 	"syscall"
 	"os/signal"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/lights"
+	"time"
 )
 
-var commander	daemon.Runnable
 
-func init() {
-	commander = daemon.NewCommander()
-}
+var runner				*daemon.Runnable
+var commander			*daemon.Commander
+var cmdOptionsValues	bbqframework.CmdOptions
 
-type cmdOptions struct {
-	LogFile   string `short:"l" long:"logfile" description:"Specify the log file" default:""`
-	Verbose   bool   `short:"v" long:"verbose" description:"Show verbose debug information"`
-	StaticDir string `short:"s" long:"static" description:"The path to the directory containing static resources" default:""`
-}
-
-var cmdOptionsValues cmdOptions
 
 func configureFlags(api *operations.BbqberryAPI) {
 	log.Debug("action=method_entry")
@@ -62,7 +56,9 @@ func configureFlags(api *operations.BbqberryAPI) {
 func configureAPI(api *operations.BbqberryAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
-	
+
+	commander = daemon.NewCommander(&cmdOptionsValues)
+
 	log.SetDebug(cmdOptionsValues.Verbose)
 	if cmdOptionsValues.LogFile != "" {
 		log.SetOutput(cmdOptionsValues.LogFile)
@@ -104,6 +100,12 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 
 			return framework.HandleAPIRequestWithError(mgr.GetMonitors(&params))
 		})
+	api.LightsEnableShifterHandler = lights.EnableShifterHandlerFunc(
+		func(params lights.EnableShifterParams) middleware.Responder {
+			p := time.Duration(params.Period) * time.Millisecond
+			commander.EnableLightShow(p)
+			return framework.HandleAPIRequestWithError(true, nil)
+		})
 
 	globalMiddleware := setupGlobalMiddleware(api.Serve(setupMiddlewares))
 	
@@ -137,10 +139,8 @@ func setupHardware() {
 
 	hardware.Startup()
 
-	if ( ! commander.IsRunning() ) {
-		if err := commander.StartBackground(); err != nil {
-			panic(err)
-		}
+	if err := commander.StartBackground(); err != nil {
+		panic(err)
 	}
 }
 
