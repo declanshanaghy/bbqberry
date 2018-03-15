@@ -11,6 +11,9 @@ import (
 	"github.com/declanshanaghy/bbqberry/models"
 )
 
+// GetMonitorsOKCode is the HTTP code returned for type GetMonitorsOK
+const GetMonitorsOKCode int = 200
+
 /*GetMonitorsOK The currently configured monitor(s) were retrieved successfully
 
 swagger:response getMonitorsOK

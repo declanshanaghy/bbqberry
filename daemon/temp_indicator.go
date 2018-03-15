@@ -11,6 +11,7 @@ import (
 
 // temperatureIndicator collects and logs temperature metrics
 type temperatureIndicator struct {
+	period     time.Duration
 	reader     hardware.TemperatureReader
 	strip      hardware.WS2801
 	errorCount int
@@ -25,12 +26,17 @@ func newTemperatureIndicator() Runnable {
 		&temperatureIndicator{
 			reader: hardware.NewTemperatureReader(),
 			strip:  hardware.NewStrandController(),
+			period: time.Second,
 		},
 	)
 }
 
 func (r *temperatureIndicator) getPeriod() time.Duration {
-	return time.Second
+	return r.period
+}
+
+func (r *temperatureIndicator) setPeriod(period time.Duration)  {
+	r.period = period
 }
 
 // GetName returns a human readable name for this background task
@@ -42,6 +48,7 @@ func (r *temperatureIndicator) GetName() string {
 func (r *temperatureIndicator) start() {
 	log.Debug("action=method_entry")
 	defer log.Debug("action=method_entry")
+	r.tick()
 }
 
 // Stop performs cleanup when the goroutine is exiting

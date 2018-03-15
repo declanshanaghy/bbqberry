@@ -24,6 +24,9 @@ type Tickable interface {
 	// will be used as the period between calls to tick
 	getPeriod() time.Duration
 
+	// setPeriod is used to change the period between calls to tick
+	setPeriod(time.Duration)
+
 	// GetName returns a human readable name for this background task
 	GetName() string
 }
@@ -36,6 +39,16 @@ type Runnable interface {
 	StopBackground() error
 	// IsRunning determines if the main loop is executing
 	IsRunning() bool
+}
+
+type RunnableTicker struct {
+	runnable Runnable
+	tickable Tickable
+}
+
+func newRunnableTicker(tickable Tickable) RunnableTicker {
+	r := newRunnable(tickable)
+	return RunnableTicker{r, tickable}
 }
 
 // runner represents a single background goroutine
@@ -92,11 +105,8 @@ func (r *runner) loop() {
 	// Start the tickable before entering the loop
 	r.tickable.start()
 
-	ticker := time.NewTicker(r.tickable.getPeriod())
-
-	// Run first tick outside the loop
-	r.running = r.tickable.tick()
 	for r.running {
+		ticker := time.NewTicker(r.tickable.getPeriod())
 		select {
 		case r.running = <-r.ch:
 			log.Debugf("action=rx running=%t", r.running)
