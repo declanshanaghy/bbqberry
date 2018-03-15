@@ -27,9 +27,12 @@ import (
 	_ "github.com/docker/go-units"
 	// Unsure why this is suppressed
 	_ "github.com/tylerb/graceful"
+	"os"
+	"syscall"
+	"os/signal"
 )
 
-var commander	*daemon.Commander
+var commander	daemon.Runnable
 
 func init() {
 	commander = daemon.NewCommander()
@@ -112,19 +115,38 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 	return globalMiddleware
 }
 
-func globalStartup() {
+func registerSignals() {
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc,
+		syscall.SIGKILL,
+		syscall.SIGUSR1,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT)
+	go func() {
+		s := <-sigc
+		log.WithField("signal", s).Info("Received signal")
+		globalShutdown()
+		os.Exit(42)
+	}()
+}
+
+func setupHardware() {
 	log.Info("action=method_entry")
 	defer log.Info("action=method_exit")
-	
+
 	hardware.Startup()
-	
+
 	if ( ! commander.IsRunning() ) {
 		if err := commander.StartBackground(); err != nil {
 			panic(err)
 		}
 	}
-	
-	return
+}
+
+func globalStartup() {
+	registerSignals()
+	setupHardware()
 }
 
 func globalShutdown() {

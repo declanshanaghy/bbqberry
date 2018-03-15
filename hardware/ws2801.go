@@ -67,11 +67,19 @@ func (s *ws2801Strand) SetAllPixels(color int) error {
 	r := uint8(color >> 16 & 0xFF)
 	g := uint8(color >> 8 & 0xFF)
 	b := uint8(color & 0xFF)
+
+	// Set the pixel values
 	for i := int32(0); i < s.GetNumPixels(); i++ {
 		if err := s.SetPixelRGB(i, r, g, b); err != nil {
 			return err
 		}
 	}
+
+	// Applyt the update
+	if err := s.Update(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -89,7 +97,7 @@ func (s *ws2801Strand) SetPixelRGB(n int32, r uint8, g uint8, b uint8) error {
 }
 
 func (s *ws2801Strand) validatePixel(n int32) (err error) {
-	if n < int32(0) || n > s.GetNumPixels() {
+	if n < int32(0) || n >= s.GetNumPixels() {
 		err = fmt.Errorf("action=invalid pixel=%d, max=%d", n, s.GetNumPixels())
 	}
 	return err
