@@ -5,6 +5,6 @@ type CmdOptions struct {
 	Verbose  	 				bool	`short:"v" long:"verbose" description:"Show verbose debug information"`
 	StaticDir 					string	`short:"s" long:"static" description:"The path to the directory containing static resources" default:""`
 	TemperatureLoggerEnabled 	bool	`short:"L" long:"logger" description:"Run the temperature logger"`
-	TemperatureIndicatorEnabled bool	`short:"I" long:"indicator" description:"Run the temperature indicator"`
-	LightShowEnabled 			bool	`short:"S" long:"show" description:"Run the lightshow"`
+	LightShow	 				string	`short:"S" long:"show" description:"Run the given lightshow" default:"Temperature" choice:"Rainbow" choice:"Pulser" choice:"Simple Shifter" choice:"Temperature"`
 }
+

@@ -4,10 +4,10 @@ import (
 	"crypto/tls"
 	"net/http"
 	
-	errors "github.com/go-openapi/errors"
-	runtime "github.com/go-openapi/runtime"
-	middleware "github.com/go-openapi/runtime/middleware"
-	graceful "github.com/tylerb/graceful"
+	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/runtime/middleware"
+	"github.com/tylerb/graceful"
 	
 	"github.com/Polarishq/middleware/framework"
 	"github.com/Polarishq/middleware/framework/log"
@@ -31,19 +31,16 @@ import (
 	"syscall"
 	"os/signal"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/lights"
-	"time"
+	"sync"
 )
 
 
-var runner				*daemon.Runnable
+var shutdown			sync.Mutex
 var commander			*daemon.Commander
 var cmdOptionsValues	bbqframework.CmdOptions
 
 
 func configureFlags(api *operations.BbqberryAPI) {
-	log.Debug("action=method_entry")
-	defer log.Debug("action=method_exit")
-	
 	api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{
 		{
 			ShortDescription: "BBQ Berry Server Flags",
@@ -100,11 +97,9 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 
 			return framework.HandleAPIRequestWithError(mgr.GetMonitors(&params))
 		})
-	api.LightsEnableShifterHandler = lights.EnableShifterHandlerFunc(
-		func(params lights.EnableShifterParams) middleware.Responder {
-			p := time.Duration(params.Period) * time.Millisecond
-			commander.EnableLightShow(p)
-			return framework.HandleAPIRequestWithError(true, nil)
+	api.LightsUpdateGrillLightsHandler = lights.UpdateGrillLightsHandlerFunc(
+		func(params lights.UpdateGrillLightsParams) middleware.Responder {
+			return framework.HandleAPIRequestWithError(commander.UpdateGrillLights(&params))
 		})
 
 	globalMiddleware := setupGlobalMiddleware(api.Serve(setupMiddlewares))
@@ -121,7 +116,6 @@ func registerSignals() {
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc,
 		syscall.SIGKILL,
-		syscall.SIGUSR1,
 		syscall.SIGINT,
 		syscall.SIGTERM,
 		syscall.SIGQUIT)
@@ -134,9 +128,6 @@ func registerSignals() {
 }
 
 func setupHardware() {
-	log.Info("action=method_entry")
-	defer log.Info("action=method_exit")
-
 	hardware.Startup()
 
 	if err := commander.StartBackground(); err != nil {
@@ -150,10 +141,10 @@ func globalStartup() {
 }
 
 func globalShutdown() {
-	log.Info("action=method_entry")
-	defer log.Info("action=method_exit")
-	
-	if ( commander.IsRunning() ) {
+	shutdown.Lock()
+	defer shutdown.Unlock()
+
+	if commander.IsRunning() {
 		if err := commander.StopBackground(); err != nil {
 			panic(err)
 		}
@@ -164,6 +155,7 @@ func globalShutdown() {
 
 // The TLS configuration before HTTPS server starts.
 func configureTLS(tlsConfig *tls.Config) {
+	_ = tlsConfig
 	// Make all necessary changes to the TLS configuration here.
 }
 
@@ -172,6 +164,8 @@ func configureTLS(tlsConfig *tls.Config) {
 // This function can be called multiple times, depending on the number of serving schemes.
 // scheme value will be set accordingly: "http", "https" or "unix"
 func configureServer(s *graceful.Server, scheme string) {
+	_ = s
+	_ = scheme
 }
 
 // The middleware configuration is for the handler executors. These do not apply to the swagger.json document.
@@ -183,9 +177,6 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 // The middleware configuration happens before anything, this middleware also applies to serving the swagger.json document.
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
-	log.Debug("action=method_entry")
-	defer log.Debug("action=method_exit")
-	
 	return handlers.NewPanicHandler(
 		handlers.NewLoggingHandler(
 			bbqhandlers.NewStaticHandler(cmdOptionsValues.StaticDir, handler)))

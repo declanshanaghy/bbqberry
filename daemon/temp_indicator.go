@@ -11,7 +11,7 @@ import (
 
 // temperatureIndicator collects and logs temperature metrics
 type temperatureIndicator struct {
-	period     time.Duration
+	basicTickable
 	reader     hardware.TemperatureReader
 	strip      hardware.WS2801
 	errorCount int
@@ -19,53 +19,36 @@ type temperatureIndicator struct {
 
 // newTemperatureIndicator creates a new temperatureIndicator instance which can be
 // run in the background to check average temperature and indicate it visually on the LED strip
-func newTemperatureIndicator() Runnable {
-	log.Debug("action=method_entry")
-	defer log.Debug("action=method_exit")
-	return newRunnable(
-		&temperatureIndicator{
-			reader: hardware.NewTemperatureReader(),
-			strip:  hardware.NewStrandController(),
-			period: time.Second,
-		},
-	)
-}
+func newTemperatureIndicator() RunnableTicker {
+	t := &temperatureIndicator{
+		reader: hardware.NewTemperatureReader(),
+		strip:  hardware.NewStrandController(),
+	}
+	t.Period = time.Second
 
-func (r *temperatureIndicator) getPeriod() time.Duration {
-	return r.period
-}
-
-func (r *temperatureIndicator) setPeriod(period time.Duration)  {
-	r.period = period
+	return newRunnableTicker(t)
 }
 
 // GetName returns a human readable name for this background task
-func (r *temperatureIndicator) GetName() string {
-	return "temperatureIndicator"
+func (o *temperatureIndicator) GetName() string {
+	return "Temperature"
 }
 
 // Start performs initialization before the first tick
-func (r *temperatureIndicator) start() {
-	log.Debug("action=method_entry")
-	defer log.Debug("action=method_entry")
-	r.tick()
+func (o *temperatureIndicator) start() {
+	o.tick()
 }
 
 // Stop performs cleanup when the goroutine is exiting
-func (r *temperatureIndicator) stop() {
-	log.Debug("action=stop")
-	defer log.Debug("action=stop")
+func (o *temperatureIndicator) stop() {
 }
 
 // Tick executes on a ticker schedule
-func (r *temperatureIndicator) tick() bool {
-	log.Debug("action=tick")
-	defer log.Debug("action=tick")
-
+func (o *temperatureIndicator) tick() bool {
 	// Assuming that the ambient probe is #0
 	ambientProbeNumber := int32(0)
 
-	avg, err := influxdb.QueryAverageTemperature(r.getPeriod() * 10, ambientProbeNumber)
+	avg, err := influxdb.QueryAverageTemperature(o.getPeriod() * 10, ambientProbeNumber)
 
 	if err != nil {
 		log.Error(err.Error())
@@ -73,19 +56,19 @@ func (r *temperatureIndicator) tick() bool {
 	}
 
 	probe := framework.Constants.Hardware.Probes[ambientProbeNumber]
-	min := *probe.TempLimits.MinWarnCelsius
-	max := *probe.TempLimits.MaxWarnCelsius
+	min := *probe.Limits.MinWarnCelsius
+	max := *probe.Limits.MaxWarnCelsius
 
-	color := r.getTempColor(*avg.Celsius, min, max)
+	color := o.getTempColor(*avg.Celsius, min, max)
 
-	if err := r.strip.SetAllPixels(color); err != nil {
+	if err := o.strip.SetAllPixels(color); err != nil {
 		log.Error(err.Error())
 	}
 
 	return true
 }
 
-func (r *temperatureIndicator) getTempColor(temp, min, max int32) int {
+func (o *temperatureIndicator) getTempColor(temp, min, max int32) int {
 	// Map the temperature to a color to be displayed on the LED pixels.
 	// cold / min = blue	( 0x0000FF ) =
 	// hot / max = red ( 0xFF0000 )

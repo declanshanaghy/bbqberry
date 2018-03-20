@@ -41,6 +41,7 @@ func NewStrandController() WS2801 {
 	config := framework.Constants.Hardware
 
 	bus := newSPIBus(0)
+	//bus := NewSoftwareSPI(21, 20)
 	return newWS2801(*config.NumLedPixels, bus)
 }
 

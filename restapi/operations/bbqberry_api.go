@@ -38,9 +38,6 @@ func NewBbqberryAPI(spec *loads.Document) *BbqberryAPI {
 		MonitorsCreateMonitorHandler: monitors.CreateMonitorHandlerFunc(func(params monitors.CreateMonitorParams) middleware.Responder {
 			return middleware.NotImplemented("operation MonitorsCreateMonitor has not yet been implemented")
 		}),
-		LightsEnableShifterHandler: lights.EnableShifterHandlerFunc(func(params lights.EnableShifterParams) middleware.Responder {
-			return middleware.NotImplemented("operation LightsEnableShifter has not yet been implemented")
-		}),
 		HardwareGetHardwareHandler: hardware.GetHardwareHandlerFunc(func(params hardware.GetHardwareParams) middleware.Responder {
 			return middleware.NotImplemented("operation HardwareGetHardware has not yet been implemented")
 		}),
@@ -52,6 +49,9 @@ func NewBbqberryAPI(spec *loads.Document) *BbqberryAPI {
 		}),
 		HealthHealthHandler: health.HealthHandlerFunc(func(params health.HealthParams) middleware.Responder {
 			return middleware.NotImplemented("operation HealthHealth has not yet been implemented")
+		}),
+		LightsUpdateGrillLightsHandler: lights.UpdateGrillLightsHandlerFunc(func(params lights.UpdateGrillLightsParams) middleware.Responder {
+			return middleware.NotImplemented("operation LightsUpdateGrillLights has not yet been implemented")
 		}),
 	}
 }
@@ -73,8 +73,6 @@ type BbqberryAPI struct {
 
 	// MonitorsCreateMonitorHandler sets the operation handler for the create monitor operation
 	MonitorsCreateMonitorHandler monitors.CreateMonitorHandler
-	// LightsEnableShifterHandler sets the operation handler for the enable shifter operation
-	LightsEnableShifterHandler lights.EnableShifterHandler
 	// HardwareGetHardwareHandler sets the operation handler for the get hardware operation
 	HardwareGetHardwareHandler hardware.GetHardwareHandler
 	// MonitorsGetMonitorsHandler sets the operation handler for the get monitors operation
@@ -83,6 +81,8 @@ type BbqberryAPI struct {
 	TemperaturesGetTemperaturesHandler temperatures.GetTemperaturesHandler
 	// HealthHealthHandler sets the operation handler for the health operation
 	HealthHealthHandler health.HealthHandler
+	// LightsUpdateGrillLightsHandler sets the operation handler for the update grill lights operation
+	LightsUpdateGrillLightsHandler lights.UpdateGrillLightsHandler
 
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
@@ -150,10 +150,6 @@ func (o *BbqberryAPI) Validate() error {
 		unregistered = append(unregistered, "monitors.CreateMonitorHandler")
 	}
 
-	if o.LightsEnableShifterHandler == nil {
-		unregistered = append(unregistered, "lights.EnableShifterHandler")
-	}
-
 	if o.HardwareGetHardwareHandler == nil {
 		unregistered = append(unregistered, "hardware.GetHardwareHandler")
 	}
@@ -168,6 +164,10 @@ func (o *BbqberryAPI) Validate() error {
 
 	if o.HealthHealthHandler == nil {
 		unregistered = append(unregistered, "health.HealthHandler")
+	}
+
+	if o.LightsUpdateGrillLightsHandler == nil {
+		unregistered = append(unregistered, "lights.UpdateGrillLightsHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -255,11 +255,6 @@ func (o *BbqberryAPI) initHandlerCache() {
 	}
 	o.handlers["POST"]["/monitors"] = monitors.NewCreateMonitor(o.context, o.MonitorsCreateMonitorHandler)
 
-	if o.handlers["PUT"] == nil {
-		o.handlers["PUT"] = make(map[string]http.Handler)
-	}
-	o.handlers["PUT"]["/lights/shifter"] = lights.NewEnableShifter(o.context, o.LightsEnableShifterHandler)
-
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -279,6 +274,11 @@ func (o *BbqberryAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/health"] = health.NewHealth(o.context, o.HealthHealthHandler)
+
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/lights/grill"] = lights.NewUpdateGrillLights(o.context, o.LightsUpdateGrillLightsHandler)
 
 }
 
