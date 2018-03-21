@@ -87,8 +87,8 @@ var _ = Describe("Monitors backends", func() {
 			monitor := models.TemperatureMonitor{
 				Label: &label,
 				Probe: &probe,
-				Min:   settings.TempLimits.MinWarnCelsius,
-				Max:   settings.TempLimits.MaxWarnCelsius,
+				Min:   settings.Limits.MinWarnCelsius,
+				Max:   settings.Limits.MaxWarnCelsius,
 				Scale: &scale,
 			}
 			mgr.GetCollection().Insert(monitor)

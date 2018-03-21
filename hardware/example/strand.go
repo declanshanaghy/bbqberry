@@ -35,8 +35,8 @@ func Rainbow(strand0 hardware.WS2801) {
 	log.Infof("action=Rainbow nPixels=%d", strand0.GetNumPixels())
 	n := strand0.GetNumPixels()
 
-	for j := 0; j < 256; j++ {
-		for i := 0; i < n; i++ {
+	for j := int32(0); j < 256; j++ {
+		for i := int32(0); i < n; i++ {
 			r, g, b := wheel(uint8(((i * 256 / n) + j) % 256))
 			strand0.SetPixelRGB(i, r, g, b)
 		}
@@ -54,19 +54,19 @@ func RedGreenBlueRandom(strand0 hardware.WS2801) {
 
 	log.Infof("action=RedGreenBlueRandom nPixels=%d", strand0.GetNumPixels())
 
-	for i := 0; i < strand0.GetNumPixels(); i++ {
+	for i := int32(0); i < strand0.GetNumPixels(); i++ {
 		strand0.SetPixelRGB(i, 0xFF, 0x00, 0x00)
 	}
 	strand0.Update()
 	time.Sleep(1 * time.Second)
 
-	for i := 0; i < strand0.GetNumPixels(); i++ {
+	for i := int32(0); i < strand0.GetNumPixels(); i++ {
 		strand0.SetPixelRGB(i, 0x00, 0xFF, 0x00)
 	}
 	strand0.Update()
 	time.Sleep(1 * time.Second)
 
-	for i := 0; i < strand0.GetNumPixels(); i++ {
+	for i := int32(0); i < strand0.GetNumPixels(); i++ {
 		strand0.SetPixelRGB(i, 0x00, 0x00, 0xFF)
 	}
 	strand0.Update()
@@ -74,7 +74,7 @@ func RedGreenBlueRandom(strand0 hardware.WS2801) {
 
 	rand.Seed(time.Now().UnixNano())
 	colors := []int{hardware.RED, hardware.GREEN, hardware.BLUE}
-	for i := 0; i < strand0.GetNumPixels(); i++ {
+	for i := int32(0); i < strand0.GetNumPixels(); i++ {
 		strand0.SetPixelColor(i, colors[rand.Intn(3)])
 	}
 	strand0.Update()
@@ -86,4 +86,5 @@ func main() {
 	defer strand.Close()
 
 	RedGreenBlueRandom(strand)
+	Rainbow(strand)
 }

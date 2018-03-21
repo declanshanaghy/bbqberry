@@ -21,12 +21,8 @@ var _ = Describe("Temperature daemon", func() {
 		hardware.StubBus = bus
 	})
 
-	It("should return a sane name", func() {
-		tl := newTemperatureLogger()
-		Expect(tl.GetName()).ToNot(BeNil())
-	})
 	It("should start and stop cleanly", func() {
-		temperatureLogger := newTemperatureLogger()
+		temperatureLogger := newTemperatureLoggerRunnable()
 
 		err := temperatureLogger.StartBackground()
 		Expect(err).ToNot(HaveOccurred())
@@ -39,17 +35,22 @@ var _ = Describe("Temperature daemon", func() {
 	})
 	It("should collect valid temperature readings from all probes", func() {
 		temperatureLogger := newTemperatureLogger()
+		temperatureLogger.period = time.Nanosecond
+
 		readings, err := temperatureLogger.collectTemperatureMetrics()
 
 		Expect(err).ToNot(HaveOccurred())
 
-		Expect(len(readings)).To(Equal(int(temperatureLogger.reader.GetNumProbes())))
+		Expect(len(readings)).To(Equal(len(*temperatureLogger.reader.GetEnabledPobes())))
 		for i, r := range readings {
 			Expect(*r.Probe).To(Equal(int32(i)))
 		}
 	})
 	It("should log temperature readings successfully", func() {
-		temperatureLogger := newTemperatureLogger()
+		temperatureLogger := &temperatureLogger{
+			reader: hardware.NewTemperatureReader(),
+			period: time.Nanosecond,
+		}
 		readings := make([]*models.TemperatureReading, 0)
 
 		for i := int32(0); i < 5; i++ {

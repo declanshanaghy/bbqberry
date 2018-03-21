@@ -23,30 +23,30 @@ type Client struct {
 }
 
 /*
-EnableShifter enables the simple shifter light show
+UpdateGrillLights enables a light show on the grill lights
 */
-func (a *Client) EnableShifter(params *EnableShifterParams) (*EnableShifterCreated, error) {
+func (a *Client) UpdateGrillLights(params *UpdateGrillLightsParams) (*UpdateGrillLightsCreated, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewEnableShifterParams()
+		params = NewUpdateGrillLightsParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "enableShifter",
+		ID:                 "updateGrillLights",
 		Method:             "PUT",
-		PathPattern:        "/lights/shifter",
+		PathPattern:        "/lights/grill",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &EnableShifterReader{formats: a.formats},
+		Reader:             &UpdateGrillLightsReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(*EnableShifterCreated), nil
+	return result.(*UpdateGrillLightsCreated), nil
 
 }
 

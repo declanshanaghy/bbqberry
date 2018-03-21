@@ -33,7 +33,7 @@ type HardwareConfig struct {
 
 	// probes
 	// Required: true
-	Probes []*TemperatureSetting `json:"probes"`
+	Probes []*TemperatureProbe `json:"probes"`
 
 	// vcc
 	// Required: true

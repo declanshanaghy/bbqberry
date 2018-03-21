@@ -9,6 +9,9 @@ import (
 // DefaultDB is the default database name that should be used if an override is not provided
 const DefaultDB = "bbqberry"
 
+var Enabled = true
+var Disabled = false
+
 func init() {
 	stub := false
 	if os.Getenv("STUB") != "" {
@@ -62,21 +65,30 @@ func init() {
 		MaxAbsCelsius:  &tempLimitAbsCookingHighCelsiusI32,
 	}
 
-	chamber := "Chamber"
-	pa := "Probe A"
-	pb := "Probe B"
-	probes := []*models.TemperatureSetting{
+	chamberA := "Chamber A"
+	chamberB := "Chamber B"
+	probeA := "Probe A"
+	probeB := "Probe B"
+	probes := []*models.TemperatureProbe{
 		{
-			Label:      &chamber,
-			TempLimits: &ambient,
+			Label:  	&chamberA,
+			Enabled:	&Enabled,
+			Limits: 	&ambient,
 		},
 		{
-			Label:      &pa,
-			TempLimits: &cooking,
+			Label:  	&chamberB,
+			Enabled:	&Disabled,
+			Limits: 	&ambient,
 		},
 		{
-			Label:      &pb,
-			TempLimits: &cooking,
+			Label:  	&probeA,
+			Enabled:	&Disabled,
+			Limits: 	&cooking,
+		},
+		{
+			Label:  	&probeB,
+			Enabled:	&Disabled,
+			Limits: 	&cooking,
 		},
 	}
 

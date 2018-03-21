@@ -31,7 +31,6 @@ import (
 	"syscall"
 	"os/signal"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/lights"
-	"time"
 )
 
 
@@ -39,6 +38,9 @@ var runner				*daemon.Runnable
 var commander			*daemon.Commander
 var cmdOptionsValues	bbqframework.CmdOptions
 
+func init() {
+	commander = daemon.NewCommander()
+}
 
 func configureFlags(api *operations.BbqberryAPI) {
 	log.Debug("action=method_entry")
@@ -57,7 +59,7 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
 
-	commander = daemon.NewCommander(&cmdOptionsValues)
+	commander.Options = &cmdOptionsValues
 
 	log.SetDebug(cmdOptionsValues.Verbose)
 	if cmdOptionsValues.LogFile != "" {
@@ -100,11 +102,14 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 
 			return framework.HandleAPIRequestWithError(mgr.GetMonitors(&params))
 		})
-	api.LightsEnableShifterHandler = lights.EnableShifterHandlerFunc(
-		func(params lights.EnableShifterParams) middleware.Responder {
-			p := time.Duration(params.Period) * time.Millisecond
-			commander.EnableLightShow(p)
-			return framework.HandleAPIRequestWithError(true, nil)
+	api.LightsUpdateGrillLightsHandler = lights.UpdateGrillLightsHandlerFunc(
+		func(params lights.UpdateGrillLightsParams) middleware.Responder {
+			err := commander.UpdateGrillLights(&params)
+			if ( err != nil ) {
+				return framework.HandleAPIRequestWithError(false, err)
+			} else {
+				return framework.HandleAPIRequestWithError(false, err)
+			}
 		})
 
 	globalMiddleware := setupGlobalMiddleware(api.Serve(setupMiddlewares))

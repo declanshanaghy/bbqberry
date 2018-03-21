@@ -13,76 +13,78 @@ import (
 
 // temperatureLogger collects and logs temperature metrics
 type temperatureLogger struct {
-	period time.Duration
-	reader hardware.TemperatureReader
+	period	time.Duration
+	reader	hardware.TemperatureReader
+	probes	*[]int32
 }
 
 // newTemperatureLogger creates a new temperatureLogger instance which can be
 // run in the background to collect and log temperature metrics
-func newTemperatureLogger() Runnable {
-	log.Debug("action=method_entry")
-	defer log.Debug("action=method_exit")
-	return newRunnable(
-		&temperatureLogger{
-			reader: hardware.NewTemperatureReader(),
-			period: time.Second * 1,
-		},
-	)
+func newTemperatureLoggerRunnable() Runnable {
+	return newRunnable(newTemperatureLogger())
 }
 
-func (r *temperatureLogger) getPeriod() time.Duration {
-	return r.period
+func newTemperatureLogger() *temperatureLogger {
+	reader := hardware.NewTemperatureReader()
+	probes := reader.GetEnabledPobes()
+
+	return &temperatureLogger{
+		reader: reader,
+		probes: probes,
+		period: time.Second,
+	}
 }
 
-func (r *temperatureLogger) setPeriod(period time.Duration)  {
-	r.period = period
+func (o *temperatureLogger) getPeriod() time.Duration {
+	return o.period
+}
+
+func (o *temperatureLogger) setPeriod(period time.Duration)  {
+	o.period = period
 }
 
 // GetName returns a human readable name for this background task
-func (r *temperatureLogger) GetName() string {
+func (o *temperatureLogger) GetName() string {
 	return "temperatureLogger"
 }
 
 // Start performs initialization before the first tick
-func (r *temperatureLogger) start() {
-	log.Debug("action=method_entry")
-	defer log.Debug("action=method_entry")
-	r.tick()
+func (o *temperatureLogger) start() error {
+	o.probes = o.reader.GetEnabledPobes()
+	log.WithField("probes", len(*o.probes)).Infof("Found enabled probes")
+
+	return o.tick()
 }
 
 // Stop performs cleanup when the goroutine is exiting
-func (r *temperatureLogger) stop() {
-	log.Debug("action=stop")
-	defer log.Debug("action=stop")
+func (o *temperatureLogger) stop() error {
+	return nil
 }
 
 // Tick executes on a ticker schedule
-func (r *temperatureLogger) tick() bool {
-	log.Debug("action=tick")
-	defer log.Debug("action=tick")
-
-	readings, err := r.collectTemperatureMetrics()
+func (o *temperatureLogger) tick() error {
+	readings, err := o.collectTemperatureMetrics()
 	if err != nil {
-		log.Error(err.Error())
+		return err
 	}
 
-	err = r.logTemperatureMetrics(readings)
+	err = o.logTemperatureMetrics(readings)
 	if err != nil {
-		log.Error(err.Error())
+		return err
 	}
 
-	return true
+	return nil
 }
 
-func (r *temperatureLogger) collectTemperatureMetrics() ([]*models.TemperatureReading, error) {
-	log.Debug("action=method_entry numProbes=%d", r.reader.GetNumProbes())
-	defer log.Debug("action=method_exit")
+func (o *temperatureLogger) collectTemperatureMetrics() ([]*models.TemperatureReading, error) {
+	nProbes := len(*o.probes)
+	log.WithField("nProbes", nProbes).Info("collecting temperature readings")
 
 	readings := make([]*models.TemperatureReading, 0)
-	for i := int32(0); i < r.reader.GetNumProbes(); i++ {
-		log.Debugf("action=iterate probe=%d", i)
+	for _, i := range(*o.probes) {
+		log.Infof("action=iterate probe i=%d, o=%v", i, *o)
 		reading := models.TemperatureReading{}
-		if err := r.reader.GetTemperatureReading(i, &reading); err != nil {
+		if err := o.reader.GetTemperatureReading(i, &reading); err != nil {
 			return nil, err
 		}
 		readings = append(readings, &reading)
@@ -90,9 +92,8 @@ func (r *temperatureLogger) collectTemperatureMetrics() ([]*models.TemperatureRe
 	return readings, nil
 }
 
-func (r *temperatureLogger) logTemperatureMetrics(readings []*models.TemperatureReading) error {
-	log.Debugf("action=method_entry numReadings=%d", len(readings))
-	defer log.Debug("action=method_exit")
+func (o *temperatureLogger) logTemperatureMetrics(readings []*models.TemperatureReading) error {
+	log.WithField("numReadings", len(readings)).Debug("logging temperature metrics")
 
 	for _, reading := range readings {
 		tags := map[string]string{

@@ -7,7 +7,7 @@ import (
 )
 
 var _ = Describe("Temperature indicator", func() {
-	lim := framework.Constants.Hardware.Probes[0].TempLimits
+	lim := framework.Constants.Hardware.Probes[0].Limits
 	min := float32(*lim.MinWarnCelsius)
 	max := float32(*lim.MaxWarnCelsius)
 

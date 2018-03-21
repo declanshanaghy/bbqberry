@@ -14,7 +14,7 @@ import (
 var _ = Describe("Hardware package", func() {
 	probe := int32(0)
 	hwCfg := framework.Constants.Hardware
-	lim := hwCfg.Probes[probe].TempLimits
+	lim := hwCfg.Probes[probe].Limits
 	minC := *lim.MinWarnCelsius
 	maxC := *lim.MaxWarnCelsius
 	minA := hardware.ConvertCelsiusToAnalog(minC)

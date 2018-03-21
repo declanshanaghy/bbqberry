@@ -11,21 +11,29 @@ consumes:
 produces:
   - application/json
 paths:
-  /lights/shifter:
+  /lights/grill:
     put:
-      operationId: enableShifter
+      operationId: updateGrillLights
       tags:
         - Lights
-      summary: "Enable the simple shifter light show"
+      summary: "Enable a light show on the grill lights"
       parameters:
+        - name: name
+          description: The light show to enable
+          in: query
+          required: true
+          type: string
+          enum: ["Pulser", "Shifter", "Rainbow", "Temperature"]
         - name: period
-          description: The time period between updates in milliseconds
+          description: The time period between updates in microseconds
           in: query
           required: true
           type: integer
+          minimum: 1
+          default: 500000
       responses:
         201:
-          description: "The monitor was created successfully"
+          description: "The lights were updated successfully"
         default:
           description: Unexpected error
           schema:
@@ -159,15 +167,18 @@ definitions:
       maxAbsCelsius:
         type: integer
         format: int32
-  TemperatureSetting:
+  TemperatureProbe:
     type: object
     required:
       - label
-      - tempLimits
+      - enabled
+      - limits
     properties:
       label:
         type: string
-      tempLimits:
+      enabled:
+        type: boolean
+      limits:
         $ref: "#/definitions/TemperatureLimits"
   HardwareConfig:
     type: object
@@ -200,7 +211,7 @@ definitions:
       probes:
         type: array
         items:
-          $ref: "#/definitions/TemperatureSetting"
+          $ref: "#/definitions/TemperatureProbe"
   TemperatureMonitor:
     type: object
     required:
