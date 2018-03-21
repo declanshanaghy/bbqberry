@@ -14,7 +14,7 @@ import (
 	"github.com/kidoman/embd/convertors/mcp3008"
 )
 
-// FakeTemps can be set to return specific analog readings during tests
+// FakeTemps can be o.t to return o.ecific analog readings during tests
 var FakeTemps = make(map[int32]int32, 0)
 
 func init() {
@@ -23,7 +23,7 @@ func init() {
 	if framework.Constants.Stub {
 		nProbes := int32(len(hwCfg.Probes))
 		for probe := int32(0); probe < nProbes; probe++ {
-			limit := framework.Constants.Hardware.Probes[probe].TempLimits
+			limit := framework.Constants.Hardware.Probes[probe].Limits
 			min := ConvertCelsiusToAnalog(-15)
 			max := ConvertCelsiusToAnalog(*limit.MaxAbsCelsius)
 			a := int32(rand.Intn(int(min)) + int(max-min))
@@ -39,6 +39,8 @@ type TemperatureReader interface {
 	GetTemperatureReading(probe int32, reading *models.TemperatureReading) error
 	// GetNumProbes returns the number of configured temperature probes
 	GetNumProbes() int32
+	// GetEnabledPobeIndices returns the indices of all enabled probes
+	GetEnabledPobes() *[]int32
 	// Close closes communication with the underlying hardware
 	Close()
 }
@@ -59,28 +61,40 @@ func newTemperatureReader(numProbes int32, bus embd.SPIBus) TemperatureReader {
 	}
 }
 
-func (s *temperatureReader) Close() {
+func (o *temperatureReader) Close() {
 	log.Info("action=Close")
-	s.bus.Close()
+	o.bus.Close()
 }
 
-func (s *temperatureReader) GetNumProbes() int32 {
-	return s.numProbes
+func (o *temperatureReader) GetNumProbes() int32 {
+	return o.numProbes
 }
 
-func (s *temperatureReader) errorCheckProbeNumber(probe int32) error {
-	if probe < 0 || probe > s.numProbes-1 {
-		return fmt.Errorf("Invalid probe: %d. Must be between 1 and %d", probe, s.numProbes)
+func (o *temperatureReader) GetEnabledPobes() *[]int32 {
+	enabled := make([]int32, 0)
+
+	for probe := int32(0); probe < o.numProbes; probe++ {
+		if *framework.Constants.Hardware.Probes[probe].Enabled {
+			enabled = append(enabled, probe)
+		}
+	}
+
+	return &enabled
+}
+
+func (o *temperatureReader) errorCheckProbeNumber(probe int32) error {
+	if probe < 0 || probe > o.numProbes-1 {
+		return fmt.Errorf("invalid probe: %d. Must be between 1 and %d", probe, o.numProbes)
 	}
 	return nil
 }
 
-func (s *temperatureReader) readProbe(probe int32) (a int32, err error) {
-	if err := s.errorCheckProbeNumber(probe); err != nil {
+func (o *temperatureReader) readProbe(probe int32) (a int32, err error) {
+	if err := o.errorCheckProbeNumber(probe); err != nil {
 		return 0, err
 	}
 	if framework.Constants.Stub {
-		limit := framework.Constants.Hardware.Probes[probe].TempLimits
+		limit := framework.Constants.Hardware.Probes[probe].Limits
 		min := ConvertCelsiusToAnalog(-15)
 		max := ConvertCelsiusToAnalog(*limit.MaxAbsCelsius)
 		a = FakeTemps[probe]
@@ -90,7 +104,7 @@ func (s *temperatureReader) readProbe(probe int32) (a int32, err error) {
 		}
 		FakeTemps[probe] = a + int32(rand.Intn(10))
 	} else {
-		iv, err := s.adc.AnalogValueAt(int(probe))
+		iv, err := o.adc.AnalogValueAt(int(probe))
 		a = int32(iv)
 		if err != nil {
 			return 0, err
@@ -100,8 +114,8 @@ func (s *temperatureReader) readProbe(probe int32) (a int32, err error) {
 	return int32(a), err
 }
 
-func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.TemperatureReading) error {
-	analog, err := s.readProbe(probe)
+func (o *temperatureReader) GetTemperatureReading(probe int32, reading *models.TemperatureReading) error {
+	analog, err := o.readProbe(probe)
 	if err != nil {
 		return err
 	}
@@ -110,7 +124,7 @@ func (s *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 	vOut := ConvertAnalogToVoltage(analog)
 
 	physProbe := hwCfg.Probes[probe]
-	probeLimits := physProbe.TempLimits
+	probeLimits := physProbe.Limits
 
 	tempK, tempC, tempF := adafruitAD8495ThermocoupleVtoKCF(vOut)
 	log.Debugf("probe=%d A=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
@@ -159,9 +173,9 @@ func adafruitAD8495ThermocoupleVtoKCF(v float32) (tempK int32, tempC int32, temp
 }
 
 // ConvertVoltageToTemperature converts the given voltage value to its corresponding temperature values
-func ConvertVoltageToTemperature(v float32) (tempK int32, tempC int32, tempF int32) {
-	return adafruitAD8495ThermocoupleVtoKCF(v)
-}
+//func ConvertVoltageToTemperature(v float32) (tempK int32, tempC int32, tempF int32) {
+//	return adafruitAD8495ThermocoupleVtoKCF(v)
+//}
 
 // ConvertAnalogToVoltage converts an analog reading to its corresponding voltage value
 func ConvertAnalogToVoltage(analog int32) float32 {

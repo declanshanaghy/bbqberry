@@ -76,17 +76,32 @@ func init() {
         }
       }
     },
-    "/lights/shifter": {
+    "/lights/grill": {
       "put": {
         "tags": [
           "Lights"
         ],
-        "summary": "Enable the simple shifter light show",
-        "operationId": "enableShifter",
+        "summary": "Enable a light show on the grill lights",
+        "operationId": "updateGrillLights",
         "parameters": [
           {
+            "enum": [
+              "Pulser",
+              "Shifter",
+              "Rainbow",
+              "Temperature"
+            ],
+            "type": "string",
+            "description": "The light show to enable",
+            "name": "name",
+            "in": "query",
+            "required": true
+          },
+          {
+            "minimum": 1,
             "type": "integer",
-            "description": "The time period between updates",
+            "default": 500000,
+            "description": "The time period between updates in microseconds",
             "name": "period",
             "in": "query",
             "required": true
@@ -94,7 +109,7 @@ func init() {
         ],
         "responses": {
           "201": {
-            "description": "The monitor was created successfully"
+            "description": "The lights were updated successfully"
           },
           "default": {
             "description": "Unexpected error",
@@ -261,7 +276,7 @@ func init() {
         "probes": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/TemperatureSetting"
+            "$ref": "#/definitions/TemperatureProbe"
           }
         },
         "vcc": {
@@ -385,6 +400,25 @@ func init() {
         }
       }
     },
+    "TemperatureProbe": {
+      "type": "object",
+      "required": [
+        "label",
+        "enabled",
+        "limits"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        },
+        "limits": {
+          "$ref": "#/definitions/TemperatureLimits"
+        }
+      }
+    },
     "TemperatureReading": {
       "type": "object",
       "required": [
@@ -438,21 +472,6 @@ func init() {
         },
         "warning": {
           "type": "string"
-        }
-      }
-    },
-    "TemperatureSetting": {
-      "type": "object",
-      "required": [
-        "label",
-        "tempLimits"
-      ],
-      "properties": {
-        "label": {
-          "type": "string"
-        },
-        "tempLimits": {
-          "$ref": "#/definitions/TemperatureLimits"
         }
       }
     }

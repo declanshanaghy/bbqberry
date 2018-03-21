@@ -9,15 +9,9 @@ import (
 // DefaultDB is the default database name that should be used if an override is not provided
 const DefaultDB = "bbqberry"
 
-<<<<<<< Updated upstream
-=======
-const PROBE_TYPE_AMBIENT = "ambient"
-const PROBE_TYPE_COOKING = "cooking"
-
 var Enabled = true
 var Disabled = false
 
->>>>>>> Stashed changes
 func init() {
 	stub := false
 	if os.Getenv("STUB") != "" {
@@ -51,7 +45,7 @@ func init() {
 	minTempWarnCookingCelsius := int32(tempLimitAbsCookingLowCelsius - (tempLimitAbsCookingLowCelsius * tempWarnThreshold))
 	maxTempWarnCookingCelsius := int32(tempLimitAbsCookingHighCelsius - (tempLimitAbsCookingHighCelsius * tempWarnThreshold))
 
-	sAmb := PROBE_TYPE_AMBIENT
+	sAmb := "ambient"
 	ambient := models.TemperatureLimits{
 		ProbeType:      &sAmb,
 		MinWarnCelsius: &minTempWarnAmbCelsius,
@@ -60,7 +54,7 @@ func init() {
 		MaxAbsCelsius:  &tempLimitAbsAmbientHighCelsius,
 	}
 
-	sCook := PROBE_TYPE_COOKING
+	sCook := "cooking"
 	tempLimitAbsCookingLowCelsiusI32 := int32(tempLimitAbsCookingLowCelsius)
 	tempLimitAbsCookingHighCelsiusI32 := int32(tempLimitAbsCookingHighCelsius)
 	cooking := models.TemperatureLimits{
@@ -71,21 +65,30 @@ func init() {
 		MaxAbsCelsius:  &tempLimitAbsCookingHighCelsiusI32,
 	}
 
-	chamber := "Chamber"
-	pa := "Probe A"
-	pb := "Probe B"
-	probes := []*models.TemperatureSetting{
+	chamberA := "Chamber A"
+	chamberB := "Chamber B"
+	probeA := "Probe A"
+	probeB := "Probe B"
+	probes := []*models.TemperatureProbe{
 		{
-			Label:      &chamber,
-			TempLimits: &ambient,
+			Label:  	&chamberA,
+			Enabled:	&Enabled,
+			Limits: 	&ambient,
 		},
 		{
-			Label:      &pa,
-			TempLimits: &cooking,
+			Label:  	&chamberB,
+			Enabled:	&Disabled,
+			Limits: 	&ambient,
 		},
 		{
-			Label:      &pb,
-			TempLimits: &cooking,
+			Label:  	&probeA,
+			Enabled:	&Disabled,
+			Limits: 	&cooking,
+		},
+		{
+			Label:  	&probeB,
+			Enabled:	&Disabled,
+			Limits: 	&cooking,
 		},
 	}
 
