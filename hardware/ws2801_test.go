@@ -56,13 +56,13 @@ var _ = Describe("WS2801", func() {
 			err = strand.Update()
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(1).To(Equal(bus.TransferAndReceiveDataCallCount))
+			Expect(1).To(Equal(bus.WriteCallCount))
 		})
 		It("close should disable all pixels and close the bus", func() {
 			err := strand.Close()
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(1).To(Equal(bus.TransferAndReceiveDataCallCount))
+			Expect(1).To(Equal(bus.WriteCallCount))
 			Expect(1).To(Equal(bus.CloseCallCount))
 		})
 	})

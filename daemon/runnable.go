@@ -14,11 +14,11 @@ import (
 // Tickable objects are executed in the background by a runner
 type Tickable interface {
 	// start is called when the goroutine is starting up, before the first tick
-	start()
+	start() error
 	// tick is called on a time.Ticker period. Returning false will cause the goroutine to exit
-	tick() bool
+	tick() error
 	// stop is called when the goroutine is exiting
-	stop()
+	stop() error
 
 	// getPeriod will be called by the runner. The time.Duration returned
 	// will be used as the period between calls to tick
@@ -103,21 +103,53 @@ func (r *runner) loop() {
 	r.running = true
 
 	// Start the tickable before entering the loop
+<<<<<<< Updated upstream
 	r.tickable.start()
 
 	for r.running {
 		ticker := time.NewTicker(r.tickable.getPeriod())
+=======
+	if err := o.tickable.start(); err != nil {
+		panic(err)
+	}
+
+	ticker := time.NewTicker(o.tickable.getPeriod())
+	var ticker_err error = nil
+
+	for o.running {
+		ticker = time.NewTicker(o.tickable.getPeriod())
+>>>>>>> Stashed changes
 		select {
 		case r.running = <-r.ch:
 			log.Debugf("action=rx running=%t", r.running)
 		case <-ticker.C:
+<<<<<<< Updated upstream
 			log.Debugf("action=timeout")
 			r.running = r.tickable.tick()
+=======
+			//log.WithFields(log.Fields{
+			//	"name": o.tickable.GetName(),
+			//	"period": o.tickable.getPeriod(),
+			//}).Debugf("tick")
+			tick_err := o.tickable.tick()
+			if tick_err != nil {
+				log.Error(tick_err)
+				o.running = false
+			}
+>>>>>>> Stashed changes
 		}
 	}
 
 	// Stop the tickable before exiting
+<<<<<<< Updated upstream
 	r.tickable.stop()
+=======
+	if ticker_err != nil {
+		if err := o.tickable.stop(); err != nil {
+			panic(err)
+		}
+	}
+>>>>>>> Stashed changes
 
 	// Ensure running flag is reset
 	r.running = false

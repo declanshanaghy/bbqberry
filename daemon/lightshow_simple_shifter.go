@@ -43,6 +43,7 @@ func (r *simpleShifter) GetName() string {
 }
 
 // Start performs initialization before the first tick
+<<<<<<< Updated upstream
 func (r *simpleShifter) start() {
 	log.Debug("action=method_entry")
 	defer log.Debug("action=method_exit")
@@ -56,6 +57,18 @@ func (r *simpleShifter) stop() {
 }
 
 func (r *simpleShifter) tick() bool {
+=======
+func (o *simpleShifter) start() error {
+	return o.strip.Off()
+}
+
+// Stop performs cleanup when the goroutine is exiting
+func (o *simpleShifter) stop() error {
+	return o.strip.Off()
+}
+
+func (o *simpleShifter) tick() error {
+>>>>>>> Stashed changes
 	log.WithFields(log.Fields{
 		"curled":  r.curled,
 		"lastled": r.lastled,
@@ -63,11 +76,19 @@ func (r *simpleShifter) tick() bool {
 	}).Info("simpleShifter updating lights")
 	defer log.Debug("action=method_exit")
 
+<<<<<<< Updated upstream
 	if err := r.strip.SetPixelColor(r.lastled, 0x000000); err != nil {
 		log.Error(err.Error())
 	}
 	if err := r.strip.SetPixelColor(r.curled, 0xFF0000); err != nil {
 		log.Error(err.Error())
+=======
+	if err := o.strip.SetPixelColor(o.lastled, 0x000000); err != nil {
+		return err
+	}
+	if err := o.strip.SetPixelColor(o.curled, 0xFF0000); err != nil {
+		return err
+>>>>>>> Stashed changes
 	}
 	r.strip.Update()
 
@@ -78,5 +99,5 @@ func (r *simpleShifter) tick() bool {
 		r.curled = 0
 	}
 
-	return true
+	return nil
 }

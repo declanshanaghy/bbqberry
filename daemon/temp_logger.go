@@ -44,6 +44,7 @@ func (r *temperatureLogger) GetName() string {
 }
 
 // Start performs initialization before the first tick
+<<<<<<< Updated upstream
 func (r *temperatureLogger) start() {
 	log.Debug("action=method_entry")
 	defer log.Debug("action=method_entry")
@@ -62,24 +63,56 @@ func (r *temperatureLogger) tick() bool {
 	defer log.Debug("action=tick")
 
 	readings, err := r.collectTemperatureMetrics()
+=======
+func (o *temperatureLogger) start() error {
+	o.probes = o.reader.GetEnabledPobes()
+	log.WithField("probes", len(*o.probes)).Infof("Found enabled probes")
+
+	return o.tick()
+}
+
+// Stop performs cleanup when the goroutine is exiting
+func (o *temperatureLogger) stop() error {
+	return nil
+}
+
+// Tick executes on a ticker schedule
+func (o *temperatureLogger) tick() error {
+	readings, err := o.collectTemperatureMetrics()
+>>>>>>> Stashed changes
 	if err != nil {
 		log.Error(err.Error())
 	}
 
+<<<<<<< Updated upstream
 	err = r.logTemperatureMetrics(readings)
 	if err != nil {
 		log.Error(err.Error())
+=======
+	if err := o.logTemperatureMetrics(readings); err != nil {
+		return err
+>>>>>>> Stashed changes
 	}
 
-	return true
+	return nil
 }
 
+<<<<<<< Updated upstream
 func (r *temperatureLogger) collectTemperatureMetrics() ([]*models.TemperatureReading, error) {
 	log.Debug("action=method_entry numProbes=%d", r.reader.GetNumProbes())
 	defer log.Debug("action=method_exit")
 
 	readings := make([]*models.TemperatureReading, 0)
 	for i := int32(0); i < r.reader.GetNumProbes(); i++ {
+=======
+func (o *temperatureLogger) collectTemperatureMetrics() ([]*models.TemperatureReading, error) {
+	nProbes := len(*o.probes)
+
+	log.WithField("numProbes", nProbes).Info("collecting temperature metrics")
+	readings := make([]*models.TemperatureReading, nProbes)
+
+	for _, i := range(*o.probes) {
+>>>>>>> Stashed changes
 		log.Debugf("action=iterate probe=%d", i)
 		reading := models.TemperatureReading{}
 		if err := r.reader.GetTemperatureReading(i, &reading); err != nil {
@@ -90,11 +123,17 @@ func (r *temperatureLogger) collectTemperatureMetrics() ([]*models.TemperatureRe
 	return readings, nil
 }
 
+<<<<<<< Updated upstream
 func (r *temperatureLogger) logTemperatureMetrics(readings []*models.TemperatureReading) error {
 	log.Debugf("action=method_entry numReadings=%d", len(readings))
 	defer log.Debug("action=method_exit")
+=======
+func (o *temperatureLogger) logTemperatureMetrics(readings []*models.TemperatureReading) error {
+	log.WithField("numReadings", len(readings)).Info("logging temperature metrics")
+>>>>>>> Stashed changes
 
 	for _, reading := range readings {
+		log.WithField("reading", reading).Info("logging temperature reading")
 		tags := map[string]string{
 			"Probe": fmt.Sprintf("%d", *reading.Probe),
 		}

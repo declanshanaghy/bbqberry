@@ -9,6 +9,15 @@ import (
 // DefaultDB is the default database name that should be used if an override is not provided
 const DefaultDB = "bbqberry"
 
+<<<<<<< Updated upstream
+=======
+const PROBE_TYPE_AMBIENT = "ambient"
+const PROBE_TYPE_COOKING = "cooking"
+
+var Enabled = true
+var Disabled = false
+
+>>>>>>> Stashed changes
 func init() {
 	stub := false
 	if os.Getenv("STUB") != "" {
@@ -42,7 +51,7 @@ func init() {
 	minTempWarnCookingCelsius := int32(tempLimitAbsCookingLowCelsius - (tempLimitAbsCookingLowCelsius * tempWarnThreshold))
 	maxTempWarnCookingCelsius := int32(tempLimitAbsCookingHighCelsius - (tempLimitAbsCookingHighCelsius * tempWarnThreshold))
 
-	sAmb := "ambient"
+	sAmb := PROBE_TYPE_AMBIENT
 	ambient := models.TemperatureLimits{
 		ProbeType:      &sAmb,
 		MinWarnCelsius: &minTempWarnAmbCelsius,
@@ -51,7 +60,7 @@ func init() {
 		MaxAbsCelsius:  &tempLimitAbsAmbientHighCelsius,
 	}
 
-	sCook := "cooking"
+	sCook := PROBE_TYPE_COOKING
 	tempLimitAbsCookingLowCelsiusI32 := int32(tempLimitAbsCookingLowCelsius)
 	tempLimitAbsCookingHighCelsiusI32 := int32(tempLimitAbsCookingHighCelsius)
 	cooking := models.TemperatureLimits{
