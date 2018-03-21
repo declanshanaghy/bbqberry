@@ -6,10 +6,10 @@ import (
 )
 
 func main() {
-	s, err := hardware.NewSoftwareSPI(21,20)
-	if  err != nil {
-		panic(err)
-	}
+	s := hardware.NewSoftwareSPI(21,20)
+	//if  err != nil {
+	//	panic(err)
+	//}
 
 	//data := []byte {
 	//	0xFF,0x00,0x00,0x00,0xFF,0x00,0x00,0x00,0xFF,0xFF,0xFF,0x00,0x00,0xFF,0xFF,
