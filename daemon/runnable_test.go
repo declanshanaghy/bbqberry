@@ -54,7 +54,7 @@ func (t *testingTickable) tick() error {
 		time.Sleep(t.tickSleep)
 	}
 
-	if t.maxTickCalls >= 0 && t.tickCalls > t.maxTickCalls {
+	if t.maxTickCalls >= 0 && t.tickCalls >= t.maxTickCalls {
 		return fmt.Errorf("Tick limit reached nTicks=%d", t.maxTickCalls)
 	}
 
@@ -64,7 +64,7 @@ func (t *testingTickable) tick() error {
 var _ = Describe("The runner", func() {
 	Context("When given a tickable that exits immediately", func() {
 		It("it should exit cleanly", func() {
-			tt := testingTickable{}
+			tt := testingTickable{maxTickCalls:1}
 			rt := newRunnableTicker(&tt)
 
 			err := rt.runnable.StartBackground()
@@ -83,7 +83,7 @@ var _ = Describe("The runner", func() {
 
 			Expect(tt.startCalls).Should(Equal(1), "Number of calls to start is incorrect")
 			Expect(tt.tickCalls).Should(Equal(1), "Number of calls to tick is incorrect")
-			Expect(tt.stopCalls).Should(Equal(1), "Number of calls to stop is incorrect")
+			Expect(tt.stopCalls).Should(Equal(0), "Number of calls to stop is incorrect")
 		})
 	})
 	Context("When given a tickable that never exits", func() {
@@ -91,7 +91,7 @@ var _ = Describe("The runner", func() {
 		var rt RunnableTicker
 
 		BeforeEach(func() {
-			tt = testingTickable{}
+			tt = testingTickable{maxTickCalls:-1}
 			rt = newRunnableTicker(&tt)
 		})
 

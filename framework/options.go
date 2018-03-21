@@ -7,3 +7,9 @@ type CmdOptions struct {
 	TemperatureLoggerEnabled 	bool	`short:"L" long:"logger" description:"Run the temperature logger"`
 	LightShow	 				string	`short:"S" long:"show" description:"Run the given lightshow" default:"Temperature" choice:"Rainbow" choice:"Pulser" choice:"Simple Shifter" choice:"Temperature"`
 }
+
+func NewCmdOptions() *CmdOptions {
+	return &CmdOptions{
+		LightShow: "Temperature",
+	}
+}

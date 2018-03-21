@@ -15,21 +15,23 @@ import (
 type Commander struct {
 	runner
 	basicTickable
+
+	Options     *framework.CmdOptions
+
 	period      time.Duration
 	tempLogger  Runnable
 	currentShow *RunnableTicker
 	lightShows  map[string]RunnableTicker
 	strip       hardware.WS2801
-	options     *framework.CmdOptions
 }
 
 // NewCommander creates a Commander instance which can be
 // used to query and control all background processes.
 // e.g: Temperature logger, temperature monitor
-func NewCommander(options *framework.CmdOptions) *Commander {
+func NewCommander() *Commander {
 	c := Commander{
+		Options: 	framework.NewCmdOptions(),
 		strip: 		hardware.NewStrandController(),
-		options: 	options,
 		lightShows: getLightShows(1000000000),
 	}
 	c.runner.tickable = &c
@@ -58,19 +60,32 @@ func (o *Commander) GetName() string {
 
 // Start performs initialization before the first tick
 func (o *Commander) start() error {
-	o.tempLogger = newTemperatureLogger()
-	if o.options.TemperatureLoggerEnabled {
+	o.tempLogger = newTemperatureLoggerRunnable()
+	if o.Options.TemperatureLoggerEnabled {
 		o.EnableTemperatureLogger()
 	}
 
-	show := o.lightShows[o.options.LightShow]
+	show, err := o.getLightShow(o.Options.LightShow)
+	if err != nil {
+		return err
+	}
+
 	p := lights.UpdateGrillLightsParams{
-		Name: o.options.LightShow,
+		Name: o.Options.LightShow,
 		// The period is in milliseconds so we need to divide
 		// the time.Duration by 1000 because it is in nanoseconds
 		Period: int64(show.tickable.getPeriod() / 1000),
 	}
 	return o.UpdateGrillLights(&p)
+}
+
+func (o* Commander) getLightShow(name string) (RunnableTicker, error) {
+	show, ok := o.lightShows[o.Options.LightShow]
+	if ok {
+		return show, nil
+	} else {
+		return show, fmt.Errorf("Unable to find light show with name='%s'", name)
+	}
 }
 
 func (o *Commander) UpdateGrillLights(params *lights.UpdateGrillLightsParams) error {

@@ -145,7 +145,7 @@ func (o *runner) loop() {
 	}
 
 	// Stop the tickable before exiting
-	if ticker_err != nil {
+	if ticker_err == nil {
 		if err := o.tickable.stop(); err != nil {
 			log.Error(err)
 		}

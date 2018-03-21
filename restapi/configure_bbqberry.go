@@ -31,7 +31,6 @@ import (
 	"syscall"
 	"os/signal"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/lights"
-	"time"
 )
 
 
@@ -103,13 +102,6 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 
 			return framework.HandleAPIRequestWithError(mgr.GetMonitors(&params))
 		})
-<<<<<<< Updated upstream
-	api.LightsEnableShifterHandler = lights.EnableShifterHandlerFunc(
-		func(params lights.EnableShifterParams) middleware.Responder {
-			p := time.Duration(params.Period) * time.Millisecond
-			commander.EnableLightShow(p)
-			return framework.HandleAPIRequestWithError(true, nil)
-=======
 	api.LightsUpdateGrillLightsHandler = lights.UpdateGrillLightsHandlerFunc(
 		func(params lights.UpdateGrillLightsParams) middleware.Responder {
 			err := commander.UpdateGrillLights(&params)
@@ -118,7 +110,6 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 			} else {
 				return framework.HandleAPIRequestWithError(false, err)
 			}
->>>>>>> Stashed changes
 		})
 
 	globalMiddleware := setupGlobalMiddleware(api.Serve(setupMiddlewares))

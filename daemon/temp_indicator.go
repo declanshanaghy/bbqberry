@@ -48,18 +48,17 @@ func (o *temperatureIndicator) stop() error {
 func (o *temperatureIndicator) tick() error {
 	// Assuming that the ambient probe is #0
 	ambientProbeNumber := int32(0)
-
-	avg, err := influxdb.QueryAverageTemperature(o.getPeriod() * 10, ambientProbeNumber)
-
-	if err != nil {
-		return err
-	}
-
 	probe := framework.Constants.Hardware.Probes[ambientProbeNumber]
 	min := *probe.Limits.MinWarnCelsius
 	max := *probe.Limits.MaxWarnCelsius
 
-	color := o.getTempColor(*avg.Celsius, min, max)
+	avg, err := influxdb.QueryAverageTemperature(o.getPeriod() * 10, ambientProbeNumber)
+	if err != nil {
+		log.Error(err)
+		return nil
+	}
+
+	color := getTempColor(*avg.Celsius, min, max)
 
 	if err := o.strip.SetAllPixels(color); err != nil {
 		return err
@@ -68,7 +67,7 @@ func (o *temperatureIndicator) tick() error {
 	return nil
 }
 
-func (o *temperatureIndicator) getTempColor(temp, min, max int32) int {
+func getTempColor(temp, min, max int32) int {
 	// Map the temperature to a color to be displayed on the LED pixels.
 	// cold / min = blue	( 0x0000FF ) =
 	// hot / max = red ( 0xFF0000 )

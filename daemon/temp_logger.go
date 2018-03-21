@@ -13,20 +13,26 @@ import (
 
 // temperatureLogger collects and logs temperature metrics
 type temperatureLogger struct {
-	period time.Duration
-	reader hardware.TemperatureReader
-	probes *[]int32
+	period	time.Duration
+	reader	hardware.TemperatureReader
+	probes	*[]int32
 }
 
 // newTemperatureLogger creates a new temperatureLogger instance which can be
 // run in the background to collect and log temperature metrics
-func newTemperatureLogger() Runnable {
-	return newRunnable(
-		&temperatureLogger{
-			reader: hardware.NewTemperatureReader(),
-			period: time.Second,
-		},
-	)
+func newTemperatureLoggerRunnable() Runnable {
+	return newRunnable(newTemperatureLogger())
+}
+
+func newTemperatureLogger() *temperatureLogger {
+	reader := hardware.NewTemperatureReader()
+	probes := reader.GetEnabledPobes()
+
+	return &temperatureLogger{
+		reader: reader,
+		probes: probes,
+		period: time.Second,
+	}
 }
 
 func (o *temperatureLogger) getPeriod() time.Duration {
@@ -56,26 +62,27 @@ func (o *temperatureLogger) stop() error {
 }
 
 // Tick executes on a ticker schedule
-func (o *temperatureLogger) tick() bool {
+func (o *temperatureLogger) tick() error {
 	readings, err := o.collectTemperatureMetrics()
 	if err != nil {
-		log.Error(err.Error())
+		return err
 	}
 
 	err = o.logTemperatureMetrics(readings)
 	if err != nil {
-		log.Error(err.Error())
+		return err
 	}
 
-	return true
+	return nil
 }
 
 func (o *temperatureLogger) collectTemperatureMetrics() ([]*models.TemperatureReading, error) {
-	log.WithField("numProbes", o.reader.GetNumProbes()).Debug("collecting temperature metrics")
+	nProbes := len(*o.probes)
+	log.WithField("nProbes", nProbes).Info("collecting temperature readings")
 
 	readings := make([]*models.TemperatureReading, 0)
 	for _, i := range(*o.probes) {
-		log.Debugf("action=iterate probe=%d", i)
+		log.Infof("action=iterate probe i=%d, o=%v", i, *o)
 		reading := models.TemperatureReading{}
 		if err := o.reader.GetTemperatureReading(i, &reading); err != nil {
 			return nil, err
