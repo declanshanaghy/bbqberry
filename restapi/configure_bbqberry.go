@@ -31,15 +31,19 @@ import (
 	"syscall"
 	"os/signal"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/lights"
+	"sync"
 )
 
 
-var runner				*daemon.Runnable
-var commander			*daemon.Commander
-var cmdOptionsValues	bbqframework.CmdOptions
+var (
+	shdnMux 			*sync.Mutex
+	commander			*daemon.Commander
+	cmdOptionsValues	bbqframework.CmdOptions
+)
 
 func init() {
-	commander = daemon.NewCommander()
+	commander	= daemon.NewCommander()
+	shdnMux 	= 	&sync.Mutex{}
 }
 
 func configureFlags(api *operations.BbqberryAPI) {
@@ -157,7 +161,10 @@ func globalStartup() {
 func globalShutdown() {
 	log.Info("action=method_entry")
 	defer log.Info("action=method_exit")
-	
+
+	shdnMux.Lock()
+	defer shdnMux.Unlock()
+
 	if ( commander.IsRunning() ) {
 		if err := commander.StopBackground(); err != nil {
 			panic(err)

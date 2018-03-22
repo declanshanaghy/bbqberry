@@ -3,7 +3,6 @@ package daemon
 import (
 	"time"
 	"github.com/declanshanaghy/bbqberry/hardware"
-	"github.com/Polarishq/middleware/framework/log"
 )
 
 // rainbow displays a single colored pulse on the strand
@@ -19,7 +18,7 @@ func newRainbow(period time.Duration) RunnableTicker {
 	t := &rainbow{
 		strip: hardware.NewStrandController(),
 	}
-	t.Period = time.Millisecond * 100
+	t.Period = time.Millisecond * 1
 
 	return newRunnableTicker(t)
 }
@@ -74,12 +73,17 @@ def rainbow_colors(pixels, wait=0.1):
 func (o *rainbow) tick() error {
 	nPixels := int(o.strip.GetNumPixels())
 
-	w := ((256 / nPixels + o.j)) % 256
+	// This "w" cycles all pixels through the same color
+	//w := ((256 / nPixels + o.j)) % 256
+
 	for i := 0; i < nPixels; i++ {
+		// This "w" cycles each pixel individually
+		w := ((i * 256 / nPixels) + o.j) % 256
 		color := o.wheel(w)
 		o.strip.SetPixelColor(int32(i), color)
 	}
-	log.Infof("j=%d, w=%d, pixels=%v", o.j, w, o.strip.GetPixels())
+
+	//log.Infof("j=%d, w=%d, pixels=%v", o.j, w, o.strip.GetPixels())
 	if err := o.strip.Update(); err != nil {
 		return err
 	}

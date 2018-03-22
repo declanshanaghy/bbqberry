@@ -121,7 +121,7 @@ func (o *runner) loop() {
 	}
 
 	ticker := time.NewTicker(o.tickable.getPeriod())
-	var ticker_err error = nil
+	var tickerErr error = nil
 
 	for o.running {
 		ticker = time.NewTicker(o.tickable.getPeriod())
@@ -136,16 +136,16 @@ func (o *runner) loop() {
 			//	"name": o.tickable.GetName(),
 			//	"period": o.tickable.getPeriod(),
 			//}).Debugf("tick")
-			ticker_err = o.tickable.tick()
-			if ticker_err != nil {
-				log.Error(ticker_err)
+			tickerErr = o.tickable.tick()
+			if tickerErr != nil {
+				log.Error(tickerErr)
 				o.running = false
 			}
 		}
 	}
 
 	// Stop the tickable before exiting
-	if ticker_err == nil {
+	if tickerErr == nil {
 		if err := o.tickable.stop(); err != nil {
 			log.Error(err)
 		}
@@ -161,7 +161,7 @@ func (o *runner) StopBackground() error {
 	defer log.WithField("name", o.tickable.GetName()).Infof("Stopping background routine succeeded")
 
 	if !o.running {
-		return errors.New("Cannot execute StopBackground. Not running")
+		return fmt.Errorf("Cannot execute StopBackground on %s. Not running", o.tickable.GetName())
 	}
 
 	// Close the run channel which will cause the runner loop to exit
