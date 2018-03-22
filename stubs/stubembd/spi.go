@@ -7,12 +7,12 @@ type StubSPIBus struct {
 }
 
 // ResetCallCounts resets the call counts of all embd.SPIBus interface methods
-func (_m *StubSPIBus) ResetCallCounts() {
-	_m.CloseCallCount = 0
-	_m.ReceiveByteCallCount = 0
-	_m.ReceiveDataCallCount = 0
-	_m.TransferAndReceiveByteCallCount = 0
-	_m.TransferAndReceiveDataCallCount = 0
+func (o *StubSPIBus) ResetCallCounts() {
+	o.CloseCallCount = 0
+	o.ReceiveByteCallCount = 0
+	o.ReceiveDataCallCount = 0
+	o.TransferAndReceiveByteCallCount = 0
+	o.TransferAndReceiveDataCallCount = 0
 }
 
 // NewStubSPIBus creates a new stubbed SPIBus
@@ -21,37 +21,37 @@ func NewStubSPIBus() *StubSPIBus {
 }
 
 // Close - See embd.SPIBus
-func (_m *StubSPIBus) Close() error {
-	_m.CloseCallCount++
+func (o *StubSPIBus) Close() error {
+	o.CloseCallCount++
 	return nil
 }
 
 // ReceiveByte - See embd.SPIBus
-func (_m *StubSPIBus) ReceiveByte() (byte, error) {
-	_m.ReceiveByteCallCount++
+func (o *StubSPIBus) ReceiveByte() (byte, error) {
+	o.ReceiveByteCallCount++
 	return 1, nil
 }
 
 // ReceiveData - See embd.SPIBus
-func (_m *StubSPIBus) ReceiveData(_param0 int) ([]byte, error) {
-	_m.ReceiveDataCallCount++
+func (o *StubSPIBus) ReceiveData(_param0 int) ([]byte, error) {
+	o.ReceiveDataCallCount++
 	return nil, nil
 }
 
 // TransferAndReceiveByte - See embd.SPIBus
-func (_m *StubSPIBus) TransferAndReceiveByte(_param0 byte) (byte, error) {
-	_m.TransferAndReceiveByteCallCount++
+func (o *StubSPIBus) TransferAndReceiveByte(_param0 byte) (byte, error) {
+	o.TransferAndReceiveByteCallCount++
 	return 1, nil
 }
 
 // TransferAndReceiveData - See embd.SPIBus
-func (_m *StubSPIBus) TransferAndReceiveData(_param0 []byte) error {
-	_m.TransferAndReceiveDataCallCount++
+func (o *StubSPIBus) TransferAndReceiveData(_param0 []byte) error {
+	o.TransferAndReceiveDataCallCount++
 	return nil
 }
 
 // Write - See embd.SPIBus
-func (_m *StubSPIBus) Write(_param0 []byte) (int, error) {
-	_m.WriteCallCount++
+func (o *StubSPIBus) Write(_param0 []byte) (int, error) {
+	o.WriteCallCount++
 	return 1, nil
 }

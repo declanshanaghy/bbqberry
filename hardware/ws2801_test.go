@@ -17,7 +17,7 @@ var _ = Describe("WS2801", func() {
 
 	BeforeEach(func() {
 		bus = stubembd.NewStubSPIBus()
-		hardware.StubBus = bus
+		hardware.StubSPIBus = bus
 		strand = hardware.NewStrandController()
 	})
 

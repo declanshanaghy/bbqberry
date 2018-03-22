@@ -6,20 +6,13 @@ import (
 	"fmt"
 )
 
-// ADS1x15 privdes an interface for communicating with an ADS1x15 analog to digital converter chip
-type ADS1x15 interface {
-	ReadChannel(uint8) (int, error)
-	read(int, int, int) (int, error)
-	convert(low, high byte) int
-}
-
 type ads1x15 struct {
 	bus    	embd.I2CBus
 	addr 	byte
 }
 
-// ADS1115 creates a new object capable of communicating with a WS2801 LED strip
-func ADS1115(bus embd.I2CBus, addr byte) ADS1x15 {
+// NewADS1115 creates a new object capable of communicating with a NewADS1115 chip over I2C
+func NewADS1115(addr byte, bus embd.I2CBus) *ads1x15 {
 	return &ads1x15{
 		bus: bus,
 		addr: addr,
@@ -84,7 +77,7 @@ func (o *ads1x15) read(mux, gain, mode int) (int, error) {
 	// Send the config value to start the ADC conversion.
 	// Explicitly break the 16-bit value down to a big endian pair of bytes.
 	//self._device.writeList(ADS1x15_POINTER_CONFIG, [(config >> 8) & 0xFF, config & 0xFF])
-	err := o.bus.WriteBytes(o.addr, []byte{ADS1x15_POINTER_CONFIG, byte(config >> 8) & 0xFF, byte(config & 0xFF)})
+	err := o.bus.WriteToReg(o.addr, ADS1x15_POINTER_CONFIG, []byte{byte(config >> 8) & 0xFF, byte(config & 0xFF)})
 	if err != nil {
 		return ADS1x15_READ_FAIL, err
 	}
@@ -96,7 +89,11 @@ func (o *ads1x15) read(mux, gain, mode int) (int, error) {
 
 	// Retrieve the result.
 	//result = self._device.readList(ADS1x15_POINTER_CONVERSION, 2)
-	result, err := o.bus.ReadBytes(o.addr, 2)
+	result := make([]byte, 2)
+	err = o.bus.ReadFromReg(o.addr, ADS1x15_POINTER_CONVERSION, result)
+	if err != nil {
+		return ADS1x15_READ_FAIL, err
+	}
 
 	return o.convert(result[1], result[0]), nil
 }
@@ -119,8 +116,8 @@ func (o *ads1x15) convert(low, high byte) int {
 	return value
 }
 
-func (o *ads1x15) ReadChannel(channel uint8) (int, error) {
-	result, err := o.read(int(channel + 0x04), 1, ADS1x15_CONFIG_MODE_SINGLE)
+func (o *ads1x15) AnalogValueAt(chanNum int) (int, error) {
+	result, err := o.read(int(chanNum + 0x04), 1, ADS1x15_CONFIG_MODE_SINGLE)
 	if err != nil {
 		return ADS1x15_READ_FAIL, err
 	}

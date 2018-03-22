@@ -11,7 +11,6 @@ import (
 	"github.com/declanshanaghy/bbqberry/util"
 	"github.com/go-openapi/strfmt"
 	"github.com/kidoman/embd"
-	"github.com/kidoman/embd/convertors/mcp3008"
 )
 
 // FakeTemps can be o.t to return o.ecific analog readings during tests
@@ -48,7 +47,7 @@ type TemperatureReader interface {
 type temperatureReader struct {
 	numProbes int32
 	bus       embd.SPIBus
-	adc       *mcp3008.MCP3008
+	adc       ADC
 }
 
 // newTemperatureReader constructs a concrete implementation of
@@ -57,7 +56,8 @@ func newTemperatureReader(numProbes int32, bus embd.SPIBus) TemperatureReader {
 	return &temperatureReader{
 		numProbes: numProbes,
 		bus:       bus,
-		adc:       mcp3008.New(mcp3008.SingleMode, bus),
+		adc:       NewMCP3008(bus),
+		//adc:       NewADS1115(bus),
 	}
 }
 

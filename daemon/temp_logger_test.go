@@ -18,7 +18,7 @@ var _ = Describe("Temperature daemon", func() {
 
 	BeforeEach(func() {
 		bus = stubembd.NewStubSPIBus()
-		hardware.StubBus = bus
+		hardware.StubSPIBus = bus
 	})
 
 	It("should start and stop cleanly", func() {

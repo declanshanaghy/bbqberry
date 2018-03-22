@@ -23,7 +23,7 @@ var _ = Describe("Termperatures API", func() {
 
 	BeforeEach(func() {
 		bus = stubembd.NewStubSPIBus()
-		hardware.StubBus = bus
+		hardware.StubSPIBus = bus
 	})
 
 	It("should return a single temperature reading when given a probe number", func() {
