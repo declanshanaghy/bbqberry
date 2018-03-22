@@ -1,5 +1,15 @@
 package ads1x15
 
+const (
+	MAX_UINT = ^uint(0)
+	MIN_UINT = 0
+	MAX_INT = int(MAX_UINT >> 1)
+	MIN_INT = -MAX_INT - 1
+
+	// Error codes
+	ADS1x15_READ_FAIL = MIN_INT
+)
+
 // Register and other configuration values:
 const (
 	ADS1x15_DEFAULT_ADDRESS        = 0x48
@@ -27,16 +37,19 @@ const (
 )
 
 // Mapping of data/sample rate to config register values for ADS1015 (faster).
-var ADS1015_CONFIG_DR = map[int]int{
-	128:   0x0000,
-	250:   0x0020,
-	490:   0x0040,
-	920:   0x0060,
-	1600:  0x0080,
-	2400:  0x00A0,
-	3300:  0x00C0,
-}
+//const ADS1015_CONFIG_DR_DEFAULT = 1600
+//var ADS1015_CONFIG_DR = map[int]int{
+//	128:   0x0000,
+//	250:   0x0020,
+//	490:   0x0040,
+//	920:   0x0060,
+//	1600:  0x0080,
+//	2400:  0x00A0,
+//	3300:  0x00C0,
+//}
+
 // Mapping of data/sample rate to config register values for ADS1115 (slower).
+const ADS1115_CONFIG_DR_DEFAULT = 128
 var ADS1115_CONFIG_DR = map[int]int{
 	8:    0x0000,
 	16:   0x0020,
