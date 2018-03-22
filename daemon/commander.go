@@ -39,20 +39,6 @@ func NewCommander() *Commander {
 	return &c
 }
 
-func getLightShows(period time.Duration) map[string]RunnableTicker {
-	shows := []RunnableTicker {
-		newPulser(period),
-		newSimpleShifter(period),
-		newTemperatureIndicator(),
-		newRainbow(period),
-	}
-	lightShows := make(map[string]RunnableTicker)
-	for _, show := range(shows) {
-		lightShows[show.tickable.GetName()] = show
-	}
-	return lightShows
-}
-
 // GetName returns a human readable name for this background task
 func (o *Commander) GetName() string {
 	return "Commander"
@@ -79,6 +65,45 @@ func (o *Commander) start() error {
 	return o.UpdateGrillLights(&p)
 }
 
+// Stop performs cleanup when the goroutine is exiting
+func (o *Commander) stop() error {
+	if o.tempLogger != nil && o.tempLogger.IsRunning() {
+		if err := o.tempLogger.StopBackground(); err != nil {
+			log.Error(err.Error())
+		}
+	}
+
+	if err := o.DisableLights(); err != nil {
+		log.Error(err.Error())
+	}
+
+	log.Info("Clearing all pixels")
+	if err := o.strip.Close(); err != nil {
+		log.Error(err.Error())
+	}
+
+	return nil
+}
+
+// Tick executes on a ticker schedule
+func (o *Commander) tick() error {
+	return nil
+}
+
+func getLightShows(period time.Duration) map[string]RunnableTicker {
+	shows := []RunnableTicker {
+		newPulser(period),
+		newSimpleShifter(period),
+		newTemperatureIndicator(),
+		newRainbow(period),
+	}
+	lightShows := make(map[string]RunnableTicker)
+	for _, show := range(shows) {
+		lightShows[show.tickable.GetName()] = show
+	}
+	return lightShows
+}
+
 func (o* Commander) getLightShow(name string) (RunnableTicker, error) {
 	show, ok := o.lightShows[o.Options.LightShow]
 	if ok {
@@ -103,6 +128,10 @@ func (o *Commander) changeLightShow(lightShow *RunnableTicker, period int64) err
 	o.currentShow = lightShow
 	o.currentShow.tickable.setPeriod(time.Duration(period) * time.Microsecond)
 
+
+	log.WithFields(log.Fields{
+		"name": o.currentShow.tickable.GetName(),
+	}).Info("Change light show")
 	if err := o.currentShow.runnable.StartBackground(); err != nil {
 		return err
 	}
@@ -123,11 +152,16 @@ func (o *Commander) EnableTemperatureLogger() error {
 }
 
 func (o *Commander) DisableLights() error {
-	if o.currentShow != nil && o.currentShow.runnable.IsRunning() {
-		log.WithField("type", o.currentShow.tickable.GetName()).
-			Info("Shutting down currentShow")
-		if err := o.currentShow.runnable.StopBackground(); err != nil {
-			return err
+	if o.currentShow != nil {
+		log.WithFields(log.Fields{
+			"name": o.currentShow.tickable.GetName(),
+			"running": o.currentShow.runnable.IsRunning(),
+		}).Info("Disabling lights")
+
+		if o.currentShow.runnable.IsRunning() {
+			if err := o.currentShow.runnable.StopBackground(); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -135,38 +169,15 @@ func (o *Commander) DisableLights() error {
 }
 
 func (o *Commander) DisableTemperatureLogger() error {
+	log.WithFields(log.Fields{
+		"running": o.tempLogger.IsRunning(),
+	}).Info("Disabling temperature logger")
+
 	if o.tempLogger.IsRunning() {
-		log.WithField("type", reflect.TypeOf(o.tempLogger)).
-			Info("Shutting down temperature logger")
 		if err := o.tempLogger.StopBackground(); err != nil {
 			return err
 		}
 	}
 
-	return nil
-}
-
-// Stop performs cleanup when the goroutine is exiting
-func (o *Commander) stop() error {
-	if o.tempLogger != nil {
-		if err := o.tempLogger.StopBackground(); err != nil {
-			return err
-		}
-	}
-
-	if err := o.DisableLights(); err != nil {
-		return err
-	}
-
-	log.Info("Clearing all pixels")
-	if err := o.strip.Close(); err != nil {
-		log.Error(err.Error())
-	}
-
-	return nil
-}
-
-// Tick executes on a ticker schedule
-func (o *Commander) tick() error {
 	return nil
 }
