@@ -11,7 +11,7 @@ const (
 	spiCpol = 0x02
 
 	// SPIMode0 represents the mode0 operation (CPOL=0 CPHA=0) of spi.
-	SPIMode0 = 0x4 | (0 | 0)
+	SPIMode0 = (0 | 0)
 
 	// SPIMode1 represents the mode0 operation (CPOL=0 CPHA=1) of spi.
 	SPIMode1 = (0 | spiCpha)

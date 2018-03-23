@@ -3,6 +3,7 @@ package daemon
 import (
 	"time"
 	"github.com/declanshanaghy/bbqberry/hardware"
+	"github.com/Polarishq/middleware/framework/log"
 )
 
 // rainbow displays a single colored pulse on the strand
@@ -81,9 +82,9 @@ func (o *rainbow) tick() error {
 		w := ((i * 256 / nPixels) + o.j) % 256
 		color := o.wheel(w)
 		o.strip.SetPixelColor(int32(i), color)
+		log.Infof("j=%d, w=%d, pixels=%v", o.j, w, o.strip.GetPixels())
 	}
 
-	//log.Infof("j=%d, w=%d, pixels=%v", o.j, w, o.strip.GetPixels())
 	if err := o.strip.Update(); err != nil {
 		return err
 	}

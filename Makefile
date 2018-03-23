@@ -37,6 +37,15 @@ upload_scp: stop_bbqberry build_bbqberry
 	@echo "Upload complete"
 	@make start_remote
 
+upload_config:
+	@echo "Uploading config..."
+	@scp -p etc/bbqberry-supervisord.conf pi@bbqberry-gaff:~/go/src/github.com/declanshanaghy/bbqberry/etc/bbqberry-supervisord.conf
+	@echo "Restarting..."
+	@ssh pi@bbqberry-gaff sudo supervisorctl reread
+	@ssh pi@bbqberry-gaff sudo supervisorctl update
+	@ssh pi@bbqberry-gaff sudo supervisorctl restart bbqberry
+	@echo "Upload complete"
+
 stop_bbqberry:
 	@echo "Stopping BBQBerry..."
 	@ssh pi@bbqberry-gaff sudo supervisorctl stop bbqberry

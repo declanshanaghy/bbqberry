@@ -68,8 +68,8 @@ func NewStrandController() WS2801 {
 func NewTemperatureReader() TemperatureReader {
 	config := framework.Constants.Hardware
 
-	//bus := newSPIBus(1)
-	bus := newI2CBus(1)
+	bus := newSPIBus(1)
+	//bus := newI2CBus(1)
 	return newTemperatureReader(int32(len(config.Probes)), bus)
 }
 

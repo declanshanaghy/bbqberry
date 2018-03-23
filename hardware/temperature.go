@@ -25,19 +25,19 @@ type TemperatureReader interface {
 
 type temperatureReader struct {
 	numProbes int32
-	//bus       embd.SPIBus
-	bus       embd.I2CBus
+	bus       embd.SPIBus
+	//bus       embd.I2CBus
 	adc       ADC
 }
 
 // newTemperatureReader constructs a concrete implementation of
 // TemperatureReader which can communicate with the underlying hardware
-func newTemperatureReader(numProbes int32, bus embd.I2CBus) TemperatureReader {
+func newTemperatureReader(numProbes int32, bus embd.SPIBus) TemperatureReader {
 	return &temperatureReader{
 		numProbes: numProbes,
 		bus:       bus,
-		//adc:       NewMCP3008(bus),
-		adc:       NewADS1115(bus),
+		adc:       NewMCP3008(bus),
+		//adc:       NewADS1115(bus),
 	}
 }
 
