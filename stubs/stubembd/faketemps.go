@@ -62,8 +62,8 @@ func getFakeTemp(probe int32) int32 {
 	if analog >= max {
 	   analog = min
 	}
-	analog2 := analog + int32(rand.Intn(10))
-	celcius, _ = framework.ConvertAnalogToCF(analog2)
+	celcius, _ = framework.ConvertAnalogToCF(analog)
+	analog2 := framework.ConvertCelsiusToAnalog(celcius + 1)
 
 	fakeTemps[probe] = analog
 

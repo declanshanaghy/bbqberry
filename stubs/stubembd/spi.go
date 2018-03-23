@@ -11,8 +11,9 @@ type StubSPIBus struct {
 
 // NewStubSPIBus creates a new stubbed SPIBus
 func NewStubSPIBus(channel byte) *StubSPIBus {
+	log.WithField("channel", channel).Info("NewStubSPIBus")
 	return &StubSPIBus{
-		simulateTemp: channel == 0,
+		simulateTemp: channel == 1,
 	}
 }
 
@@ -67,15 +68,19 @@ func (o *StubSPIBus) TransferAndReceiveByte(data byte) (byte, error) {
 // TransferAndReceiveData - See embd.SPIBus
 func (o *StubSPIBus) TransferAndReceiveData(data []byte) error {
 	log.WithFields(log.Fields{
+		"simulateTemp": o.simulateTemp,
 		"data": data,
-	}).Info("TransferAndReceiveData")
+	}).Info("TransferAndReceiveData - Transfer")
 
 	if o.simulateTemp {
 		a := getFakeTemp(0)
 		data[0] = byte(a & 0x00FF)			// low byte
 		data[1] = byte(a >> 8 & 0x03)		// high byte
-		data[0] = 0x0
 	}
+
+	log.WithFields(log.Fields{
+		"data": data,
+	}).Info("TransferAndReceiveData - Receive")
 
 	o.TransferAndReceiveDataCallCount++
 	return nil

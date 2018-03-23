@@ -25,6 +25,7 @@ type TemperatureReader interface {
 
 type temperatureReader struct {
 	numProbes int32
+	//bus       embd.SPIBus
 	bus       embd.I2CBus
 	adc       ADC
 }
