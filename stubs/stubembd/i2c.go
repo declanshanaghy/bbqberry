@@ -1,20 +1,28 @@
 package stubembd
 
+import (
+	"github.com/Polarishq/middleware/framework/log"
+	"fmt"
+)
+
 // StubI2CBus provides a stub of embd.I2CBus
 type StubI2CBus struct {
 	CloseCallCount, WriteToRegCallCount, ReadFromRegCallCount int
-}
-
-// ResetCallCounts resets the call counts of all embd.SPIBus interface methods
-func (o *StubI2CBus) ResetCallCounts() {
-	o.CloseCallCount = 0
-	o.WriteToRegCallCount = 0
-	o.ReadFromRegCallCount = 0
+	ReadFromRegReturnValues [][]int
 }
 
 // NewStubI2CBus creates a new stubbed SPIBus
 func NewStubI2CBus() *StubI2CBus {
 	return &StubI2CBus{}
+}
+
+// ResetCallCounts resets the call counts of all embd.SPIBus interface methods
+func (o *StubI2CBus) Reset() {
+	o.CloseCallCount = 0
+	o.WriteToRegCallCount = 0
+	o.ReadFromRegCallCount = 0
+
+	resetFakeTemps()
 }
 
 // ReadByte reads a byte from the given address.
@@ -39,7 +47,20 @@ func (o *StubI2CBus) WriteBytes(addr byte, value []byte) error {
 
 // ReadFromReg reads n (len(value)) bytes from the given address and register.
 func (o *StubI2CBus) ReadFromReg(addr, reg byte, value []byte) error {
+	a := getFakeTemp(0)
+
 	o.ReadFromRegCallCount++
+
+	value[1] = byte(a & 0x00FF)			// low byte
+	value[0] = byte((a >> 8) & 0x00FF)	// high byte
+
+	log.WithFields(log.Fields{
+		"reg": reg,
+		"a": a,
+		"value1": fmt.Sprintf("%02x", value[1]),
+		"value0": fmt.Sprintf("%02x", value[0]),
+	}).Info("ReadFromReg")
+
 	return nil
 }
 

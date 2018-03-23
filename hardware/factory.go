@@ -68,8 +68,8 @@ func NewStrandController() WS2801 {
 func NewTemperatureReader() TemperatureReader {
 	config := framework.Constants.Hardware
 
-	bus := newSPIBus(1)
-	//bus := newI2CBus(1)
+	//bus := newSPIBus(1)
+	bus := newI2CBus(1)
 	return newTemperatureReader(int32(len(config.Probes)), bus)
 }
 
@@ -77,7 +77,7 @@ func newSPIBus(channel byte) embd.SPIBus {
 	if framework.Constants.Stub {
 		//log.Warningf("action=NewSPIBus channel=%d STUBBED", channel)
 		if StubSPIBus == nil {
-			StubSPIBus = stubembd.NewStubSPIBus()
+			StubSPIBus = stubembd.NewStubSPIBus(channel)
 		}
 		return StubSPIBus
 	}

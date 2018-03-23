@@ -7,24 +7,14 @@ import (
 
 	"github.com/declanshanaghy/bbqberry/backend"
 	"github.com/declanshanaghy/bbqberry/framework"
-	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperatures"
-	"github.com/declanshanaghy/bbqberry/stubs/stubembd"
 	"github.com/go-openapi/strfmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Termperatures API", func() {
-	var (
-		bus *stubembd.StubSPIBus
-	)
 	hwCfg := framework.Constants.Hardware
-
-	BeforeEach(func() {
-		bus = stubembd.NewStubSPIBus()
-		hardware.StubSPIBus = bus
-	})
 
 	It("should return a single temperature reading when given a probe number", func() {
 		probe := int32(1)

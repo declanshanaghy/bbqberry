@@ -4,21 +4,18 @@ import (
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	. "github.com/declanshanaghy/bbqberry/hardware"
-	"github.com/declanshanaghy/bbqberry/stubs/stubembd"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("WS2801", func() {
 	var (
-		bus    *stubembd.StubSPIBus
 		strand WS2801
 	)
 
 	BeforeEach(func() {
-		bus = stubembd.NewStubSPIBus()
-		hardware.StubSPIBus = bus
 		strand = hardware.NewStrandController()
+		hardware.StubSPIBus.Reset()
 	})
 
 	Context("sanity checks", func() {
@@ -49,6 +46,9 @@ var _ = Describe("WS2801", func() {
 		})
 	})
 	Context("strand functionality", func() {
+		BeforeEach(func() {
+			hardware.StubSPIBus.Reset()
+		})
 		It("update should call TransferAndReceiveData once", func() {
 			err := strand.SetPixelColor(0, RED)
 			Expect(err).ToNot(HaveOccurred())
@@ -56,14 +56,14 @@ var _ = Describe("WS2801", func() {
 			err = strand.Update()
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(1).To(Equal(bus.WriteCallCount))
+			Expect(1).To(Equal(hardware.StubSPIBus.WriteCallCount))
 		})
 		It("close should disable all pixels and close the bus", func() {
 			err := strand.Close()
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(1).To(Equal(bus.WriteCallCount))
-			Expect(1).To(Equal(bus.CloseCallCount))
+			Expect(1).To(Equal(hardware.StubSPIBus.WriteCallCount))
+			Expect(1).To(Equal(hardware.StubSPIBus.CloseCallCount))
 		})
 	})
 })

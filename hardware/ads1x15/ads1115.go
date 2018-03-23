@@ -4,6 +4,7 @@ import (
 	"github.com/kidoman/embd"
 	"time"
 	"fmt"
+	"github.com/Polarishq/middleware/framework/log"
 )
 
 type ads1x15 struct {
@@ -109,10 +110,21 @@ func (o *ads1x15) read(mux, gain, mode int) (int, error) {
 
  */
 func (o *ads1x15) convert(low, high byte) int {
-	value := int(((high & 0xFF) << 8)) | int(low & 0xFF)
+	value := int(high) & 0xFF << 8 | int(low & 0xFF)
+
+	log.WithFields(log.Fields{
+		"low": fmt.Sprintf("%02x", low),
+		"high": fmt.Sprintf("%02x", high),
+		"value": value,
+	}).Info("convert")
+
 	if value & 0x8000 != 0 {
 		value -= 1 << 16
+		log.WithFields(log.Fields{
+			"value": value,
+		}).Info("value munged - figure out why this is here")
 	}
+
 	return value
 }
 
