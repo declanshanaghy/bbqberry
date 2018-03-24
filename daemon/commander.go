@@ -9,6 +9,10 @@ import (
 	"reflect"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/lights"
 	"fmt"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/system"
+	"strings"
+	"bytes"
+	"os/exec"
 )
 
 // Commander is the main controller of all background goroutines
@@ -45,7 +49,7 @@ func (o *Commander) GetName() string {
 }
 
 // Start performs initialization before the first tick
-func (o *Commander) start() error {
+func (o *Commander) start() (bool, error) {
 	o.tempLogger = newTemperatureLoggerRunnable()
 	if o.Options.TemperatureLoggerEnabled {
 		o.EnableTemperatureLogger()
@@ -53,7 +57,7 @@ func (o *Commander) start() error {
 
 	show, err := o.getLightShow(o.Options.LightShow)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	p := lights.UpdateGrillLightsParams{
@@ -113,13 +117,25 @@ func (o* Commander) getLightShow(name string) (RunnableTicker, error) {
 	}
 }
 
-func (o *Commander) UpdateGrillLights(params *lights.UpdateGrillLightsParams) error {
+func (o *Commander) UpdateGrillLights(params *lights.UpdateGrillLightsParams) (bool, error) {
 	if show, ok := o.lightShows[params.Name]; ok {
 		o.changeLightShow(&show, params.Period)
-		return nil
+		return true, nil
 	}  else {
-		return fmt.Errorf("Invalid light show %s", params.Name)
+		return false, fmt.Errorf("Invalid light show %s", params.Name)
 	}
+}
+
+func (o *Commander) ShutdownSystem(params *system.ShutdownParams) (bool, error) {
+	cmd := exec.Command("sudo shutdown", "-h", "now")
+	cmd.Stdin = strings.NewReader("some input")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (o *Commander) changeLightShow(lightShow *RunnableTicker, period int64) error {

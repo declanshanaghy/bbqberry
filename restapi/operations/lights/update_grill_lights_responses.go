@@ -11,25 +11,25 @@ import (
 	"github.com/declanshanaghy/bbqberry/models"
 )
 
-// UpdateGrillLightsCreatedCode is the HTTP code returned for type UpdateGrillLightsCreated
-const UpdateGrillLightsCreatedCode int = 201
+// UpdateGrillLightsOKCode is the HTTP code returned for type UpdateGrillLightsOK
+const UpdateGrillLightsOKCode int = 200
 
-/*UpdateGrillLightsCreated The lights were updated successfully
+/*UpdateGrillLightsOK The lights were updated successfully
 
-swagger:response updateGrillLightsCreated
+swagger:response updateGrillLightsOK
 */
-type UpdateGrillLightsCreated struct {
+type UpdateGrillLightsOK struct {
 }
 
-// NewUpdateGrillLightsCreated creates UpdateGrillLightsCreated with default headers values
-func NewUpdateGrillLightsCreated() *UpdateGrillLightsCreated {
-	return &UpdateGrillLightsCreated{}
+// NewUpdateGrillLightsOK creates UpdateGrillLightsOK with default headers values
+func NewUpdateGrillLightsOK() *UpdateGrillLightsOK {
+	return &UpdateGrillLightsOK{}
 }
 
 // WriteResponse to the client
-func (o *UpdateGrillLightsCreated) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+func (o *UpdateGrillLightsOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.WriteHeader(201)
+	rw.WriteHeader(200)
 }
 
 /*UpdateGrillLightsDefault Unexpected error

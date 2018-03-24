@@ -108,7 +108,7 @@ func init() {
           }
         ],
         "responses": {
-          "201": {
+          "200": {
             "description": "The lights were updated successfully"
           },
           "default": {
@@ -173,8 +173,28 @@ func init() {
           }
         ],
         "responses": {
-          "201": {
+          "200": {
             "description": "The monitor was created successfully"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/system/shutdown": {
+      "put": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Shutdown the Operating System",
+        "operationId": "shutdown",
+        "responses": {
+          "200": {
+            "description": "Shutdown executed successfully"
           },
           "default": {
             "description": "Unexpected error",

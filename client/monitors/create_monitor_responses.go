@@ -23,8 +23,8 @@ type CreateMonitorReader struct {
 func (o *CreateMonitorReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
 
-	case 201:
-		result := NewCreateMonitorCreated()
+	case 200:
+		result := NewCreateMonitorOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -42,23 +42,23 @@ func (o *CreateMonitorReader) ReadResponse(response runtime.ClientResponse, cons
 	}
 }
 
-// NewCreateMonitorCreated creates a CreateMonitorCreated with default headers values
-func NewCreateMonitorCreated() *CreateMonitorCreated {
-	return &CreateMonitorCreated{}
+// NewCreateMonitorOK creates a CreateMonitorOK with default headers values
+func NewCreateMonitorOK() *CreateMonitorOK {
+	return &CreateMonitorOK{}
 }
 
-/*CreateMonitorCreated handles this case with default header values.
+/*CreateMonitorOK handles this case with default header values.
 
 The monitor was created successfully
 */
-type CreateMonitorCreated struct {
+type CreateMonitorOK struct {
 }
 
-func (o *CreateMonitorCreated) Error() string {
-	return fmt.Sprintf("[POST /monitors][%d] createMonitorCreated ", 201)
+func (o *CreateMonitorOK) Error() string {
+	return fmt.Sprintf("[POST /monitors][%d] createMonitorOK ", 200)
 }
 
-func (o *CreateMonitorCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *CreateMonitorOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

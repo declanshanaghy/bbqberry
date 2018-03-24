@@ -92,6 +92,12 @@ func (o *ads1x15) read(mux, gain, mode int) (int, error) {
 	//result = self._device.readList(ADS1x15_POINTER_CONVERSION, 2)
 	result := make([]byte, 2)
 	err = o.bus.ReadFromReg(o.addr, ADS1x15_POINTER_CONVERSION, result)
+
+	log.WithFields(log.Fields{
+		"result1": result[1],
+		"result0": result[0],
+	}).Info("read")
+
 	if err != nil {
 		return ADS1x15_READ_FAIL, err
 	}
