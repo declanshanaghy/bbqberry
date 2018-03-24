@@ -22,40 +22,6 @@ type ADC interface {
 	AnalogValueAt(chanNum int) (int, error)
 }
 
-// NewADS1115 creates an abstracted ADC based on the ADS1115 I2C chip
-func NewADS1115(bus embd.I2CBus) ADC {
-	return ads1x15.NewADS1115(ads1x15.ADS1x15_DEFAULT_ADDRESS, bus)
-}
-
-// NewADS1115 creates an abstracted ADC based on the MCP3008 SPI chip
-func NewMCP3008(bus embd.SPIBus) ADC {
-	return mcp3008.New(mcp3008.SingleMode, bus)
-}
-
-// Startup initializes the hardware, should be called before first access
-func Startup() {
-	// no-op when stubbed
-	if framework.Constants.Stub {
-		return
-	}
-
-	if err := embd.InitSPI(); err != nil {
-		panic(err)
-	}
-}
-
-// Shutdown de-initializes the hardware, should be called when the service is shutting down
-func Shutdown() {
-	// no-op when stubbed
-	if framework.Constants.Stub {
-		return
-	}
-
-	if err := embd.CloseSPI(); err != nil {
-		panic(err)
-	}
-}
-
 // NewStrandController provides an abstracted interface to the LED strands
 func NewStrandController() WS2801 {
 	config := framework.Constants.Hardware
@@ -95,4 +61,38 @@ func newI2CBus(address byte) embd.I2CBus {
 	}
 	log.Debugf("action=newI2CBus address=%d", address)
 	return embd.NewI2CBus(address)
+}
+
+// NewADS1115 creates an abstracted ADC based on the ADS1115 I2C chip
+func NewADS1115(bus embd.I2CBus) ADC {
+	return ads1x15.NewADS1115(ads1x15.ADS1x15_DEFAULT_ADDRESS, bus)
+}
+
+// NewADS1115 creates an abstracted ADC based on the MCP3008 SPI chip
+func NewMCP3008(bus embd.SPIBus) ADC {
+	return mcp3008.New(mcp3008.SingleMode, bus)
+}
+
+// Startup initializes the hardware, should be called before first access
+func Startup() {
+	// no-op when stubbed
+	if framework.Constants.Stub {
+		return
+	}
+
+	if err := embd.InitSPI(); err != nil {
+		panic(err)
+	}
+}
+
+// Shutdown de-initializes the hardware, should be called when the service is shutting down
+func Shutdown() {
+	// no-op when stubbed
+	if framework.Constants.Stub {
+		return
+	}
+
+	if err := embd.CloseSPI(); err != nil {
+		panic(err)
+	}
 }

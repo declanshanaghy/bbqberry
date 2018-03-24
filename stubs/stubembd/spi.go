@@ -67,20 +67,20 @@ func (o *StubSPIBus) TransferAndReceiveByte(data byte) (byte, error) {
 
 // TransferAndReceiveData - See embd.SPIBus
 func (o *StubSPIBus) TransferAndReceiveData(data []byte) error {
-	//log.WithFields(log.Fields{
-	//	"simulateTemp": o.simulateTemp,
-	//	"data": data,
-	//}).Debugf("TransferAndReceiveData - Transfer")
+	log.WithFields(log.Fields{
+		"simulateTemp": o.simulateTemp,
+		"data": data,
+	}).Debugf("TransferAndReceiveData")
 
 	if o.simulateTemp {
 		a := getFakeTemp(0)
-		data[0] = byte(a & 0x00FF)			// low byte
+		data[2] = byte(a & 0x00FF)			// low byte
 		data[1] = byte(a >> 8 & 0x03)		// high byte
+		log.WithFields(log.Fields{
+			"a": a,
+			"data": data,
+		}).Infof("simulateTemp")
 	}
-
-	//log.WithFields(log.Fields{
-	//	"data": data,
-	//}).Debugf("TransferAndReceiveData - Receive")
 
 	o.TransferAndReceiveDataCallCount++
 	return nil
