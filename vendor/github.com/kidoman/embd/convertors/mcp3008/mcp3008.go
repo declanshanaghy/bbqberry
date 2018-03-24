@@ -4,6 +4,8 @@ package mcp3008
 import (
 	"github.com/golang/glog"
 	"github.com/kidoman/embd"
+	"github.com/Polarishq/middleware/framework/log"
+	"fmt"
 )
 
 // MCP3008 represents a mcp3008 8bit DAC.
@@ -42,5 +44,17 @@ func (m *MCP3008) AnalogValueAt(chanNum int) (int, error) {
 		return 0, err
 	}
 
-	return int(uint16(data[1]&0x03)<<8 | uint16(data[2])), nil
+	high := data[1]
+	low := data[2]
+	value := int(uint16(high & 0x03) << 8 | uint16(low))
+	//return int(uint16(data[1]&0x03)<<8 | uint16(data[2])), nil
+
+	log.WithFields(log.Fields{
+		"low": fmt.Sprintf("%02x", low),
+		"high": fmt.Sprintf("%02x", high),
+		"value": value,
+	}).Info("AnalogValueAt")
+
+	return value, nil
+
 }

@@ -12,7 +12,7 @@ SWAGGER_SERVER ?= true
 SWAGGER_CLIENT ?= true
 SWAGGER_SUPPORT ?= true
 
-unittest_bbqberry: create_influxdb
+unittest_bbqberry:
 	@echo "Running Unit Tests..."
 	@ginkgo -r -v -p -randomizeAllSpecs -randomizeSuites \
 	    -progress -trace -cover -covermode atomic -skipPackage "./cmd" $(XARGS)
@@ -29,25 +29,35 @@ upload_ftp: stop_bbqberry build_bbqberry
 	@echo "Uploading via FTP..."
 	@time scripts/upload_ftp.sh
 	@echo "Upload complete"
-	@make start_remote
 
 upload_scp: stop_bbqberry build_bbqberry
 	@echo "Uploading via SCP..."
 	@time scp -p tmp/bin/bbqberry pi@bbqberry-gaff:~/deploy/bbqberry
 	@echo "Upload complete"
-	@make start_remote
+
+upload_config:
+	@echo "Uploading config..."
+	@scp -p etc/systemd/bbqberry.service pi@bbqberry-gaff:/home/pi/go/src/github.com/declanshanaghy/bbqberry/etc/systemd/
+	@ssh pi@bbqberry-gaff sudo cp /home/pi/go/src/github.com/declanshanaghy/bbqberry/etc/systemd/bbqberry.service /usr/lib/systemd/system/bbqberry.service
+	@echo "Upload complete"
+
+reload_config:
+	@echo "Reloading config..."
+	@ssh pi@bbqberry-gaff sudo systemctl daemon-reload
+	@ssh pi@bbqberry-gaff sudo systemctl restart bbqberry
+	@echo "Reload complete"
 
 stop_bbqberry:
 	@echo "Stopping BBQBerry..."
-	@ssh pi@bbqberry-gaff sudo supervisorctl stop bbqberry
+	@ssh pi@bbqberry-gaff sudo systemctl stop bbqberry
 
 restart_remote:
 	@echo "Restarting BBQBerry remote..."
-	@ssh pi@bbqberry-gaff sudo supervisorctl restart bbqberry
+	@ssh pi@bbqberry-gaff sudo systemctl restart bbqberry
 
 start_remote:
 	@echo "Restarting BBQBerry remote..."
-	@ssh pi@bbqberry-gaff sudo supervisorctl start bbqberry
+	@ssh pi@bbqberry-gaff sudo systemctl start bbqberry
 
 run_remote: upload_scp
 	@echo "Running BBQBerry remote..."

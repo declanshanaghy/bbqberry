@@ -4,7 +4,6 @@ import (
 	"time"
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/hardware"
-
 )
 
 // simpleShifter displays fancy colors
@@ -33,11 +32,18 @@ func (o *simpleShifter) GetName() string {
 
 // Start performs initialization before the first tick
 func (o *simpleShifter) start() error {
+	log.WithFields(log.Fields{
+		"name": o.GetName(),
+		"period": o.getPeriod(),
+	}).Info("Starting tickable execution")
 	return o.strip.Off()
 }
 
 // Stop performs cleanup when the goroutine is exiting
 func (o *simpleShifter) stop() error {
+	log.WithFields(log.Fields{
+		"name": o.GetName(),
+	}).Info("Stopping tickable execution")
 	return o.strip.Off()
 }
 

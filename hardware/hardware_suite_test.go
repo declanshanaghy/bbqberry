@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestWS2801(t *testing.T) {
+func TestHardware(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Hardware Suite")
 }

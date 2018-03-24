@@ -4,6 +4,7 @@ import (
 	"time"
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/declanshanaghy/bbqberry/hardware"
+	"fmt"
 )
 
 // pulser displays a single colored pulse on the strand
@@ -36,11 +37,19 @@ func (o *pulser) GetName() string {
 
 // Start performs initialization before the first tick
 func (o *pulser) start() error {
+	log.WithFields(log.Fields{
+		"color": fmt.Sprintf("0x%06x", o.color),
+		"name": o.GetName(),
+		"period": o.getPeriod(),
+	}).Info("Starting tickable execution")
 	return o.strip.SetAllPixels(o.color);
 }
 
 // Stop performs cleanup when the goroutine is exiting
 func (o *pulser) stop() error {
+	log.WithFields(log.Fields{
+		"name": o.GetName(),
+	}).Info("Stopping tickable execution")
 	return o.strip.Off()
 }
 

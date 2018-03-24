@@ -3,6 +3,7 @@ package daemon
 import (
 	"time"
 	"github.com/declanshanaghy/bbqberry/hardware"
+	"github.com/Polarishq/middleware/framework/log"
 )
 
 // rainbow displays a single colored pulse on the strand
@@ -18,7 +19,7 @@ func newRainbow(period time.Duration) RunnableTicker {
 	t := &rainbow{
 		strip: hardware.NewStrandController(),
 	}
-	t.Period = time.Millisecond * 1
+	t.Period = time.Millisecond * 10
 
 	return newRunnableTicker(t)
 }
@@ -30,11 +31,18 @@ func (o *rainbow) GetName() string {
 
 // Start performs initialization before the first tick
 func (o *rainbow) start() error {
+	log.WithFields(log.Fields{
+		"name": o.GetName(),
+		"period": o.getPeriod(),
+	}).Info("Starting tickable execution")
 	return o.strip.Off()
 }
 
 // Stop performs cleanup when the goroutine is exiting
 func (o *rainbow) stop() error {
+	log.WithFields(log.Fields{
+		"name": o.GetName(),
+	}).Info("Stopping tickable execution")
 	return o.strip.Off()
 }
 /*
@@ -81,9 +89,9 @@ func (o *rainbow) tick() error {
 		w := ((i * 256 / nPixels) + o.j) % 256
 		color := o.wheel(w)
 		o.strip.SetPixelColor(int32(i), color)
+		//log.Infof("j=%d, w=%d, pixels=%v", o.j, w, o.strip.GetPixels())
 	}
 
-	//log.Infof("j=%d, w=%d, pixels=%v", o.j, w, o.strip.GetPixels())
 	if err := o.strip.Update(); err != nil {
 		return err
 	}

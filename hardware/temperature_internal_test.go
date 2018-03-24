@@ -20,7 +20,7 @@ var _ = Describe("Temperature package", func() {
 			}
 
 			for c, answer := range conversions {
-				k, f := ConvertCToKF(c)
+				k, f := framework.ConvertCToKF(c)
 				Expect(k).To(BeNumerically("~", answer[0], precision))
 				Expect(f).To(BeNumerically("~", answer[1], precision))
 			}
@@ -36,7 +36,7 @@ var _ = Describe("Temperature package", func() {
 			}
 
 			for v, answer := range conversions {
-				k, c, f := adafruitAD8495ThermocoupleVtoKCF(v)
+				k, c, f := framework.AdafruitAD8495ThermocoupleVtoKCF(v)
 				Expect(k).To(BeNumerically("~", answer[0], precision))
 				Expect(c).To(BeNumerically("~", answer[1], precision))
 				Expect(f).To(BeNumerically("~", answer[2], precision))
