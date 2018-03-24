@@ -45,8 +45,9 @@ func (m *MCP3008) AnalogValueAt(chanNum int) (int, error) {
 	}
 
 	high := data[1]
-	low := data[0]
+	low := data[2]
 	value := int(uint16(high & 0x03) << 8 | uint16(low))
+	//return int(uint16(data[1]&0x03)<<8 | uint16(data[2])), nil
 
 	log.WithFields(log.Fields{
 		"low": fmt.Sprintf("%02x", low),

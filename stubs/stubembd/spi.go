@@ -67,10 +67,10 @@ func (o *StubSPIBus) TransferAndReceiveByte(data byte) (byte, error) {
 
 // TransferAndReceiveData - See embd.SPIBus
 func (o *StubSPIBus) TransferAndReceiveData(data []byte) error {
-	log.WithFields(log.Fields{
-		"simulateTemp": o.simulateTemp,
-		"data": data,
-	}).Info("TransferAndReceiveData - Transfer")
+	//log.WithFields(log.Fields{
+	//	"simulateTemp": o.simulateTemp,
+	//	"data": data,
+	//}).Debugf("TransferAndReceiveData - Transfer")
 
 	if o.simulateTemp {
 		a := getFakeTemp(0)
@@ -78,9 +78,9 @@ func (o *StubSPIBus) TransferAndReceiveData(data []byte) error {
 		data[1] = byte(a >> 8 & 0x03)		// high byte
 	}
 
-	log.WithFields(log.Fields{
-		"data": data,
-	}).Info("TransferAndReceiveData - Receive")
+	//log.WithFields(log.Fields{
+	//	"data": data,
+	//}).Debugf("TransferAndReceiveData - Receive")
 
 	o.TransferAndReceiveDataCallCount++
 	return nil
@@ -89,8 +89,8 @@ func (o *StubSPIBus) TransferAndReceiveData(data []byte) error {
 // Write - See embd.SPIBus
 func (o *StubSPIBus) Write(data []byte) (int, error) {
 	o.WriteCallCount++
-	log.WithFields(log.Fields{
-		"data": data,
-	}).Info("Write")
+	//log.WithFields(log.Fields{
+	//	"data": data,
+	//}).Debugf("Write")
 	return 1, nil
 }

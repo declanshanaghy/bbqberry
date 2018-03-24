@@ -157,12 +157,12 @@ func (o *runner) loop() {
 
 // StopBackground causes the background goroutine to exit
 func (o *runner) StopBackground() error {
-	log.WithField("name", o.tickable.GetName()).Infof("Stopping background routine")
-	defer log.WithField("name", o.tickable.GetName()).Infof("Stopping background routine succeeded")
-
 	if !o.running {
 		return fmt.Errorf("Cannot execute StopBackground on %s. Not running", o.tickable.GetName())
 	}
+
+	log.WithField("name", o.tickable.GetName()).Infof("Stopping background routine")
+	defer log.WithField("name", o.tickable.GetName()).Infof("Stopping background routine succeeded")
 
 	// Close the run channel which will cause the runner loop to exit
 	close(o.ch)
@@ -175,7 +175,6 @@ func (o *runner) StopBackground() error {
 		return fmt.Errorf("Timed out waiting for background task to exit: name=%s", o.tickable.GetName())
 	}
 
-	o.tickable = nil
 	return nil
 }
 

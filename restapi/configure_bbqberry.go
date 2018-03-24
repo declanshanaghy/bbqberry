@@ -110,7 +110,7 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 		func(params lights.UpdateGrillLightsParams) middleware.Responder {
 			err := commander.UpdateGrillLights(&params)
 			if ( err != nil ) {
-				return framework.HandleAPIRequestWithError(false, err)
+				return framework.HandleAPIRequestWithError(true, err)
 			} else {
 				return framework.HandleAPIRequestWithError(false, err)
 			}

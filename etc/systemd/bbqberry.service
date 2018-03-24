@@ -1,0 +1,13 @@
+[Unit]
+Description=BBQ Berry
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/deploy
+ExecStart=/home/pi/deploy/bbqberry --host=0.0.0.0 --port=8080 --static=/home/pi/go/src/github.com/declanshanaghy/bbqberry/static -S Rainbow
+Restart=on-failure # or always, on-abort, etc
+
+[Install]
+Wants=influxdb.target

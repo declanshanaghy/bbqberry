@@ -87,7 +87,7 @@ func init() {
           {
             "enum": [
               "Pulser",
-              "Shifter",
+              "Simple Shifter",
               "Rainbow",
               "Temperature"
             ],
