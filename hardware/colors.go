@@ -1,6 +1,5 @@
 package hardware
 
-
 const (
 	// RED is a pure red integer representation
 	RED = 0xFF0000

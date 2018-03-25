@@ -92,7 +92,6 @@ func (o *Commander) tick() error {
 
 func getLightShows(period time.Duration) map[string]RunnableTicker {
 	shows := []RunnableTicker {
-		newPulser(period),
 		newSimpleShifter(period),
 		newTemperatureIndicator(),
 		newRainbow(period),

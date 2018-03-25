@@ -236,6 +236,12 @@
 			"revisionTime": "2016-09-25T18:48:02Z"
 		},
 		{
+			"checksumSHA1": "qpEpl35oKsn3zTKgfVPF4i8+qio=",
+			"path": "github.com/lucasb-eyer/go-colorful",
+			"revision": "231272389856c976b7500c4fffcc52ddf06ff4eb",
+			"revisionTime": "2017-09-03T18:42:57Z"
+		},
+		{
 			"checksumSHA1": "Os9zOV8aOYDofmvtrJBfCPBC8nQ=",
 			"path": "github.com/mailru/easyjson/buffer",
 			"revision": "159cdb893c982e3d1bc6450322fedd514f9c9de3",

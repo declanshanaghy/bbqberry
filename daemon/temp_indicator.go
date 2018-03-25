@@ -7,6 +7,7 @@ import (
 	"github.com/declanshanaghy/bbqberry/db/influxdb"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/hardware"
+	"github.com/lucasb-eyer/go-colorful"
 )
 
 // temperatureIndicator collects and logs temperature metrics
@@ -67,7 +68,7 @@ func (o *temperatureIndicator) tick() error {
 	return nil
 }
 
-func getTempColor(temp, min, max int32) int {
+func getTempColor(temp, min, max int32) colorful.Color {
 	// Map the temperature to a color to be displayed on the LED pixels.
 	// cold / min = blue	( 0x0000FF ) =
 	// hot / max = red ( 0xFF0000 )
@@ -106,5 +107,5 @@ func getTempColor(temp, min, max int32) int {
 		"color": color,
 	}).Debugf("Calculating temperature color")
 
-	return color
+	return colorful.Color{R: float64(red), G: 0.0, B: float64(blu)}
 }

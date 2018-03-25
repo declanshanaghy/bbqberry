@@ -23,7 +23,7 @@ paths:
           in: query
           required: true
           type: string
-          enum: ["Pulser", "Simple Shifter", "Rainbow", "Temperature"]
+          enum: ["Simple Shifter", "Rainbow", "Temperature"]
         - name: period
           description: The time period between updates in microseconds
           in: query

@@ -5,6 +5,7 @@ import (
 
 	"github.com/Polarishq/middleware/framework/log"
 	"github.com/kidoman/embd"
+	"github.com/lucasb-eyer/go-colorful"
 )
 
 // WS2801 privdes an interface for communicating with an LED strip which uses the WS2801 chip
@@ -16,7 +17,7 @@ type WS2801 interface {
 	Update() error
 	SetPixelRGB(n int32, r uint8, g uint8, b uint8) error
 	SetPixelColor(n int32, color int) error
-	SetAllPixels(color int) error
+	SetAllPixels(color colorful.Color) error
 }
 
 type ws2801Strand struct {
@@ -74,13 +75,10 @@ func (s *ws2801Strand) SetPixelColor(n int32, color int) error {
 	return s.SetPixelRGB(n, uint8(color>>16&0xFF), uint8(color>>8&0xFF), uint8(color&0xFF))
 }
 
-func (s *ws2801Strand) SetAllPixels(color int) error {
-	//log.Debugf("action=SetAllPixels n=%d, color=%#06x", s.GetNumPixels(),color)
-	r := GetRed(color)
-	g := GetGreen(color)
-	b := GetBlue(color)
+func (s *ws2801Strand) SetAllPixels(color colorful.Color) error {
+	//log.Debugf("action=SetAllPixels n=%d, color=%#06x", s.GetNumPixels(), color)
+	r, g, b := color.RGB255()
 
-	// Set the pixel values
 	for i := int32(0); i < s.GetNumPixels(); i++ {
 		if err := s.SetPixelRGB(i, r, g, b); err != nil {
 			return err
