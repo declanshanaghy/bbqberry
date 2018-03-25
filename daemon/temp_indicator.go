@@ -8,6 +8,7 @@ import (
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/lucasb-eyer/go-colorful"
+	"fmt"
 )
 
 // temperatureIndicator collects and logs temperature metrics
@@ -104,8 +105,10 @@ func getTempColor(temp, min, max int32) colorful.Color {
 		"temp": temp,
 		"corrected": corrected,
 		"scaled": scaled,
-		"color": color,
-	}).Debugf("Calculating temperature color")
+		"red": fmt.Sprintf("0x%02x", red),
+		"blu": fmt.Sprintf("0x%02x", blu),
+		"color": fmt.Sprintf("0x%06x", color),
+	}).Infof("Calculating temperature color")
 
 	return colorful.Color{R: float64(red), G: 0.0, B: float64(blu)}
 }
