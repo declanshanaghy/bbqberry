@@ -55,43 +55,68 @@ func NewADS1115(addr byte, bus embd.I2CBus) *ads1x15 {
  */
 func (o *ads1x15) read(mux, gain, mode int) (int, error) {
 	config := ADS1x15_CONFIG_OS_SINGLE  // Go out of power-down mode for conversion.
+	log.WithField("config", fmt.Sprintf("%04x", config)).Debug("SINGLE")
 
 	// Specify mux value.
 	config |= (mux & 0x07) << ADS1x15_CONFIG_MUX_OFFSET
+	log.WithField("config", fmt.Sprintf("%04x", config)).Debug("MUXOFF")
 
 	// Validate the passed in gain and then set it in the config.
 	gainv, ok := ADS1x15_CONFIG_GAIN[gain]
 	if ! ok {
 		return ADS1x15_READ_FAIL, fmt.Errorf("Invalid gain %d, must be one of %v", gain, ADS1x15_CONFIG_GAIN)
 	}
-	config |= ADS1x15_CONFIG_GAIN[gainv]
+	config |= gainv
+	log.WithFields(log.Fields{
+		"config": fmt.Sprintf("%04x", config),
+		"gain": gain,
+		"gainv": fmt.Sprintf("%04x", gainv),
+		"ADS1x15_CONFIG_GAIN[gainv]": ADS1x15_CONFIG_GAIN[gainv],
+	}).Debug("GAIN")
 
 	// Set the mode (continuous or single shot).
 	config |= mode
+	log.WithField("config", fmt.Sprintf("%04x", config)).Debug("MODE")
 
 	// Set the data rate (this is controlled by the subclass as it differs between ADS1015 and ADS1115).
 	data_rate := ADS1115_CONFIG_DR_DEFAULT
 	config |= ADS1115_CONFIG_DR[data_rate]
+	log.WithField("config", fmt.Sprintf("%04x", config)).Debug("DATARATE")
 
 	config |= ADS1x15_CONFIG_COMP_QUE_DISABLE  // Disble comparator mode.
+	log.WithField("config", fmt.Sprintf("%04x", config)).Debug("COMFOFF")
 
 	// Send the config value to start the ADC conversion.
 	// Explicitly break the 16-bit value down to a big endian pair of bytes.
 	//self._device.writeList(ADS1x15_POINTER_CONFIG, [(config >> 8) & 0xFF, config & 0xFF])
-	err := o.bus.WriteToReg(o.addr, ADS1x15_POINTER_CONFIG, []byte{byte(config >> 8) & 0xFF, byte(config & 0xFF)})
+	wl := []byte{byte(config >> 8) & 0xFF, byte(config & 0xFF)}
+	log.WithFields(log.Fields{
+		"0": fmt.Sprintf("%02x", wl[0]),
+		"1": fmt.Sprintf("%02x", wl[1]),
+	}).Debug("WriteToReg")
+	err := o.bus.WriteToReg(o.addr, ADS1x15_POINTER_CONFIG, wl)
 	if err != nil {
 		return ADS1x15_READ_FAIL, err
 	}
 
 	// Wait for the ADC sample to finish based on the sample rate plus a
 	// small offset to be sure (0.1 millisecond).
-	// TODO: Check the value of this, i.e: nano seconds vs milliseconds
-	time.Sleep(time.Duration(1.0 / data_rate + int(time.Millisecond)))
+	s := (1.0 / float32(data_rate)) + float32(time.Millisecond)
+	time.Sleep(time.Duration(s))
+	log.WithFields(log.Fields{
+		"s": fmt.Sprintf("%f", s),
+	}).Debug("Sleep")
 
 	// Retrieve the result.
 	//result = self._device.readList(ADS1x15_POINTER_CONVERSION, 2)
 	result := make([]byte, 2)
 	err = o.bus.ReadFromReg(o.addr, ADS1x15_POINTER_CONVERSION, result)
+
+	log.WithFields(log.Fields{
+		"result1": fmt.Sprintf("%02x", result[1]),
+		"result0": fmt.Sprintf("%02x", result[0]),
+	}).Debug("read")
+
 	if err != nil {
 		return ADS1x15_READ_FAIL, err
 	}
@@ -116,13 +141,13 @@ func (o *ads1x15) convert(low, high byte) int {
 		"low": fmt.Sprintf("%02x", low),
 		"high": fmt.Sprintf("%02x", high),
 		"value": value,
-	}).Info("convert")
+	}).Debug("convert")
 
 	if value & 0x8000 != 0 {
 		value -= 1 << 16
 		log.WithFields(log.Fields{
 			"value": value,
-		}).Info("value munged - figure out why this is here")
+		}).Debug("value munged - figure out why this is here")
 	}
 
 	return value

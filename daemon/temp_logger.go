@@ -78,11 +78,10 @@ func (o *temperatureLogger) tick() error {
 
 func (o *temperatureLogger) collectTemperatureMetrics() ([]*models.TemperatureReading, error) {
 	nProbes := len(*o.probes)
-	log.WithField("nProbes", nProbes).Info("collecting temperature readings")
+	log.WithField("nProbes", nProbes).Debug("collecting temperature readings")
 
 	readings := make([]*models.TemperatureReading, 0)
 	for _, i := range(*o.probes) {
-		log.Infof("action=iterate probe i=%d, o=%v", i, *o)
 		reading := models.TemperatureReading{}
 		if err := o.reader.GetTemperatureReading(i, &reading); err != nil {
 			return nil, err

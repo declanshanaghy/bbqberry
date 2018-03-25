@@ -11,6 +11,19 @@ consumes:
 produces:
   - application/json
 paths:
+  /system/shutdown:
+    put:
+      operationId: shutdown
+      tags:
+        - System
+      summary: "Shutdown the Operating System"
+      responses:
+        200:
+          description: "Shutdown executed successfully"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
   /lights/grill:
     put:
       operationId: updateGrillLights
@@ -32,7 +45,7 @@ paths:
           minimum: 1
           default: 500000
       responses:
-        201:
+        200:
           description: "The lights were updated successfully"
         default:
           description: Unexpected error
@@ -51,7 +64,7 @@ paths:
           schema:
             $ref: "#/definitions/TemperatureMonitor"
       responses:
-        201:
+        200:
           description: "The monitor was created successfully"
         default:
           description: Unexpected error

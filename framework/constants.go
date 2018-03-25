@@ -18,10 +18,9 @@ func init() {
 		stub = true
 	}
 	/******************************** BEGIN PSEUDO CONSTANTS *********************************************/
-	/**/
 	// Electrical Constants
 	vcc := float32(3.3)
-	analogMax := int32(1024)
+	analogMax := int32(26453)
 
 	// Accessories
 	nPixels := int32(25)
@@ -34,7 +33,6 @@ func init() {
 
 	// Warn if temperature gets within this threshold of absolute limits
 	tempWarnThreshold := 0.2
-	/**/
 	/********************************* END PSEUDO CONSTANTS **********************************************/
 
 	minTempWarnAmbCelsius := int32(float64(tempLimitAbsAmbientLowCelsius) -
