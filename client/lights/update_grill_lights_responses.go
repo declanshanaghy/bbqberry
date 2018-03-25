@@ -23,8 +23,8 @@ type UpdateGrillLightsReader struct {
 func (o *UpdateGrillLightsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
 
-	case 201:
-		result := NewUpdateGrillLightsCreated()
+	case 200:
+		result := NewUpdateGrillLightsOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -42,23 +42,23 @@ func (o *UpdateGrillLightsReader) ReadResponse(response runtime.ClientResponse, 
 	}
 }
 
-// NewUpdateGrillLightsCreated creates a UpdateGrillLightsCreated with default headers values
-func NewUpdateGrillLightsCreated() *UpdateGrillLightsCreated {
-	return &UpdateGrillLightsCreated{}
+// NewUpdateGrillLightsOK creates a UpdateGrillLightsOK with default headers values
+func NewUpdateGrillLightsOK() *UpdateGrillLightsOK {
+	return &UpdateGrillLightsOK{}
 }
 
-/*UpdateGrillLightsCreated handles this case with default header values.
+/*UpdateGrillLightsOK handles this case with default header values.
 
 The lights were updated successfully
 */
-type UpdateGrillLightsCreated struct {
+type UpdateGrillLightsOK struct {
 }
 
-func (o *UpdateGrillLightsCreated) Error() string {
-	return fmt.Sprintf("[PUT /lights/grill][%d] updateGrillLightsCreated ", 201)
+func (o *UpdateGrillLightsOK) Error() string {
+	return fmt.Sprintf("[PUT /lights/grill][%d] updateGrillLightsOK ", 200)
 }
 
-func (o *UpdateGrillLightsCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UpdateGrillLightsOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

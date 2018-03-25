@@ -11,25 +11,25 @@ import (
 	"github.com/declanshanaghy/bbqberry/models"
 )
 
-// CreateMonitorCreatedCode is the HTTP code returned for type CreateMonitorCreated
-const CreateMonitorCreatedCode int = 201
+// CreateMonitorOKCode is the HTTP code returned for type CreateMonitorOK
+const CreateMonitorOKCode int = 200
 
-/*CreateMonitorCreated The monitor was created successfully
+/*CreateMonitorOK The monitor was created successfully
 
-swagger:response createMonitorCreated
+swagger:response createMonitorOK
 */
-type CreateMonitorCreated struct {
+type CreateMonitorOK struct {
 }
 
-// NewCreateMonitorCreated creates CreateMonitorCreated with default headers values
-func NewCreateMonitorCreated() *CreateMonitorCreated {
-	return &CreateMonitorCreated{}
+// NewCreateMonitorOK creates CreateMonitorOK with default headers values
+func NewCreateMonitorOK() *CreateMonitorOK {
+	return &CreateMonitorOK{}
 }
 
 // WriteResponse to the client
-func (o *CreateMonitorCreated) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+func (o *CreateMonitorOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.WriteHeader(201)
+	rw.WriteHeader(200)
 }
 
 /*CreateMonitorDefault Unexpected error

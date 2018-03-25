@@ -13,6 +13,7 @@ import (
 	"github.com/declanshanaghy/bbqberry/client/health"
 	"github.com/declanshanaghy/bbqberry/client/lights"
 	"github.com/declanshanaghy/bbqberry/client/monitors"
+	"github.com/declanshanaghy/bbqberry/client/system"
 	"github.com/declanshanaghy/bbqberry/client/temperatures"
 )
 
@@ -64,6 +65,8 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Bbqberry {
 	cli.Lights = lights.New(transport, formats)
 
 	cli.Monitors = monitors.New(transport, formats)
+
+	cli.System = system.New(transport, formats)
 
 	cli.Temperatures = temperatures.New(transport, formats)
 
@@ -119,6 +122,8 @@ type Bbqberry struct {
 
 	Monitors *monitors.Client
 
+	System *system.Client
+
 	Temperatures *temperatures.Client
 
 	Transport runtime.ClientTransport
@@ -135,6 +140,8 @@ func (c *Bbqberry) SetTransport(transport runtime.ClientTransport) {
 	c.Lights.SetTransport(transport)
 
 	c.Monitors.SetTransport(transport)
+
+	c.System.SetTransport(transport)
 
 	c.Temperatures.SetTransport(transport)
 

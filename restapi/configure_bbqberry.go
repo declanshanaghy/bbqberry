@@ -32,6 +32,7 @@ import (
 	"os/signal"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/lights"
 	"sync"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/system"
 )
 
 
@@ -108,12 +109,11 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 		})
 	api.LightsUpdateGrillLightsHandler = lights.UpdateGrillLightsHandlerFunc(
 		func(params lights.UpdateGrillLightsParams) middleware.Responder {
-			err := commander.UpdateGrillLights(&params)
-			if ( err != nil ) {
-				return framework.HandleAPIRequestWithError(true, err)
-			} else {
-				return framework.HandleAPIRequestWithError(false, err)
-			}
+			return framework.HandleAPIRequestWithError(commander.UpdateGrillLights(&params))
+		})
+	api.SystemShutdownHandler = system.ShutdownHandlerFunc(
+		func(params system.ShutdownParams) middleware.Responder {
+			return framework.HandleAPIRequestWithError(commander.ShutdownSystem(&params))
 		})
 
 	globalMiddleware := setupGlobalMiddleware(api.Serve(setupMiddlewares))

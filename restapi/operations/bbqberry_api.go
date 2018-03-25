@@ -20,6 +20,7 @@ import (
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/lights"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/monitors"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/system"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperatures"
 )
 
@@ -49,6 +50,9 @@ func NewBbqberryAPI(spec *loads.Document) *BbqberryAPI {
 		}),
 		HealthHealthHandler: health.HealthHandlerFunc(func(params health.HealthParams) middleware.Responder {
 			return middleware.NotImplemented("operation HealthHealth has not yet been implemented")
+		}),
+		SystemShutdownHandler: system.ShutdownHandlerFunc(func(params system.ShutdownParams) middleware.Responder {
+			return middleware.NotImplemented("operation SystemShutdown has not yet been implemented")
 		}),
 		LightsUpdateGrillLightsHandler: lights.UpdateGrillLightsHandlerFunc(func(params lights.UpdateGrillLightsParams) middleware.Responder {
 			return middleware.NotImplemented("operation LightsUpdateGrillLights has not yet been implemented")
@@ -81,6 +85,8 @@ type BbqberryAPI struct {
 	TemperaturesGetTemperaturesHandler temperatures.GetTemperaturesHandler
 	// HealthHealthHandler sets the operation handler for the health operation
 	HealthHealthHandler health.HealthHandler
+	// SystemShutdownHandler sets the operation handler for the shutdown operation
+	SystemShutdownHandler system.ShutdownHandler
 	// LightsUpdateGrillLightsHandler sets the operation handler for the update grill lights operation
 	LightsUpdateGrillLightsHandler lights.UpdateGrillLightsHandler
 
@@ -164,6 +170,10 @@ func (o *BbqberryAPI) Validate() error {
 
 	if o.HealthHealthHandler == nil {
 		unregistered = append(unregistered, "health.HealthHandler")
+	}
+
+	if o.SystemShutdownHandler == nil {
+		unregistered = append(unregistered, "system.ShutdownHandler")
 	}
 
 	if o.LightsUpdateGrillLightsHandler == nil {
@@ -274,6 +284,11 @@ func (o *BbqberryAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/health"] = health.NewHealth(o.context, o.HealthHealthHandler)
+
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/system/shutdown"] = system.NewShutdown(o.context, o.SystemShutdownHandler)
 
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)

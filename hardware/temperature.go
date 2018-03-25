@@ -83,7 +83,7 @@ func (o *temperatureReader) readProbe(probe int32) (a int32, err error) {
 	log.WithFields(log.Fields{
 		"probe": probe,
 		"a": a,
-	}).Infof("Read probe")
+	}).Debug("Read probe")
 
 	return int32(a), err
 }
@@ -101,7 +101,7 @@ func (o *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 	probeLimits := physProbe.Limits
 
 	tempK, tempC, tempF := framework.AdafruitAD8495ThermocoupleVtoKCF(vOut)
-	log.Infof("probe=%d A=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
+	log.Debugf("probe=%d A=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
 		probe, analog, vOut, tempK, tempC, tempF, probeLimits.MinWarnCelsius, probeLimits.MaxWarnCelsius)
 
 	if tempC < *probeLimits.MinWarnCelsius {

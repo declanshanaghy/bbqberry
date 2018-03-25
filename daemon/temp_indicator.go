@@ -36,7 +36,7 @@ func (o *temperatureIndicator) GetName() string {
 
 // Start performs initialization before the first tick
 func (o *temperatureIndicator) start() error {
-	return o.tick()
+	return nil
 }
 
 // Stop performs cleanup when the goroutine is exiting
