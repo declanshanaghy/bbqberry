@@ -4,6 +4,7 @@ import (
 	"time"
 	"github.com/declanshanaghy/bbqberry/hardware"
 	"github.com/Polarishq/middleware/framework/log"
+	"github.com/lucasb-eyer/go-colorful"
 )
 
 // rainbow displays a single colored pulse on the strand
@@ -57,7 +58,7 @@ def wheel(pos):
         pos -= 170
         return Adafruit_WS2801.RGB_to_color(0, pos * 3, 255 - pos * 3)
 */
-func (o *rainbow) wheel(pos int) int {
+func (o *rainbow) wheel(pos int) colorful.Color {
 	if pos < 85 {
 		return hardware.Color(pos * 3, 255 - pos * 3, 0)
 	} else if pos < 170 {

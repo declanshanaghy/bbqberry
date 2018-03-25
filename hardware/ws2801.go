@@ -16,7 +16,7 @@ type WS2801 interface {
 	Off() error
 	Update() error
 	SetPixelRGB(n int32, r uint8, g uint8, b uint8) error
-	SetPixelColor(n int32, color int) error
+	SetPixelColor(n int32, color colorful.Color) error
 	SetAllPixels(color colorful.Color) error
 }
 
@@ -46,7 +46,7 @@ func (s *ws2801Strand) GetNumPixels() int32 {
 func (s *ws2801Strand) Off() error {
 	log.Infof("action=Off nPixels=%d", s.GetNumPixels())
 	for i := int32(0); i < s.GetNumPixels(); i++ {
-		s.SetPixelColor(i, 0)
+		s.SetPixelColor(i, BLACK)
 	}
 	return s.Update()
 }
@@ -59,20 +59,13 @@ func (s *ws2801Strand) Close() error {
 
 func (s *ws2801Strand) Update() error {
 	copy(s.data, s.pixels)
-
-	pixels := make([]string, s.GetNumPixels())
-	for i:=0; i<int(s.GetNumPixels()); i++ {
-		pixels[i] = fmt.Sprintf("0x%06x", Color(int(s.data[i]), int(s.data[i * 3 + 1]), int(s.data[i * 3 + 2])))
-	}
-	//log.Debugf("Update pixels=%v", pixels)
-
 	_, err := s.bus.Write(s.data)
 	return err
 }
 
-func (s *ws2801Strand) SetPixelColor(n int32, color int) error {
-	//log.Debugf("action=SetPixelColor n=%d, color=%#06x", n, color)
-	return s.SetPixelRGB(n, uint8(color>>16&0xFF), uint8(color>>8&0xFF), uint8(color&0xFF))
+func (s *ws2801Strand) SetPixelColor(n int32, color colorful.Color) error {
+	r, g, b := color.RGB255()
+	return s.SetPixelRGB(n, r, g, b)
 }
 
 func (s *ws2801Strand) SetAllPixels(color colorful.Color) error {

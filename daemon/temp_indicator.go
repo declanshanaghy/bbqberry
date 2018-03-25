@@ -96,7 +96,7 @@ func getTempColor(temp, min, max int32) colorful.Color {
 	red := int(255 * scaled)
 	blu := 0xFF - red
 
-	color := red<<16 | blu
+	color := colorful.Color{R: float64(red) / 255, G: 0.0, B: float64(blu) / 255}
 
 	log.WithFields(log.Fields{
 		"min": min,
@@ -107,8 +107,8 @@ func getTempColor(temp, min, max int32) colorful.Color {
 		"scaled": scaled,
 		"red": fmt.Sprintf("0x%02x", red),
 		"blu": fmt.Sprintf("0x%02x", blu),
-		"color": fmt.Sprintf("0x%06x", color),
-	}).Infof("Calculating temperature color")
+		"colorHex": color.Hex(),
+	}).Debugf("Calculating temperature color")
 
-	return colorful.Color{R: float64(red), G: 0.0, B: float64(blu)}
+	return color
 }
