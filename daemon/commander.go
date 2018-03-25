@@ -10,8 +10,6 @@ import (
 	"github.com/declanshanaghy/bbqberry/restapi/operations/lights"
 	"fmt"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/system"
-	"strings"
-	"bytes"
 	"os/exec"
 )
 
@@ -128,16 +126,42 @@ func (o *Commander) UpdateGrillLights(params *lights.UpdateGrillLightsParams) (b
 	}
 }
 
-func (o *Commander) ShutdownSystem(params *system.ShutdownParams) (bool, error) {
-	cmd := exec.Command("sudo shutdown", "-h", "now")
-	cmd.Stdin = strings.NewReader("some input")
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
+func (o *Commander) ShutdownSystem(params *system.ShutdownParams) (map[string]interface{}, error) {
+	tNow := time.Now().Local()
+	tShdn := tNow.Add(time.Minute * time.Duration(1))
+
+	//Shutdown uses time format of hh:mm
+	tShutdownAbbr := fmt.Sprintf("%04d/%02d/%02d %02d:%02d", tShdn.Year(), tShdn.Month(),
+		tShdn.Day(), tShdn.Hour(), tShdn.Minute())
+	tShutdown := fmt.Sprintf("%02d:%02d", tShdn.Hour(), tShdn.Minute())
+
+	tActual, err := time.ParseInLocation("2006/01/02 15:04" , tShutdownAbbr, time.Local)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
-	return true, nil
+
+	tDiff := tActual.Sub(tNow).Round(time.Second)
+
+	log.WithFields(log.Fields{
+		"tNow": tNow,
+		"tShdn": tShdn,
+		"tActual": tActual,
+		"tDiff": tDiff,
+		"tShutdown": tShutdown,
+	}).Info("Shutting down at specified time")
+
+	out, err := exec.Command("/usr/bin/sudo", "/sbin/shutdown", "-h", tShutdown,
+		"BBQBerry initiated shutdown").Output()
+	if err != nil {
+		return nil, err
+	}
+
+	r := make(map[string]interface{})
+	r["ShutdownTime"] = tActual
+	r["Output"] = out
+	r["Message"] = fmt.Sprintf("Will shutdown in %s", tDiff)
+
+	return r, nil
 }
 
 func (o *Commander) changeLightShow(lightShow *RunnableTicker, period int64) error {
