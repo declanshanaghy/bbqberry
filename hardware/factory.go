@@ -51,7 +51,7 @@ func newSPIBus(channel byte) embd.SPIBus {
 	return embd.NewSPIBus(embd.SPIMode0, channel, 1000000, 8, 0)
 }
 
-func newI2CBus(address byte) embd.I2CBus {
+func newI2CBus(device byte) embd.I2CBus {
 	if framework.Constants.Stub {
 		//log.Warningf("action=NewSPIBus channel=%d STUBBED", channel)
 		if StubI2CBus == nil {
@@ -59,8 +59,8 @@ func newI2CBus(address byte) embd.I2CBus {
 		}
 		return StubI2CBus
 	}
-	log.Debugf("action=newI2CBus address=%d", address)
-	return embd.NewI2CBus(address)
+	log.Debugf("action=newI2CBus device=%d", device)
+	return embd.NewI2CBus(device)
 }
 
 // NewADS1115 creates an abstracted ADC based on the ADS1115 I2C chip

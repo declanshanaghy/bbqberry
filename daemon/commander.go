@@ -49,7 +49,7 @@ func (o *Commander) GetName() string {
 }
 
 // Start performs initialization before the first tick
-func (o *Commander) start() (bool, error) {
+func (o *Commander) start() (error) {
 	o.tempLogger = newTemperatureLoggerRunnable()
 	if o.Options.TemperatureLoggerEnabled {
 		o.EnableTemperatureLogger()
@@ -57,7 +57,7 @@ func (o *Commander) start() (bool, error) {
 
 	show, err := o.getLightShow(o.Options.LightShow)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	p := lights.UpdateGrillLightsParams{
@@ -66,7 +66,9 @@ func (o *Commander) start() (bool, error) {
 		// the time.Duration by 1000 because it is in nanoseconds
 		Period: int64(show.tickable.getPeriod() / 1000),
 	}
-	return o.UpdateGrillLights(&p)
+
+	_, err = o.UpdateGrillLights(&p)
+	return err
 }
 
 // Stop performs cleanup when the goroutine is exiting
