@@ -20,7 +20,7 @@ func newRainbow(period time.Duration) RunnableTicker {
 	t := &rainbow{
 		strip: hardware.NewStrandController(),
 	}
-	t.Period = time.Millisecond * 10
+	t.Period = period
 
 	return newRunnableTicker(t)
 }

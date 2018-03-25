@@ -176,6 +176,12 @@
 			"revisionTime": "2016-08-17T18:46:32Z"
 		},
 		{
+			"checksumSHA1": "AF5ZWaxfjyXLpOyl1HYLb2CmRPM=",
+			"path": "github.com/heatxsink/go-hue/portal",
+			"revision": "077c5fe843490c62dfd36c7eee473f314dc5d605",
+			"revisionTime": "2017-01-08T21:14:35Z"
+		},
+		{
 			"checksumSHA1": "Sml5LNx5VuFIyMAjSLlRzUR9Ylc=",
 			"path": "github.com/influxdata/influxdb/client",
 			"revision": "6f027ac60e48a767087cc4903b4431ae2922886c",

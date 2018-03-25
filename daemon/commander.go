@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/system"
 	"os/exec"
+	"github.com/heatxsink/go-hue/portal"
 )
 
 // Commander is the main controller of all background goroutines
@@ -25,6 +26,7 @@ type Commander struct {
 	currentShow *RunnableTicker
 	lightShows  map[string]RunnableTicker
 	strip       hardware.WS2801
+	huePortal   *portal.Portal
 }
 
 // NewCommander creates a Commander instance which can be
@@ -34,7 +36,6 @@ func NewCommander() *Commander {
 	c := Commander{
 		Options: 	framework.NewCmdOptions(),
 		strip: 		hardware.NewStrandController(),
-		lightShows: getLightShows(1000000000),
 	}
 	c.runner.tickable = &c
 	c.runner.tickable.setPeriod(time.Second)
@@ -46,8 +47,25 @@ func (o *Commander) GetName() string {
 	return "Commander"
 }
 
+func (o *Commander) initializeHue() error {
+	pp, err := portal.GetPortal()
+	if err != nil {
+		return err
+	}
+	o.huePortal = &pp[0]
+
+	return nil
+}
+
 // Start performs initialization before the first tick
 func (o *Commander) start() (error) {
+	err := o.initializeHue()
+	if err != nil {
+		log.WithField("err", err).Error("Unable to initialize hue, functionality will be disabled")
+	}
+
+	o.initializeLightShows()
+
 	o.tempLogger = newTemperatureLoggerRunnable()
 	if o.Options.TemperatureLoggerEnabled {
 		o.EnableTemperatureLogger()
@@ -94,17 +112,18 @@ func (o *Commander) tick() error {
 	return nil
 }
 
-func getLightShows(period time.Duration) map[string]RunnableTicker {
+func (o* Commander) initializeLightShows() {
 	shows := []RunnableTicker {
-		newSimpleShifter(period),
-		newTemperatureIndicator(),
-		newRainbow(period),
+		newSimpleShifter(time.Second),
+		newTemperatureIndicator(o.huePortal),
+		newRainbow(time.Millisecond * 100),
 	}
 	lightShows := make(map[string]RunnableTicker)
 	for _, show := range(shows) {
 		lightShows[show.tickable.GetName()] = show
 	}
-	return lightShows
+
+	o.lightShows = lightShows
 }
 
 func (o* Commander) getLightShow(name string) (RunnableTicker, error) {

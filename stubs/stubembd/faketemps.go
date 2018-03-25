@@ -56,8 +56,7 @@ func getFakeTemp(probe int32) int32 {
 		"probe":   probe,
 		"analog":  fakeTemps[probe],
 		"celcius": celcius,
-	}).Infof("Got fake probe value")
-
+	}).Debugf("Got fake probe value")
 
 	if analog >= max {
 	   analog = min
@@ -71,7 +70,7 @@ func getFakeTemp(probe int32) int32 {
 		"probe": probe,
 		"analog2": analog2,
 		"celcius": celcius,
-	}).Infof("Probe updated")
+	}).Debugf("Probe updated")
 
 	return analog
 }

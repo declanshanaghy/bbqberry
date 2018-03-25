@@ -12,6 +12,9 @@ const DefaultDB = "bbqberry"
 var Enabled = true
 var Disabled = false
 
+const HUE_KEY = "5EPXHOGHzm7TGha3IFumdF2bTLdcwuae-21iQguC"
+const HUE_ALERT_GROUP = "Bar"
+
 func init() {
 	stub := false
 	if os.Getenv("STUB") != "" {
@@ -70,13 +73,13 @@ func init() {
 	probes := []*models.TemperatureProbe{
 		{
 			Label:  	&chamberA,
-			Enabled:	&Enabled,
+			Enabled:	&Disabled,
 			Limits: 	&ambient,
 		},
 		{
 			Label:  	&chamberB,
 			Enabled:	&Disabled,
-			Limits: 	&ambient,
+			Limits: 	&cooking,
 		},
 		{
 			Label:  	&probeA,
@@ -85,8 +88,8 @@ func init() {
 		},
 		{
 			Label:  	&probeB,
-			Enabled:	&Disabled,
-			Limits: 	&cooking,
+			Enabled:	&Enabled,
+			Limits: 	&ambient,
 		},
 	}
 

@@ -59,7 +59,7 @@ func (o *StubI2CBus) ReadFromReg(addr, reg byte, value []byte) error {
 		"a": a,
 		"value1": fmt.Sprintf("%02x", value[1]),
 		"value0": fmt.Sprintf("%02x", value[0]),
-	}).Info("ReadFromReg")
+	}).Debugf("ReadFromReg")
 
 	return nil
 }
