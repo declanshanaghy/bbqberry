@@ -4,6 +4,7 @@ import (
 	"github.com/Polarishq/middleware/framework/log"
 	"math/rand"
 	"github.com/declanshanaghy/bbqberry/framework"
+	"time"
 )
 
 // fakeTemps can be o.t to return specific analog readings during tests
@@ -14,14 +15,16 @@ func init() {
 }
 
 func resetFakeTemps() {
+	rand.Seed( time.Now().UTC().UnixNano())
+
 	hwCfg := framework.Constants.Hardware
 
 	if framework.Constants.Stub {
 		nProbes := int32(len(hwCfg.Probes))
 		for probe := int32(0); probe < nProbes; probe++ {
 			limit := framework.Constants.Hardware.Probes[probe].Limits
-			min := framework.ConvertCelsiusToAnalog(-15)
-			max := framework.ConvertCelsiusToAnalog(*limit.MaxAbsCelsius)
+			min := framework.ConvertCelsiusToAnalog(*limit.MinAbsCelsius - 15)
+			max := framework.ConvertCelsiusToAnalog(*limit.MaxAbsCelsius + 15)
 			analog := int32(rand.Intn(int(min)) + int(max-min))
 			celcius, _ := framework.ConvertAnalogToCF(analog)
 			fakeTemps[probe] = analog
@@ -42,13 +45,13 @@ func SetFakeTemp(probe int32, analog int32) {
 		"probe":   probe,
 		"analog":  analog,
 		"celcius": celcius,
-	}).Infof("Set fake probe value")
+	}).Info("Set fake probe value")
 }
 
 func getFakeTemp(probe int32) int32 {
 	limit := framework.Constants.Hardware.Probes[probe].Limits
-	min := framework.ConvertCelsiusToAnalog(-15)
-	max := framework.ConvertCelsiusToAnalog(*limit.MaxAbsCelsius)
+	min := framework.ConvertCelsiusToAnalog(*limit.MinAbsCelsius - 15)
+	max := framework.ConvertCelsiusToAnalog(*limit.MaxAbsCelsius + 15)
 	analog := fakeTemps[probe]
 	celcius, _ := framework.ConvertAnalogToCF(analog)
 
@@ -56,7 +59,7 @@ func getFakeTemp(probe int32) int32 {
 		"probe":   probe,
 		"analog":  fakeTemps[probe],
 		"celcius": celcius,
-	}).Debugf("Got fake probe value")
+	}).Debug("Got fake probe value")
 
 	if analog >= max {
 	   analog = min
@@ -64,13 +67,14 @@ func getFakeTemp(probe int32) int32 {
 	celcius, _ = framework.ConvertAnalogToCF(analog)
 	analog2 := framework.ConvertCelsiusToAnalog(celcius + 1)
 
-	fakeTemps[probe] = analog
+	fakeTemps[probe] = analog2
 
 	log.WithFields(log.Fields{
 		"probe": probe,
+		"analog": analog,
 		"analog2": analog2,
 		"celcius": celcius,
-	}).Debugf("Probe updated")
+	}).Debug("Probe updated")
 
 	return analog
 }

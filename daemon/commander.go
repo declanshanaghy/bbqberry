@@ -22,7 +22,7 @@ type Commander struct {
 	Options     *framework.CmdOptions
 
 	period      time.Duration
-	tempLogger  Runnable
+	tempLoggers [2]Runnable
 	currentShow *RunnableTicker
 	lightShows  map[string]RunnableTicker
 	strip       hardware.WS2801
@@ -66,9 +66,12 @@ func (o *Commander) start() (error) {
 
 	o.initializeLightShows()
 
-	o.tempLogger = newTemperatureLoggerRunnable()
+	o.tempLoggers = [2]Runnable {
+		newInfluxDBLoggerRunnable(),
+		newDynamoDBLoggerRunnable(),
+	}
 	if o.Options.TemperatureLoggerEnabled {
-		o.EnableTemperatureLogger()
+		o.EnableTemperatureLogging()
 	}
 
 	show, err := o.getLightShow(o.Options.LightShow)
@@ -89,10 +92,8 @@ func (o *Commander) start() (error) {
 
 // Stop performs cleanup when the goroutine is exiting
 func (o *Commander) stop() error {
-	if o.tempLogger != nil && o.tempLogger.IsRunning() {
-		if err := o.tempLogger.StopBackground(); err != nil {
-			log.Error(err.Error())
-		}
+	if err := o.DisableTemperatureLogging(); err != nil {
+		log.Error(err.Error())
 	}
 
 	if err := o.DisableLights(); err != nil {
@@ -199,12 +200,30 @@ func (o *Commander) changeLightShow(lightShow *RunnableTicker, period int64) err
 	return nil
 }
 
-func (o *Commander) EnableTemperatureLogger() error {
-	if ! o.tempLogger.IsRunning() {
-		log.WithField("type", reflect.TypeOf(o.tempLogger)).
-			Info("Enabling temperature logger")
-		if err := o.tempLogger.StartBackground(); err != nil {
-			return err
+func (o *Commander) EnableTemperatureLogging() error {
+	for _, tempLogger := range(o.tempLoggers) {
+		if ! tempLogger.IsRunning() {
+			log.WithField("type", reflect.TypeOf(tempLogger)).
+				Info("Enabling temperature logger")
+			if err := tempLogger.StartBackground(); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (o *Commander) DisableTemperatureLogging() error {
+	for _, tempLogger := range(o.tempLoggers) {
+		log.WithFields(log.Fields{
+			"running": tempLogger.IsRunning(),
+		}).Info("Disabling temperature logger")
+
+		if tempLogger.IsRunning() {
+			if err := tempLogger.StopBackground(); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -228,16 +247,3 @@ func (o *Commander) DisableLights() error {
 	return nil
 }
 
-func (o *Commander) DisableTemperatureLogger() error {
-	log.WithFields(log.Fields{
-		"running": o.tempLogger.IsRunning(),
-	}).Info("Disabling temperature logger")
-
-	if o.tempLogger.IsRunning() {
-		if err := o.tempLogger.StopBackground(); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}

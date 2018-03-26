@@ -14,6 +14,7 @@ var Disabled = false
 
 const HUE_KEY = "5EPXHOGHzm7TGha3IFumdF2bTLdcwuae-21iQguC"
 const HUE_ALERT_GROUP = "Bar"
+const AWS_DEFAULT_REGION = "us-east-1"
 
 func init() {
 	stub := false
@@ -66,28 +67,28 @@ func init() {
 		MaxAbsCelsius:  &tempLimitAbsCookingHighCelsiusI32,
 	}
 
-	chamberA := "Chamber A"
-	chamberB := "Chamber B"
-	probeA := "Probe A"
-	probeB := "Probe B"
-	probes := []*models.TemperatureProbe{
+	chamber 	:= "Chamber"
+	chamberAlt 	:= "Chamber Alt"
+	food 		:= "Food"
+	foodAlt 	:= "Food Alt"
+	probes 		:= []*models.TemperatureProbe{
 		{
-			Label:  	&chamberA,
+			Label:  	&chamberAlt,
 			Enabled:	&Disabled,
 			Limits: 	&ambient,
 		},
 		{
-			Label:  	&chamberB,
+			Label:  	&food,
 			Enabled:	&Disabled,
 			Limits: 	&cooking,
 		},
 		{
-			Label:  	&probeA,
+			Label:  	&foodAlt,
 			Enabled:	&Disabled,
 			Limits: 	&cooking,
 		},
 		{
-			Label:  	&probeB,
+			Label:  	&chamber,
 			Enabled:	&Enabled,
 			Limits: 	&ambient,
 		},
