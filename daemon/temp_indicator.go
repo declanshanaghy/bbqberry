@@ -127,7 +127,7 @@ func (o *temperatureIndicator) tick() error {
 		"color": color.Hex(),
 		"(r, g, b)": fmt.Sprintf("(%02x, %02x, %02x)", r, g, b),
 		"(h, s, l)": fmt.Sprintf("(%d, %d, %d)", h, s, l),
-	}).Info("Mapped color to hue")
+	}).Debugf("Mapped color to hue")
 
 	o.hueGroups.SetGroupState(o.hueGroup.ID, *o.currentState)
 	return nil
