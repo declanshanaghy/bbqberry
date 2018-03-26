@@ -104,6 +104,10 @@ func (o *temperatureLogger) logTemperatureMetrics(readings []*models.Temperature
 			"Kelvin":     *reading.Kelvin,
 			"Warning":    reading.Warning,
 		}
+		log.WithFields(log.Fields{
+			"Probe": tags["Probe"],
+			"Fahrenheit": fields["Fahrenheit"],
+		}).Debugf("Logging temperature")
 		if _, err := influxdb.WritePoint("temp", tags, fields); err != nil {
 			return err
 		}

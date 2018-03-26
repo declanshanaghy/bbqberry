@@ -176,6 +176,12 @@
 			"revisionTime": "2016-08-17T18:46:32Z"
 		},
 		{
+			"checksumSHA1": "AF5ZWaxfjyXLpOyl1HYLb2CmRPM=",
+			"path": "github.com/heatxsink/go-hue/portal",
+			"revision": "077c5fe843490c62dfd36c7eee473f314dc5d605",
+			"revisionTime": "2017-01-08T21:14:35Z"
+		},
+		{
 			"checksumSHA1": "Sml5LNx5VuFIyMAjSLlRzUR9Ylc=",
 			"path": "github.com/influxdata/influxdb/client",
 			"revision": "6f027ac60e48a767087cc4903b4431ae2922886c",
@@ -234,6 +240,12 @@
 			"path": "github.com/kidoman/embd/convertors/mcp3008",
 			"revision": "adc3d473054c5f066be48c9459107f70021c34a4",
 			"revisionTime": "2016-09-25T18:48:02Z"
+		},
+		{
+			"checksumSHA1": "qpEpl35oKsn3zTKgfVPF4i8+qio=",
+			"path": "github.com/lucasb-eyer/go-colorful",
+			"revision": "231272389856c976b7500c4fffcc52ddf06ff4eb",
+			"revisionTime": "2017-09-03T18:42:57Z"
 		},
 		{
 			"checksumSHA1": "Os9zOV8aOYDofmvtrJBfCPBC8nQ=",

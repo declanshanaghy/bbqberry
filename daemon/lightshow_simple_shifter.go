@@ -54,10 +54,10 @@ func (o *simpleShifter) tick() error {
 		"action":  "method_entry",
 	}).Debug("simpleShifter updating lights")
 
-	if err := o.strip.SetPixelColor(o.lastled, 0x000000); err != nil {
+	if err := o.strip.SetPixelColor(o.lastled, hardware.BLACK); err != nil {
 		log.Error(err.Error())
 	}
-	if err := o.strip.SetPixelColor(o.curled, 0xFF0000); err != nil {
+	if err := o.strip.SetPixelColor(o.curled, hardware.GREEN); err != nil {
 		log.Error(err.Error())
 	}
 	if err := o.strip.Update(); err != nil {

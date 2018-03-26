@@ -25,7 +25,6 @@ type TemperatureReader interface {
 
 type temperatureReader struct {
 	numProbes int32
-	//bus       embd.SPIBus
 	bus       embd.I2CBus
 	adc       ADC
 }
@@ -36,7 +35,6 @@ func newTemperatureReader(numProbes int32, bus embd.I2CBus) TemperatureReader {
 	return &temperatureReader{
 		numProbes: numProbes,
 		bus:       bus,
-		//adc:       NewMCP3008(bus),
 		adc:       NewADS1115(bus),
 	}
 }
@@ -101,7 +99,7 @@ func (o *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 	probeLimits := physProbe.Limits
 
 	tempK, tempC, tempF := framework.AdafruitAD8495ThermocoupleVtoKCF(vOut)
-	log.Debugf("probe=%d A=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
+	log.Infof("probe=%d A=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
 		probe, analog, vOut, tempK, tempC, tempF, probeLimits.MinWarnCelsius, probeLimits.MaxWarnCelsius)
 
 	if tempC < *probeLimits.MinWarnCelsius {

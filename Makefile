@@ -37,8 +37,9 @@ upload_scp: stop_bbqberry build_bbqberry
 
 upload_config:
 	@echo "Uploading config..."
-	@scp -p etc/systemd/bbqberry.service pi@bbqberry-gaff:/home/pi/go/src/github.com/declanshanaghy/bbqberry/etc/systemd/
+	@scp -rp etc/systemd/ pi@bbqberry-gaff:/home/pi/go/src/github.com/declanshanaghy/bbqberry/etc/
 	@ssh pi@bbqberry-gaff sudo cp /home/pi/go/src/github.com/declanshanaghy/bbqberry/etc/systemd/bbqberry.service /usr/lib/systemd/system/bbqberry.service
+	@ssh pi@bbqberry-gaff sudo cp /home/pi/go/src/github.com/declanshanaghy/bbqberry/etc/systemd/systemd-shutdown/* /usr/lib/systemd/system-shutdown/
 	@echo "Upload complete"
 
 reload_config:
