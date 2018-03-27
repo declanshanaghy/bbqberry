@@ -39,7 +39,7 @@ func newTemperatureIndicator(huePortal *portal.Portal) RunnableTicker {
 		huePortal:		huePortal,
 		probeNumber:	-1,
 		hueUpdTime:		time.Now(),
-		hueUpdInterval: time.Second * 5,
+		hueUpdInterval: time.Second * 10,
 	}
 	t.Period = time.Second
 
@@ -61,9 +61,22 @@ func (o *temperatureIndicator) start() error {
 		log.WithField("group", framework.HUE_ALERT_GROUP).Info("Searching for group")
 		for _, g := range allGroups {
 			if g.Name == framework.HUE_ALERT_GROUP {
-				log.WithField("group", g).Info("Found hue group")
+				log.WithFields(log.Fields{
+					"group": g,
+					"Action": g.Action,
+				}).Info("Found hue group")
 				o.hueGroup = &g
-				o.initialState = &o.hueGroup.Action
+				o.initialState = &lights.State{
+					On: g.Action.On,
+					Hue: g.Action.Hue,
+					Effect: g.Action.Effect,
+					Bri: g.Action.Bri,
+					Sat: g.Action.Sat,
+					CT: g.Action.CT,
+					XY: g.Action.XY,
+					Alert: "",
+					TransitionTime: g.Action.TransitionTime,
+				}
 				o.currentState = &lights.State{On: true}
 				break
 			}
@@ -120,18 +133,47 @@ func (o *temperatureIndicator) tick() error {
 		return err
 	}
 
-	if time.Now().Sub(o.hueUpdTime) > 0 {
-		h, s, l := hardware.ColorToHue(color)
+	if time.Now().Sub(o.hueUpdTime) >= 0 {
+		h, s, l := hardware.ColorToPhilipsHueHSB(color)
+
 		o.currentState.Hue = h
 		o.currentState.Sat = s
 		o.currentState.Bri = l
 
-		o.hueGroups.SetGroupState(o.hueGroup.ID, *o.currentState)
+		if *avg.Celsius > max {
+			// If max is exceeded ensure the alert is flashing
+			o.currentState.Alert = "lselect"
+
+			log.WithFields(log.Fields{
+				"Celsius": *avg.Celsius,
+				"color": color.Hex(),
+				"name": o.hueGroup.Name,
+				"nextHueUpdate": o.hueUpdTime,
+				"hueUpdTime": o.hueUpdTime,
+				"Alert": o.currentState.Alert,
+			}).Info("Updated hue to alert state")
+
+			o.hueGroups.SetGroupState(o.hueGroup.ID, *o.currentState)
+		} else if (*o.currentState).Alert == "lselect" && *avg.Celsius < max  {
+			//If the current state is an alert and the temp decreased, update hue
+			o.currentState.Alert = ""
+
+			log.WithFields(log.Fields{
+				"Celsius": *avg.Celsius,
+				"color": color.Hex(),
+				"name": o.hueGroup.Name,
+				"nextHueUpdate": o.hueUpdTime,
+				"hueUpdTime": o.hueUpdTime,
+				"Alert": o.currentState.Alert,
+			}).Info("Cleared hue from alert state")
+
+			o.hueGroups.SetGroupState(o.hueGroup.ID, *o.initialState)
+		}
 		o.hueUpdTime = time.Now().Add(o.hueUpdInterval)
 	}
 
 	log.WithFields(log.Fields{
-		"temp": *avg.Fahrenheit,
+		"Celsius": *avg.Celsius,
 		"color": color.Hex(),
 		"name": o.hueGroup.Name,
 		"nextHueUpdate": o.hueUpdTime,
@@ -152,11 +194,11 @@ func getTempColor(temp, min, max int32) colorful.Color {
 	// If the max limit is exceeded a visual indicator should be displayed (i.e. flashing)
 
 	if temp < min {
-		log.Warningf("Temp (%d) < min (%d)...clamping", temp, min)
+		log.Warningf("%d° C is less than min %d° C...clamping", temp, min)
 		temp = min
 	}
 	if temp > max {
-		log.Warningf("Temp (%d) > max (%d)...clamping", temp, max)
+		log.Warningf("%d° C is greater than max %d° C...clamping", temp, max)
 		temp = max
 	}
 

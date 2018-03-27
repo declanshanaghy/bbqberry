@@ -241,6 +241,7 @@ func (o *dynamoDBLogger) writeCurrentStateToDynamoDB(currentState string) error 
 		}).Info("Writing CurrentState to DynamoDB")
 
 		_, err := o.dynamo.UpdateItem(input)
+
 		return err
 	}
 

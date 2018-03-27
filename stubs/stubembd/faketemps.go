@@ -5,10 +5,12 @@ import (
 	"math/rand"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"time"
+	"sync"
 )
 
 // fakeTemps can be o.t to return specific analog readings during tests
 var fakeTemps = make(map[int32]int32, 0)
+var mux = &sync.Mutex{}
 
 func init() {
 	resetFakeTemps()
@@ -23,9 +25,9 @@ func resetFakeTemps() {
 		nProbes := int32(len(hwCfg.Probes))
 		for probe := int32(0); probe < nProbes; probe++ {
 			limit := framework.Constants.Hardware.Probes[probe].Limits
-			min := framework.ConvertCelsiusToAnalog(*limit.MinAbsCelsius - 15)
-			max := framework.ConvertCelsiusToAnalog(*limit.MaxAbsCelsius + 15)
-			analog := int32(rand.Intn(int(min)) + int(max-min))
+			min := framework.ConvertCelsiusToAnalog(*limit.MinWarnCelsius - 15)
+			//max := framework.ConvertCelsiusToAnalog(*limit.MaxAbsCelsius)
+			analog := min //int32(rand.Intn(int(min)) + int(max-min))
 			celcius, _ := framework.ConvertAnalogToCF(analog)
 			fakeTemps[probe] = analog
 			log.WithFields(log.Fields{
@@ -50,8 +52,12 @@ func SetFakeTemp(probe int32, analog int32) {
 
 func getFakeTemp(probe int32) int32 {
 	limit := framework.Constants.Hardware.Probes[probe].Limits
-	min := framework.ConvertCelsiusToAnalog(*limit.MinAbsCelsius - 15)
-	max := framework.ConvertCelsiusToAnalog(*limit.MaxAbsCelsius + 15)
+	min := framework.ConvertCelsiusToAnalog(*limit.MinWarnCelsius - 15)
+	max := framework.ConvertCelsiusToAnalog(*limit.MaxAbsCelsius)
+
+	mux.Lock()
+	defer mux.Unlock()
+
 	analog := fakeTemps[probe]
 	celcius, _ := framework.ConvertAnalogToCF(analog)
 
@@ -62,7 +68,7 @@ func getFakeTemp(probe int32) int32 {
 	}).Debug("Got fake probe value")
 
 	if analog >= max {
-	   analog = min
+		analog = min //int32(rand.Intn(int(min)) + int(max-min))
 	}
 	celcius, _ = framework.ConvertAnalogToCF(analog)
 	analog2 := framework.ConvertCelsiusToAnalog(celcius + 1)
