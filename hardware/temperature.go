@@ -104,12 +104,12 @@ func (o *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 
 	if tempC < *probeLimits.MinWarnCelsius {
 		_, f := framework.ConvertCToKF(float32(*probeLimits.MinWarnCelsius))
-		reading.Warning = fmt.Sprintf("%d° F exceeds low temperature limit of %d° F",
+		reading.Warning = fmt.Sprintf("%d° F exceeds low temperature warning limit of %d° F",
 			int32(tempF), int32(f))
 	}
 	if tempC > *probeLimits.MaxWarnCelsius {
 		_, f := framework.ConvertCToKF(float32(*probeLimits.MaxWarnCelsius))
-		reading.Warning = fmt.Sprintf("%d° F exceeds high temperature limit of %d° F",
+		reading.Warning = fmt.Sprintf("%d° F exceeds high temperature warning limit of %d° F",
 			int32(tempF), int32(f))
 	}
 

@@ -13,7 +13,7 @@ import (
 
 // QueryAverageTemperature retrieves the average temperature over the given period for the requested probe from InfluxDB
 func QueryAverageTemperature(period time.Duration, probe int32) (*models.TemperatureReading, error) {
-	log.Debug("action=method_entry period=%v probe=%d", period, probe)
+	log.Debug("action=method_entry period=%s probe=%d", period, probe)
 	defer log.Debug("action=method_exit")
 
 	t := time.Now().Add(period * -1)

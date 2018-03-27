@@ -39,10 +39,8 @@ func init() {
 	tempWarnThreshold := 0.2
 	/********************************* END PSEUDO CONSTANTS **********************************************/
 
-	minTempWarnAmbCelsius := int32(float64(tempLimitAbsAmbientLowCelsius) -
-		(float64(tempLimitAbsAmbientLowCelsius) * tempWarnThreshold))
-	maxTempWarnAmbCelsius := int32(float64(tempLimitAbsAmbientHighCelsius) -
-		(float64(tempLimitAbsAmbientHighCelsius) * tempWarnThreshold))
+	minTempWarnAmbCelsius := int32(95)
+	maxTempWarnAmbCelsius := int32(205)
 
 	minTempWarnCookingCelsius := int32(tempLimitAbsCookingLowCelsius - (tempLimitAbsCookingLowCelsius * tempWarnThreshold))
 	maxTempWarnCookingCelsius := int32(tempLimitAbsCookingHighCelsius - (tempLimitAbsCookingHighCelsius * tempWarnThreshold))

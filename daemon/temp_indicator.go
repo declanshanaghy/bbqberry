@@ -39,7 +39,7 @@ func newTemperatureIndicator(huePortal *portal.Portal) RunnableTicker {
 		huePortal:		huePortal,
 		probeNumber:	-1,
 		hueUpdTime:		time.Now(),
-		hueUpdInterval: time.Second * 5,
+		hueUpdInterval: time.Second * 10,
 	}
 	t.Period = time.Second
 
@@ -120,18 +120,34 @@ func (o *temperatureIndicator) tick() error {
 		return err
 	}
 
-	if time.Now().Sub(o.hueUpdTime) > 0 {
-		h, s, l := hardware.ColorToHue(color)
+	if time.Now().Sub(o.hueUpdTime) >= 0 {
+		h, s, l := hardware.ColorToPhilipsHueHSB(color)
+
 		o.currentState.Hue = h
 		o.currentState.Sat = s
 		o.currentState.Bri = l
+
+		if ( *avg.Celsius < min || *avg.Celsius > max ) {
+			o.currentState.Alert = "lselect"
+		} else {
+			o.currentState.Alert = ""
+		}
+
+		log.WithFields(log.Fields{
+			"Celsius": *avg.Celsius,
+			"color": color.Hex(),
+			"name": o.hueGroup.Name,
+			"nextHueUpdate": o.hueUpdTime,
+			"hueUpdTime": o.hueUpdTime,
+			"Alert": o.currentState.Alert,
+		}).Debug("Updated hue")
 
 		o.hueGroups.SetGroupState(o.hueGroup.ID, *o.currentState)
 		o.hueUpdTime = time.Now().Add(o.hueUpdInterval)
 	}
 
 	log.WithFields(log.Fields{
-		"temp": *avg.Fahrenheit,
+		"Celsius": *avg.Celsius,
 		"color": color.Hex(),
 		"name": o.hueGroup.Name,
 		"nextHueUpdate": o.hueUpdTime,
