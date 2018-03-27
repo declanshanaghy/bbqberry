@@ -99,18 +99,22 @@ func (o *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 	probeLimits := physProbe.Limits
 
 	tempK, tempC, tempF := framework.AdafruitAD8495ThermocoupleVtoKCF(vOut)
-	log.Infof("probe=%d A=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
+	log.Debugf("probe=%d A=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
 		probe, analog, vOut, tempK, tempC, tempF, probeLimits.MinWarnCelsius, probeLimits.MaxWarnCelsius)
 
 	if tempC < *probeLimits.MinWarnCelsius {
 		_, f := framework.ConvertCToKF(float32(*probeLimits.MinWarnCelsius))
-		reading.Warning = fmt.Sprintf("%d °F exceeds low temperature limit of %d °F",
+		reading.Warning = fmt.Sprintf("%d° F exceeds low temperature limit of %d° F",
 			int32(tempF), int32(f))
 	}
 	if tempC > *probeLimits.MaxWarnCelsius {
 		_, f := framework.ConvertCToKF(float32(*probeLimits.MaxWarnCelsius))
-		reading.Warning = fmt.Sprintf("%d °F exceeds high temperature limit of %d °F",
+		reading.Warning = fmt.Sprintf("%d° F exceeds high temperature limit of %d° F",
 			int32(tempF), int32(f))
+	}
+
+	if len(reading.Warning) > 0 {
+		log.WithField("probe", probe).Warning(reading.Warning)
 	}
 
 	t := strfmt.DateTime(time.Now())

@@ -47,6 +47,7 @@ func (o *StubI2CBus) WriteBytes(addr byte, value []byte) error {
 
 // ReadFromReg reads n (len(value)) bytes from the given address and register.
 func (o *StubI2CBus) ReadFromReg(addr, reg byte, value []byte) error {
+	//Assume probe 0 here
 	a := getFakeTemp(0)
 
 	o.ReadFromRegCallCount++

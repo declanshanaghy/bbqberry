@@ -45,7 +45,7 @@ var _ = Describe("Temperature", func() {
 			stubembd.SetFakeTemp(probe, actualA)
 			reader.GetTemperatureReading(probe, &reading)
 
-			msg := fmt.Sprintf("%d °F exceeds low temperature limit of %d °F", actualF, minF)
+			msg := fmt.Sprintf("%d° F exceeds low temperature limit of %d° F", actualF, minF)
 			Expect(reading.Warning).To(Equal(msg))
 			Expect(*reading.Celsius).To(BeNumerically("<", minC))
 		})
@@ -68,7 +68,7 @@ var _ = Describe("Temperature", func() {
 			stubembd.SetFakeTemp(probe, actualA)
 			reader.GetTemperatureReading(probe, &reading)
 
-			msg := fmt.Sprintf("%d °F exceeds high temperature limit of %d °F", actualF, maxF)
+			msg := fmt.Sprintf("%d° F exceeds high temperature limit of %d° F", actualF, maxF)
 			Expect(reading.Warning).To(Equal(msg))
 			Expect(*reading.Celsius).To(BeNumerically(">", maxC))
 		})

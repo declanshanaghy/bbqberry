@@ -26,6 +26,8 @@ type temperatureIndicator struct {
 	hueGroups		*groups.Groups
 	initialState	*lights.State
 	currentState	*lights.State
+	hueUpdInterval 	time.Duration
+	hueUpdTime 		time.Time
 }
 
 // newTemperatureIndicator creates a new temperatureIndicator instance which can be
@@ -36,8 +38,10 @@ func newTemperatureIndicator(huePortal *portal.Portal) RunnableTicker {
 		strip:  		hardware.NewStrandController(),
 		huePortal:		huePortal,
 		probeNumber:	-1,
+		hueUpdTime:		time.Now(),
+		hueUpdInterval: time.Second * 5,
 	}
-	t.Period = time.Second * 5
+	t.Period = time.Second
 
 	return newRunnableTicker(t)
 }
@@ -116,20 +120,23 @@ func (o *temperatureIndicator) tick() error {
 		return err
 	}
 
-	h, s, l := hardware.ColorToHue(color)
-	o.currentState.Hue = h
-	o.currentState.Sat = s
-	o.currentState.Bri = l
+	if time.Now().Sub(o.hueUpdTime) > 0 {
+		h, s, l := hardware.ColorToHue(color)
+		o.currentState.Hue = h
+		o.currentState.Sat = s
+		o.currentState.Bri = l
 
-	r, g, b := color.RGB255()
+		o.hueGroups.SetGroupState(o.hueGroup.ID, *o.currentState)
+		o.hueUpdTime = time.Now().Add(o.hueUpdInterval)
+	}
+
 	log.WithFields(log.Fields{
 		"temp": *avg.Fahrenheit,
 		"color": color.Hex(),
-		"(r, g, b)": fmt.Sprintf("(%02x, %02x, %02x)", r, g, b),
-		"(h, s, l)": fmt.Sprintf("(%d, %d, %d)", h, s, l),
-	}).Debugf("Mapped color to hue")
+		"name": o.hueGroup.Name,
+		"nextHueUpdate": o.hueUpdTime,
+	}).Debug("Updated temp indicator")
 
-	o.hueGroups.SetGroupState(o.hueGroup.ID, *o.currentState)
 	return nil
 }
 
@@ -172,7 +179,7 @@ func getTempColor(temp, min, max int32) colorful.Color {
 		"red": fmt.Sprintf("0x%02x", red),
 		"blu": fmt.Sprintf("0x%02x", blu),
 		"colorHex": color.Hex(),
-	}).Debugf("Calculating temperature color")
+	}).Debug("Calculating temperature color")
 
 	return color
 }

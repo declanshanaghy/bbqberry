@@ -12,7 +12,7 @@ import (
 
 var _ = Describe("Temperature daemon", func() {
 	It("should start and stop cleanly", func() {
-		temperatureLogger := newTemperatureLoggerRunnable()
+		temperatureLogger := newDynamoDBLoggerRunnable()
 
 		err := temperatureLogger.StartBackground()
 		Expect(err).ToNot(HaveOccurred())
@@ -24,7 +24,7 @@ var _ = Describe("Temperature daemon", func() {
 		Expect(err).ToNot(HaveOccurred())
 	})
 	It("should collect valid temperature readings from all probes", func() {
-		temperatureLogger := newTemperatureLogger()
+		temperatureLogger := newDynamoDBLogger()
 		temperatureLogger.period = time.Nanosecond
 
 		readings, err := temperatureLogger.collectTemperatureMetrics()
@@ -37,7 +37,7 @@ var _ = Describe("Temperature daemon", func() {
 		}
 	})
 	It("should log temperature readings successfully", func() {
-		temperatureLogger := &temperatureLogger{
+		temperatureLogger := &dynamoDBLogger{
 			reader: hardware.NewTemperatureReader(),
 			period: time.Nanosecond,
 		}
