@@ -15,7 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 )
 
-const dynamoDBTableName = "BBQBerry-Temperatures"
+const dynamoDBTableName = "BBQBerry-Temperature"
 
 // dynamoDBLogger collects and logs temperature metrics
 type dynamoDBLogger struct {
@@ -131,14 +131,29 @@ func initializeDynamoDB() (*dynamodb.DynamoDB, error) {
 
 // Start performs initialization before the first tick
 func (o *dynamoDBLogger) start() error {
+	var err error
+
 	o.probes = o.reader.GetEnabledPobes()
 	log.WithField("probes", len(*o.probes)).Infof("Found enabled probes")
+
+	if o.dynamo, err = initializeDynamoDB(); err == nil {
+		if err := o.writeCurrentStateToDynamoDB("On"); err != nil {
+			log.WithField("err", err).Error("Unable to write CurrentState to DynamoDB")
+		}
+	}
 
 	return o.tick()
 }
 
 // Stop performs cleanup when the goroutine is exiting
 func (o *dynamoDBLogger) stop() error {
+	var err error
+
+	if o.dynamo, err = initializeDynamoDB(); err == nil {
+		if err := o.writeCurrentStateToDynamoDB("Off"); err != nil {
+			log.WithField("err", err).Error("Unable to write CurrentState to DynamoDB")
+		}
+	}
 	return nil
 }
 
@@ -194,6 +209,44 @@ func (o *dynamoDBLogger) logTemperatureMetrics(readings []*models.TemperatureRea
 	return nil
 }
 
+func (o *dynamoDBLogger) writeCurrentStateToDynamoDB(currentState string) error {
+	for _, p := range *o.probes {
+		probe := framework.Constants.Hardware.Probes[p]
+		input := &dynamodb.UpdateItemInput{
+			TableName: aws.String(dynamoDBTableName),
+			Key: map[string]*dynamodb.AttributeValue{
+				"Label": {
+					S: probe.Label,
+				},
+			},
+
+			UpdateExpression: aws.String(
+				"SET " +
+					"UpdatedTime = :UpdatedTime, " +
+					"CurrentState = :CurrentState",
+			),
+			ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+				":UpdatedTime": {
+					S: aws.String(fmt.Sprintf(time.Now().Format(time.RFC3339))),
+				},
+				":CurrentState": {
+					S: aws.String(currentState),
+				},
+			},
+		}
+
+		log.WithFields(log.Fields{
+			"Label": *probe.Label,
+			"CurrentState": currentState,
+		}).Info("Writing CurrentState to DynamoDB")
+
+		_, err := o.dynamo.UpdateItem(input)
+		return err
+	}
+
+	return nil
+}
+
 func (o *dynamoDBLogger) writeToDynamoDB(reading *models.TemperatureReading, probe *models.TemperatureProbe) error {
 	w := "None"
 	if len(reading.Warning) > 0 {
@@ -210,14 +263,14 @@ func (o *dynamoDBLogger) writeToDynamoDB(reading *models.TemperatureReading, pro
 
 		UpdateExpression: aws.String(
 			"SET " +
-					"UpdatedTime = :UpdatedTime, " +
+					"LastUpdated = :LastUpdated, " +
 					"Celsius = :Celsius, " +
 					"Fahrenheit = :Fahrenheit, " +
 					"Kelvin = :Kelvin, " +
 					"Warning = :Warning",
 			),
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
-			":UpdatedTime": {
+			":LastUpdated": {
 				S: aws.String(fmt.Sprintf(time.Now().Format(time.RFC3339))),
 			},
 			":Celsius": {
@@ -236,7 +289,7 @@ func (o *dynamoDBLogger) writeToDynamoDB(reading *models.TemperatureReading, pro
 	}
 
 	log.WithFields(log.Fields{
-		"Probe": probe.Label,
+		"Label": *probe.Label,
 		"Fahrenheit": *reading.Fahrenheit,
 	}).Debug("Logging temperature to DynamoDB")
 

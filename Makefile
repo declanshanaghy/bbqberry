@@ -126,3 +126,10 @@ generate: swagger
 #
 	@printf "Code generation completed\n"
 
+lambda:
+	@cd alexa/BBQBerry && zip -r ../../tmp/BBQBerry.zip .
+	@aws lambda update-function-code --function-name BBQBerry --zip-file fileb://tmp/BBQBerry.zip
+
+lambda_test:
+	rm -f tmp/invocation_result.json
+	aws lambda invoke --function-name BBQBerry --payload ./alexa/TestData/invocation.json outfile=file://tmp/invocation_result.json && cat tmp/invocation_result.json

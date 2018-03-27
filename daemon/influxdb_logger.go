@@ -118,7 +118,8 @@ func (o *influxDBLogger) writeToInflux(reading *models.TemperatureReading, probe
 	}
 
 	log.WithFields(log.Fields{
-		"Probe": probe.Label,
+		"Label": *probe.Label,
+		"Probe": *reading.Probe,
 		"Fahrenheit": *reading.Fahrenheit,
 	}).Debugf("Logging temperature to InfluxDB")
 
