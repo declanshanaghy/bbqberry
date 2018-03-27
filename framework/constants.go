@@ -13,7 +13,7 @@ var Enabled = true
 var Disabled = false
 
 const HUE_KEY = "5EPXHOGHzm7TGha3IFumdF2bTLdcwuae-21iQguC"
-const HUE_ALERT_GROUP = "Bar"
+const HUE_ALERT_GROUP = "Patio"
 const AWS_DEFAULT_REGION = "us-east-1"
 
 func init() {
