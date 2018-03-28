@@ -96,7 +96,7 @@ func (o *UpdateGrillLightsParams) bindName(rawData []string, hasKey bool, format
 
 func (o *UpdateGrillLightsParams) validateName(formats strfmt.Registry) error {
 
-	if err := validate.Enum("name", "query", o.Name, []interface{}{"Pulser", "Simple Shifter", "Rainbow", "Temperature"}); err != nil {
+	if err := validate.Enum("name", "query", o.Name, []interface{}{"Simple Shifter", "Rainbow", "Temperature"}); err != nil {
 		return err
 	}
 

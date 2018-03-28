@@ -51,8 +51,11 @@ func (o *temperatureIndicator) GetName() string {
 	return "Temperature"
 }
 
-// Start performs initialization before the first tick
-func (o *temperatureIndicator) start() error {
+func (o *temperatureIndicator) initializeHue() error {
+	if o.huePortal == nil {
+		return nil
+	}
+
 	o.hueGroups = groups.New(o.huePortal.InternalIPAddress, framework.HUE_KEY)
 	allGroups, err := o.hueGroups.GetAllGroups()
 	if err != nil {
@@ -83,9 +86,16 @@ func (o *temperatureIndicator) start() error {
 		}
 	}
 
-	probes := o.reader.GetEnabledPobes()
+	return nil
+}
+
+// Start performs initialization before the first tick
+func (o *temperatureIndicator) start() error {
+	o.initializeHue()
+
+	probes := framework.Config.GetEnabledProbeIndexes()
 	for _, p := range(*probes) {
-		probe := *framework.Constants.Hardware.Probes[p]
+		probe := *framework.Config.Hardware.Probes[p]
 		log.WithFields(log.Fields{
 			"p": p,
 			"enabled": *probe.Enabled,
@@ -118,7 +128,7 @@ func (o *temperatureIndicator) stop() error {
 
 // Tick executes on a ticker schedule
 func (o *temperatureIndicator) tick() error {
-	probe := framework.Constants.Hardware.Probes[o.probeNumber]
+	probe := framework.Config.Hardware.Probes[o.probeNumber]
 	min := *probe.Limits.MinWarnCelsius
 	max := *probe.Limits.MaxWarnCelsius
 
@@ -133,7 +143,10 @@ func (o *temperatureIndicator) tick() error {
 		return err
 	}
 
-	if time.Now().Sub(o.hueUpdTime) >= 0 {
+	hueGroupName := ""
+
+	if o.hueGroup != nil && time.Now().Sub(o.hueUpdTime) >= 0 {
+		hueGroupName = o.hueGroup.Name
 		h, s, l := hardware.ColorToPhilipsHueHSB(color)
 
 		o.currentState.Hue = h
@@ -174,10 +187,11 @@ func (o *temperatureIndicator) tick() error {
 
 	log.WithFields(log.Fields{
 		"Celsius": *avg.Celsius,
+		"Fahrenheit": *avg.Fahrenheit,
 		"color": color.Hex(),
-		"name": o.hueGroup.Name,
+		"hueGroupName": hueGroupName,
 		"nextHueUpdate": o.hueUpdTime,
-	}).Debug("Updated temp indicator")
+	}).Info("Updated temp indicator")
 
 	return nil
 }
@@ -198,7 +212,7 @@ func getTempColor(temp, min, max int32) colorful.Color {
 		temp = min
 	}
 	if temp > max {
-		log.Warningf("%d° C is greater than max %d° C...clamping", temp, max)
+			log.Warningf("%d° C is greater than max %d° C...clamping", temp, max)
 		temp = max
 	}
 

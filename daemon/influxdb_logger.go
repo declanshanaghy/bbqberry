@@ -27,7 +27,7 @@ func newInfluxDBLoggerRunnable() Runnable {
 
 func newInfluxDBLogger() *influxDBLogger {
 	reader := hardware.NewTemperatureReader()
-	probes := reader.GetEnabledPobes()
+	probes := framework.Config.GetEnabledProbeIndexes()
 
 	return &influxDBLogger{
 		reader: reader,
@@ -51,7 +51,7 @@ func (o *influxDBLogger) GetName() string {
 
 // Start performs initialization before the first tick
 func (o *influxDBLogger) start() error {
-	o.probes = o.reader.GetEnabledPobes()
+	//o.probes = framework.Config.GetEnabledProbeIndexes()
 	log.WithField("probes", len(*o.probes)).Infof("Found enabled probes")
 
 	return o.tick()
@@ -96,7 +96,7 @@ func (o *influxDBLogger) logTemperatureMetrics(readings []*models.TemperatureRea
 	log.WithField("numReadings", len(readings)).Debug("logging temperature metrics")
 
 	for _, reading := range readings {
-		probe := framework.Constants.Hardware.Probes[*reading.Probe]
+		probe := framework.Config.Hardware.Probes[*reading.Probe]
 		if err := o.writeToInflux(reading, probe); err != nil {
 			log.WithField("err", err).Error("Unable to write to InfluxDB")
 		}

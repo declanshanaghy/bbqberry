@@ -18,13 +18,13 @@ func Health() (*models.Health, error) {
 	}()
 
 	si := new(models.ServiceInfo)
-	si.Name = &framework.Constants.ServiceName
-	si.Version = &framework.Constants.Version
+	si.Name = &framework.Config.ServiceName
+	si.Version = &framework.Config.Version
 	m.ServiceInfo = si
 
-	tags := map[string]string{"service": framework.Constants.ServiceName}
+	tags := map[string]string{"service": framework.Config.ServiceName}
 	fields := map[string]interface{}{
-		"version": framework.Constants.Version,
+		"version": framework.Config.Version,
 	}
 
 	_, err := influxdb.WritePoint("Health", tags, fields)

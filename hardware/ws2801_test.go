@@ -19,7 +19,7 @@ var _ = Describe("WS2801", func() {
 	})
 
 	Context("sanity checks", func() {
-		hwCfg := framework.Constants.Hardware
+		hwCfg := framework.Config.Hardware
 
 		It("should return correct pixel count", func() {
 			numPixels := strand.GetNumPixels()

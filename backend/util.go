@@ -7,7 +7,7 @@ import "github.com/declanshanaghy/bbqberry/framework"
 // a single probe index: query a single probe
 // nil or < 0: query all probes
 func getProbeIndexes(n *int32) (probes []int32) {
-	l := len(framework.Constants.Hardware.Probes)
+	l := len(framework.Config.Hardware.Probes)
 	if n == nil || *n < 0 {
 		probes = make([]int32, l)
 		for i := 0; i < l; i++ {

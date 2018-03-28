@@ -16,15 +16,10 @@ import (
 // swagger:model TemperatureMonitor
 type TemperatureMonitor struct {
 
-	// Unique ID for this temperature monitor
-	// Read Only: true
-	ID string `json:"_id,omitempty"`
-
 	// label
-	// Required: true
-	Label *string `json:"label"`
+	Label string `json:"label,omitempty"`
 
-	// The maximium temperature, below which an alert will be generated
+	// The maximium temperature, above which an alert will be generated
 	// Required: true
 	Max *int32 `json:"max"`
 
@@ -34,7 +29,7 @@ type TemperatureMonitor struct {
 
 	// probe
 	// Required: true
-	// Maximum: 7
+	// Maximum: 3
 	// Minimum: 0
 	Probe *int32 `json:"probe"`
 
@@ -46,11 +41,6 @@ type TemperatureMonitor struct {
 // Validate validates this temperature monitor
 func (m *TemperatureMonitor) Validate(formats strfmt.Registry) error {
 	var res []error
-
-	if err := m.validateLabel(formats); err != nil {
-		// prop
-		res = append(res, err)
-	}
 
 	if err := m.validateMax(formats); err != nil {
 		// prop
@@ -75,15 +65,6 @@ func (m *TemperatureMonitor) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *TemperatureMonitor) validateLabel(formats strfmt.Registry) error {
-
-	if err := validate.Required("label", "body", m.Label); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -115,7 +96,7 @@ func (m *TemperatureMonitor) validateProbe(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := validate.MaximumInt("probe", "body", int64(*m.Probe), 7, false); err != nil {
+	if err := validate.MaximumInt("probe", "body", int64(*m.Probe), 3, false); err != nil {
 		return err
 	}
 
@@ -126,7 +107,7 @@ var temperatureMonitorTypeScalePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["fahrenheit","celsius"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["celsius"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -135,8 +116,6 @@ func init() {
 }
 
 const (
-	// TemperatureMonitorScaleFahrenheit captures enum value "fahrenheit"
-	TemperatureMonitorScaleFahrenheit string = "fahrenheit"
 	// TemperatureMonitorScaleCelsius captures enum value "celsius"
 	TemperatureMonitorScaleCelsius string = "celsius"
 )

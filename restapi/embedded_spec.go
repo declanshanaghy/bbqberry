@@ -86,7 +86,6 @@ func init() {
         "parameters": [
           {
             "enum": [
-              "Pulser",
               "Simple Shifter",
               "Rainbow",
               "Temperature"
@@ -121,47 +120,12 @@ func init() {
       }
     },
     "/monitors": {
-      "get": {
+      "put": {
         "tags": [
           "Monitors"
         ],
-        "summary": "Get monitors for the requested probe",
-        "operationId": "getMonitors",
-        "parameters": [
-          {
-            "maximum": 7,
-            "minimum": 0,
-            "type": "integer",
-            "format": "int32",
-            "description": "The probe for which to retrieve active monitors (or all probes if omitted)",
-            "name": "probe",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The currently configured monitor(s) were retrieved successfully",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/TemperatureMonitor"
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Monitors"
-        ],
-        "summary": "Get monitor settings for the requested probe",
-        "operationId": "createMonitor",
+        "summary": "Update monitor settings for the requested probe",
+        "operationId": "updateMonitor",
         "parameters": [
           {
             "name": "monitor",
@@ -194,7 +158,10 @@ func init() {
         "operationId": "shutdown",
         "responses": {
           "200": {
-            "description": "Shutdown executed successfully"
+            "description": "Shutdown executed successfully",
+            "schema": {
+              "$ref": "#/definitions/Shutdown"
+            }
           },
           "default": {
             "description": "Unexpected error",
@@ -214,7 +181,7 @@ func init() {
         "operationId": "getTemperatures",
         "parameters": [
           {
-            "maximum": 7,
+            "maximum": 3,
             "minimum": 0,
             "type": "integer",
             "format": "int32",
@@ -342,6 +309,21 @@ func init() {
         }
       }
     },
+    "Shutdown": {
+      "type": "object",
+      "required": [
+        "ShutdownTime",
+        "Message"
+      ],
+      "properties": {
+        "Message": {
+          "type": "string"
+        },
+        "ShutdownTime": {
+          "type": "string"
+        }
+      }
+    },
     "TemperatureLimits": {
       "type": "object",
       "required": [
@@ -378,23 +360,16 @@ func init() {
       "type": "object",
       "required": [
         "probe",
-        "label",
         "scale",
         "min",
         "max"
       ],
       "properties": {
-        "_id": {
-          "description": "Unique ID for this temperature monitor",
-          "type": "string",
-          "format": "ObjectId",
-          "readOnly": true
-        },
         "label": {
           "type": "string"
         },
         "max": {
-          "description": "The maximium temperature, below which an alert will be generated",
+          "description": "The maximium temperature, above which an alert will be generated",
           "type": "integer",
           "format": "int32"
         },
@@ -407,14 +382,13 @@ func init() {
           "type": "integer",
           "format": "int32",
           "default": 0,
-          "maximum": 7,
+          "maximum": 3,
           "minimum": 0
         },
         "scale": {
           "description": "The temperature scale",
           "type": "string",
           "enum": [
-            "fahrenheit",
             "celsius"
           ]
         }
@@ -481,7 +455,7 @@ func init() {
           "type": "integer",
           "format": "int32",
           "default": 0,
-          "maximum": 7,
+          "maximum": 3,
           "minimum": 0
         },
         "voltage": {

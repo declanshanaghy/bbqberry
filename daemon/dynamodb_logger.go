@@ -33,7 +33,7 @@ func newDynamoDBLoggerRunnable() Runnable {
 
 func newDynamoDBLogger() *dynamoDBLogger {
 	reader := hardware.NewTemperatureReader()
-	probes := reader.GetEnabledPobes()
+	probes := framework.Config.GetEnabledProbeIndexes()
 
 	return &dynamoDBLogger{
 		reader: reader,
@@ -133,7 +133,7 @@ func initializeDynamoDB() (*dynamodb.DynamoDB, error) {
 func (o *dynamoDBLogger) start() error {
 	var err error
 
-	o.probes = o.reader.GetEnabledPobes()
+	//o.probes = framework.Config.GetEnabledProbeIndexes()
 	log.WithField("probes", len(*o.probes)).Infof("Found enabled probes")
 
 	if o.dynamo, err = initializeDynamoDB(); err == nil {
@@ -199,7 +199,7 @@ func (o *dynamoDBLogger) logTemperatureMetrics(readings []*models.TemperatureRea
 	log.WithField("numReadings", len(readings)).Debug("logging temperature metrics")
 
 	for _, reading := range readings {
-		probe := framework.Constants.Hardware.Probes[*reading.Probe]
+		probe := framework.Config.Hardware.Probes[*reading.Probe]
 		if err := o.writeToDynamoDB(reading, probe); err != nil {
 			log.WithField("err", err).Error("Unable to write to DynamoDB. Disabling logging")
 			o.dynamo = nil
@@ -211,7 +211,7 @@ func (o *dynamoDBLogger) logTemperatureMetrics(readings []*models.TemperatureRea
 
 func (o *dynamoDBLogger) writeCurrentStateToDynamoDB(currentState string) error {
 	for _, p := range *o.probes {
-		probe := framework.Constants.Hardware.Probes[p]
+		probe := framework.Config.Hardware.Probes[p]
 		input := &dynamodb.UpdateItemInput{
 			TableName: aws.String(dynamoDBTableName),
 			Key: map[string]*dynamodb.AttributeValue{

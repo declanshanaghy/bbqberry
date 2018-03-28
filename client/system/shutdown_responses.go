@@ -52,13 +52,21 @@ func NewShutdownOK() *ShutdownOK {
 Shutdown executed successfully
 */
 type ShutdownOK struct {
+	Payload *models.Shutdown
 }
 
 func (o *ShutdownOK) Error() string {
-	return fmt.Sprintf("[PUT /system/shutdown][%d] shutdownOK ", 200)
+	return fmt.Sprintf("[PUT /system/shutdown][%d] shutdownOK  %+v", 200, o.Payload)
 }
 
 func (o *ShutdownOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Shutdown)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

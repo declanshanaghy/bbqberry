@@ -17,8 +17,6 @@ type TemperatureReader interface {
 	GetTemperatureReading(probe int32, reading *models.TemperatureReading) error
 	// GetNumProbes returns the number of configured temperature probes
 	GetNumProbes() int32
-	// GetEnabledPobeIndices returns the indices of all enabled probes
-	GetEnabledPobes() *[]int32
 	// Close closes communication with the underlying hardware
 	Close()
 }
@@ -46,18 +44,6 @@ func (o *temperatureReader) Close() {
 
 func (o *temperatureReader) GetNumProbes() int32 {
 	return o.numProbes
-}
-
-func (o *temperatureReader) GetEnabledPobes() *[]int32 {
-	enabled := make([]int32, 0)
-
-	for probe := int32(0); probe < o.numProbes; probe++ {
-		if *framework.Constants.Hardware.Probes[probe].Enabled {
-			enabled = append(enabled, probe)
-		}
-	}
-
-	return &enabled
 }
 
 func (o *temperatureReader) errorCheckProbeNumber(probe int32) error {
@@ -92,7 +78,7 @@ func (o *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 		return err
 	}
 
-	hwCfg := framework.Constants.Hardware
+	hwCfg := framework.Config.Hardware
 	vOut := framework.ConvertAnalogToVoltage(analog)
 
 	physProbe := hwCfg.Probes[probe]

@@ -12,6 +12,7 @@ import (
 	"github.com/declanshanaghy/bbqberry/restapi/operations/system"
 	"os/exec"
 	"github.com/heatxsink/go-hue/portal"
+	"github.com/declanshanaghy/bbqberry/models"
 )
 
 // Commander is the main controller of all background goroutines
@@ -116,7 +117,7 @@ func (o *Commander) tick() error {
 func (o* Commander) initializeLightShows() {
 	shows := []RunnableTicker {
 		newSimpleShifter(time.Second),
-		newTemperatureIndicator(o.huePortal),
+		newTemperatureIndicator(nil),//o.huePortal),
 		newRainbow(time.Millisecond * 100),
 	}
 	lightShows := make(map[string]RunnableTicker)
@@ -145,7 +146,7 @@ func (o *Commander) UpdateGrillLights(params *lights.UpdateGrillLightsParams) (b
 	}
 }
 
-func (o *Commander) ShutdownSystem(params *system.ShutdownParams) (map[string]interface{}, error) {
+func (o *Commander) ShutdownSystem(params *system.ShutdownParams) (*models.Shutdown, error) {
 	tNow := time.Now().Local()
 	tShdn := tNow.Add(time.Minute * time.Duration(1))
 
@@ -169,18 +170,21 @@ func (o *Commander) ShutdownSystem(params *system.ShutdownParams) (map[string]in
 		"tShutdown": tShutdown,
 	}).Info("Shutting down at specified time")
 
-	out, err := exec.Command("/usr/bin/sudo", "/sbin/shutdown", "-h", tShutdown,
-		"BBQBerry initiated shutdown").Output()
-	if err != nil {
-		return nil, err
+	if ! framework.Config.Stub {
+		_, err = exec.Command("/usr/bin/sudo", "/sbin/shutdown", "-h", tShutdown,
+			"BBQBerry initiated shutdown").Output()
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	r := make(map[string]interface{})
-	r["ShutdownTime"] = tActual
-	r["Output"] = out
-	r["Message"] = fmt.Sprintf("Will shutdown in %s", tDiff)
-
-	return r, nil
+	t := tActual.String()
+	m := fmt.Sprintf("Will shutdown in %s", tDiff)
+	shdn := models.Shutdown{
+		ShutdownTime: &t,
+		Message: &m,
+	}
+	return &shdn, nil
 }
 
 func (o *Commander) changeLightShow(lightShow *RunnableTicker, period int64) error {

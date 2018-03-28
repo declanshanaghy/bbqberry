@@ -20,7 +20,6 @@ import (
 	"github.com/declanshanaghy/bbqberry/restapi/operations"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/temperatures"
-	"github.com/declanshanaghy/bbqberry/restapi/operations/monitors"
 	opshardware "github.com/declanshanaghy/bbqberry/restapi/operations/hardware"
 	"github.com/go-openapi/swag"
 	// Unsure why this is suppressed
@@ -33,6 +32,7 @@ import (
 	"github.com/declanshanaghy/bbqberry/restapi/operations/lights"
 	"sync"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/system"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/monitors"
 )
 
 
@@ -65,6 +65,9 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 	api.ServeError = errors.ServeError
 
 	commander.Options = &cmdOptionsValues
+	if err := bbqframework.Config.Initialize(&cmdOptionsValues); err != nil {
+		panic(err)
+	}
 
 	log.SetDebug(cmdOptionsValues.Verbose)
 	if cmdOptionsValues.LogFile != "" {
@@ -81,31 +84,16 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 		})
 	api.HardwareGetHardwareHandler = opshardware.GetHardwareHandlerFunc(
 		func(params opshardware.GetHardwareParams) middleware.Responder {
-			return framework.HandleAPIRequestWithError(bbqframework.Constants.Hardware, nil)
+			return framework.HandleAPIRequestWithError(bbqframework.Config.Hardware, nil)
 		})
 	api.TemperaturesGetTemperaturesHandler = temperatures.GetTemperaturesHandlerFunc(
 		func(params temperatures.GetTemperaturesParams) middleware.Responder {
 			return framework.HandleAPIRequestWithError(backend.GetTemperatureProbeReadings(&params))
 		})
-	api.MonitorsCreateMonitorHandler = monitors.CreateMonitorHandlerFunc(
-		func(params monitors.CreateMonitorParams) middleware.Responder {
-			mgr, err := backend.NewMonitorsManager()
-			if err != nil {
-				return framework.HandleAPIRequestWithError(nil, err)
-			}
-			defer mgr.Close()
-
-			return framework.HandleAPIRequestWithError(mgr.CreateMonitor(&params))
-		})
-	api.MonitorsGetMonitorsHandler = monitors.GetMonitorsHandlerFunc(
-		func(params monitors.GetMonitorsParams) middleware.Responder {
-			mgr, err := backend.NewMonitorsManager()
-			if err != nil {
-				return framework.HandleAPIRequestWithError(nil, err)
-			}
-			defer mgr.Close()
-
-			return framework.HandleAPIRequestWithError(mgr.GetMonitors(&params))
+	api.MonitorsUpdateMonitorHandler = monitors.UpdateMonitorHandlerFunc(
+		func(params monitors.UpdateMonitorParams) middleware.Responder {
+			mgr := backend.NewMonitorsManager()
+			return framework.HandleAPIRequestWithError(mgr.UpdateMonitor(&params))
 		})
 	api.LightsUpdateGrillLightsHandler = lights.UpdateGrillLightsHandlerFunc(
 		func(params lights.UpdateGrillLightsParams) middleware.Responder {

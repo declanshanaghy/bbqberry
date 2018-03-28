@@ -1,0 +1,46 @@
+[
+  {
+    "enabled": false,
+    "label": "Chamber Alt",
+    "limits": {
+      "maxAbsCelsius": 400,
+      "maxWarnCelsius": 205,
+      "minAbsCelsius": -50,
+      "minWarnCelsius": 95,
+      "probeType": "ambient"
+    }
+  },
+  {
+    "enabled": false,
+    "label": "Food",
+    "limits": {
+      "maxAbsCelsius": 250,
+      "maxWarnCelsius": 200,
+      "minAbsCelsius": -50,
+      "minWarnCelsius": -40,
+      "probeType": "cooking"
+    }
+  },
+  {
+    "enabled": false,
+    "label": "Food Alt",
+    "limits": {
+      "maxAbsCelsius": 250,
+      "maxWarnCelsius": 200,
+      "minAbsCelsius": -50,
+      "minWarnCelsius": -40,
+      "probeType": "cooking"
+    }
+  },
+  {
+    "enabled": true,
+    "label": "Chamber",
+    "limits": {
+      "maxAbsCelsius": 400,
+      "maxWarnCelsius": 205,
+      "minAbsCelsius": -50,
+      "minWarnCelsius": 95,
+      "probeType": "ambient"
+    }
+  }
+]

@@ -32,7 +32,7 @@ type GetTemperaturesParams struct {
 	HTTPRequest *http.Request
 
 	/*The termerature probe to read from (or all probes if omitted)
-	  Maximum: 7
+	  Maximum: 3
 	  Minimum: 0
 	  In: query
 	*/
@@ -86,7 +86,7 @@ func (o *GetTemperaturesParams) validateProbe(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := validate.MaximumInt("probe", "query", int64(*o.Probe), 7, false); err != nil {
+	if err := validate.MaximumInt("probe", "query", int64(*o.Probe), 3, false); err != nil {
 		return err
 	}
 

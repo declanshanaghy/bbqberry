@@ -27,7 +27,7 @@ var _ = Describe("Temperature package", func() {
 		})
 
 		It("should convert analog voltage properly", func() {
-			hwCfg := framework.Constants.Hardware
+			hwCfg := framework.Config.Hardware
 
 			// Format is [v] = [k, c, f]
 			conversions := map[float32][3]float32{

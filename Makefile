@@ -93,7 +93,7 @@ validate_swagger:
 	    swagger validate $(SWAGGER_YML); \
 	fi
 
-swagger: validate_swagger
+swagger: validate_swagger clean_swagger
 #
 #__Generates swagger source files__
 #

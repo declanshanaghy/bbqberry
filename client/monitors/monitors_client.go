@@ -23,58 +23,30 @@ type Client struct {
 }
 
 /*
-CreateMonitor gets monitor settings for the requested probe
+UpdateMonitor updates monitor settings for the requested probe
 */
-func (a *Client) CreateMonitor(params *CreateMonitorParams) (*CreateMonitorOK, error) {
+func (a *Client) UpdateMonitor(params *UpdateMonitorParams) (*UpdateMonitorOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewCreateMonitorParams()
+		params = NewUpdateMonitorParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "createMonitor",
-		Method:             "POST",
+		ID:                 "updateMonitor",
+		Method:             "PUT",
 		PathPattern:        "/monitors",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &CreateMonitorReader{formats: a.formats},
+		Reader:             &UpdateMonitorReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(*CreateMonitorOK), nil
-
-}
-
-/*
-GetMonitors gets monitors for the requested probe
-*/
-func (a *Client) GetMonitors(params *GetMonitorsParams) (*GetMonitorsOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetMonitorsParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "getMonitors",
-		Method:             "GET",
-		PathPattern:        "/monitors",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetMonitorsReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetMonitorsOK), nil
+	return result.(*UpdateMonitorOK), nil
 
 }
 

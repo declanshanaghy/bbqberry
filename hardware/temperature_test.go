@@ -14,7 +14,7 @@ import (
 
 var _ = Describe("Temperature", func() {
 	probe := int32(0)
-	hwCfg := framework.Constants.Hardware
+	hwCfg := framework.Config.Hardware
 	lim := hwCfg.Probes[probe].Limits
 	minC := *lim.MinWarnCelsius
 	maxC := *lim.MaxWarnCelsius

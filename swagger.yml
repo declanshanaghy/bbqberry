@@ -20,6 +20,8 @@ paths:
       responses:
         200:
           description: "Shutdown executed successfully"
+          schema:
+            $ref: "#/definitions/Shutdown"
         default:
           description: Unexpected error
           schema:
@@ -52,11 +54,11 @@ paths:
           schema:
             $ref: "#/definitions/Error"
   /monitors:
-    post:
-      operationId: createMonitor
+    put:
+      operationId: updateMonitor
       tags:
         - Monitors
-      summary: "Get monitor settings for the requested probe"
+      summary: "Update monitor settings for the requested probe"
       parameters:
         - name: monitor
           in: body
@@ -66,31 +68,6 @@ paths:
       responses:
         200:
           description: "The monitor was created successfully"
-        default:
-          description: Unexpected error
-          schema:
-            $ref: "#/definitions/Error"
-    get:
-      operationId: getMonitors
-      tags:
-        - Monitors
-      summary: "Get monitors for the requested probe"
-      parameters:
-        - name: probe
-          in: query
-          description: The probe for which to retrieve active monitors (or all probes if omitted)
-          required: false
-          type: integer
-          format: int32
-          minimum: 0
-          maximum: 7
-      responses:
-        200:
-          description: "The currently configured monitor(s) were retrieved successfully"
-          schema:
-            type: array
-            items:
-              $ref: "#/definitions/TemperatureMonitor"
         default:
           description: Unexpected error
           schema:
@@ -109,7 +86,7 @@ paths:
           type: integer
           format: int32
           minimum: 0
-          maximum: 7
+          maximum: 3
       responses:
         200:
           description: "Temperature was read successfully"
@@ -225,33 +202,36 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/TemperatureProbe"
+  Shutdown:
+    type: object
+    required:
+      - ShutdownTime
+      - Message
+    properties:
+      ShutdownTime:
+        type: string
+      Message:
+        type: string
   TemperatureMonitor:
     type: object
     required:
       - probe
-      - label
       - scale
       - min
       - max
     properties:
-      _id:
-        type: string
-        format: ObjectId
-        description: Unique ID for this temperature monitor
-        readOnly: true
       label:
         type: string
       probe:
         type: integer
         format: int32
         minimum: 0
-        maximum: 7
+        maximum: 3
         default: 0
       scale:
         type: string
         description: The temperature scale
         enum:
-          - fahrenheit
           - celsius
       min:
         type: integer
@@ -260,7 +240,7 @@ definitions:
       max:
         type: integer
         format: int32
-        description: The maximium temperature, below which an alert will be generated
+        description: The maximium temperature, above which an alert will be generated
   TemperatureReading:
     type: object
     required:
@@ -304,7 +284,7 @@ definitions:
         type: integer
         format: int32
         minimum: 0
-        maximum: 7
+        maximum: 3
         default: 0
   Error:
     type: object

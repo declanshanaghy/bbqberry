@@ -38,7 +38,7 @@ type TemperatureReading struct {
 
 	// probe
 	// Required: true
-	// Maximum: 7
+	// Maximum: 3
 	// Minimum: 0
 	Probe *int32 `json:"probe"`
 
@@ -160,7 +160,7 @@ func (m *TemperatureReading) validateProbe(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := validate.MaximumInt("probe", "body", int64(*m.Probe), 7, false); err != nil {
+	if err := validate.MaximumInt("probe", "body", int64(*m.Probe), 3, false); err != nil {
 		return err
 	}
 
