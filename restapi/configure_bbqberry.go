@@ -44,7 +44,7 @@ var (
 
 func init() {
 	commander	= daemon.NewCommander()
-	shdnMux 	= 	&sync.Mutex{}
+	shdnMux 	= &sync.Mutex{}
 }
 
 func configureFlags(api *operations.BbqberryAPI) {

@@ -88,6 +88,9 @@ func (o *Commander) start() (error) {
 	}
 
 	_, err = o.UpdateGrillLights(&p)
+
+	log.Info("Commander up and running")
+
 	return err
 }
 

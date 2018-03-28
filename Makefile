@@ -72,7 +72,7 @@ run_deployed:
 
 sync_web:
 	@echo "Syncing BBQBerry webapp..."
-	rsync -rv ./static/ pi@bbqberry-gaff:~/go/src/github.com/declanshanaghy/bbqberry/static/
+	@rsync -rv ./static/ pi@bbqberry-gaff:~/go/src/github.com/declanshanaghy/bbqberry/static/
 
 clean_swagger:
 #

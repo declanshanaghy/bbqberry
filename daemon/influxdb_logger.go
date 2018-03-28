@@ -51,9 +51,6 @@ func (o *influxDBLogger) GetName() string {
 
 // Start performs initialization before the first tick
 func (o *influxDBLogger) start() error {
-	//o.probes = framework.Config.GetEnabledProbeIndexes()
-	log.WithField("probes", len(*o.probes)).Infof("Found enabled probes")
-
 	return o.tick()
 }
 
@@ -121,7 +118,7 @@ func (o *influxDBLogger) writeToInflux(reading *models.TemperatureReading, probe
 		"Label": *probe.Label,
 		"Probe": *reading.Probe,
 		"Fahrenheit": *reading.Fahrenheit,
-	}).Debugf("Logging temperature to InfluxDB")
+	}).Info("Logging temperature to InfluxDB")
 
 	if _, err := influxdb.WritePoint("temp", tags, fields); err != nil {
 		return err

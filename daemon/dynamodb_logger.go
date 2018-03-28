@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/endpoints"
 )
 
 const dynamoDBTableName = "BBQBerry-Temperature"
@@ -104,28 +105,27 @@ func createDynamoDBTable(dynamo *dynamodb.DynamoDB) error {
 }
 
 func initializeDynamoDB() (*dynamodb.DynamoDB, error) {
-	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String(framework.AWS_DEFAULT_REGION)},
-	)
-	if ( err != nil ) {
-		log.WithField("err", err).Error("Error initializing AWS session")
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		Config: aws.Config{
+			Region: aws.String(endpoints.UsEast1RegionID),
+		},
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+
+	dynamo := dynamodb.New(sess)
+	create, err := shouldCreateDynamoDBTable(dynamo)
+	if err != nil {
+		log.WithField("err", err).Error("Error determining DynamoDB table status")
 		return nil, err
-	} else {
-		dynamo := dynamodb.New(sess)
-		create, err := shouldCreateDynamoDBTable(dynamo)
-		if err != nil {
-			log.WithField("err", err).Error("Error determining DynamoDB table status")
+	} else if create {
+		if err := createDynamoDBTable(dynamo); err != nil {
+			log.WithField("err", err).Error("Error creating DynamoDB table")
 			return nil, err
-		} else if create {
-			if err := createDynamoDBTable(dynamo); err != nil {
-				log.WithField("err", err).Error("Error creating DynamoDB table")
-				return nil, err
-			}
-			return dynamo, nil
-		} else {
-			// The table already exists
-			return dynamo, nil
 		}
+		return dynamo, nil
+	} else {
+		// The table already exists
+		return dynamo, nil
 	}
 }
 
@@ -133,12 +133,11 @@ func initializeDynamoDB() (*dynamodb.DynamoDB, error) {
 func (o *dynamoDBLogger) start() error {
 	var err error
 
-	//o.probes = framework.Config.GetEnabledProbeIndexes()
-	log.WithField("probes", len(*o.probes)).Infof("Found enabled probes")
-
 	if o.dynamo, err = initializeDynamoDB(); err == nil {
 		if err := o.writeCurrentStateToDynamoDB("On"); err != nil {
 			log.WithField("err", err).Error("Unable to write CurrentState to DynamoDB")
+			// Returning an error from start causes a panic. if DynamoDB is not available just ignore it
+			return nil
 		}
 	}
 
@@ -149,11 +148,16 @@ func (o *dynamoDBLogger) start() error {
 func (o *dynamoDBLogger) stop() error {
 	var err error
 
-	if o.dynamo, err = initializeDynamoDB(); err == nil {
-		if err := o.writeCurrentStateToDynamoDB("Off"); err != nil {
-			log.WithField("err", err).Error("Unable to write CurrentState to DynamoDB")
+	if o.dynamo == nil {
+		if o.dynamo, err = initializeDynamoDB(); err != nil {
+			return err
 		}
 	}
+
+	if err := o.writeCurrentStateToDynamoDB("Off"); err != nil {
+		log.WithField("err", err).Error("Unable to write CurrentState to DynamoDB")
+	}
+
 	return nil
 }
 

@@ -76,7 +76,6 @@ func (o*config) Initialize(options *CmdOptions) error {
 
 func (o*config) Save() error {
 	t, err := json.MarshalIndent(o.Hardware.Probes, "  ", "  ")
-	log.Error(t)
 	if err != nil {
 		return err
 	}
@@ -96,6 +95,8 @@ func (o *config) GetEnabledProbeIndexes() *[]int32 {
 			enabled = append(enabled, int32(i))
 		}
 	}
+
+	log.WithField("enabled", enabled).Info("GetEnabledProbeIndexes")
 
 	return &enabled
 }

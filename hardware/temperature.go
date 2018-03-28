@@ -79,11 +79,10 @@ func (o *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 	}
 
 	hwCfg := framework.Config.Hardware
-	vOut := framework.ConvertAnalogToVoltage(analog)
-
 	physProbe := hwCfg.Probes[probe]
 	probeLimits := physProbe.Limits
 
+	vOut := framework.ConvertAnalogToVoltage(analog)
 	tempK, tempC, tempF := framework.AdafruitAD8495ThermocoupleVtoKCF(vOut)
 	log.Debugf("probe=%d A=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
 		probe, analog, vOut, tempK, tempC, tempF, probeLimits.MinWarnCelsius, probeLimits.MaxWarnCelsius)
