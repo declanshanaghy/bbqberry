@@ -117,7 +117,7 @@ func (o *Commander) tick() error {
 func (o* Commander) initializeLightShows() {
 	shows := []RunnableTicker {
 		newSimpleShifter(time.Second),
-		newTemperatureIndicator(nil),//o.huePortal),
+		newTemperatureIndicator(o.huePortal),
 		newRainbow(time.Millisecond * 100),
 	}
 	lightShows := make(map[string]RunnableTicker)
