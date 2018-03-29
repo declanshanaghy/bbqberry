@@ -29,6 +29,36 @@ func init() {
   },
   "basePath": "/api",
   "paths": {
+    "/alerts": {
+      "put": {
+        "tags": [
+          "Alerts"
+        ],
+        "summary": "Clear alert warning for a probe",
+        "operationId": "updateAlert",
+        "parameters": [
+          {
+            "maximum": 3,
+            "minimum": 0,
+            "type": "integer",
+            "name": "probe",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The monitor was created successfully"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/hardware": {
       "get": {
         "tags": [
@@ -128,12 +158,39 @@ func init() {
         "operationId": "updateMonitor",
         "parameters": [
           {
-            "name": "monitor",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/TemperatureMonitor"
-            }
+            "maximum": 3,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32",
+            "name": "probe",
+            "in": "query",
+            "required": true
+          },
+          {
+            "enum": [
+              "celsius"
+            ],
+            "type": "string",
+            "description": "The temperature scale",
+            "name": "scale",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "The minimum temperature, below which an alert will be generated",
+            "name": "min",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "The maximium temperature, above which an alert will be generated",
+            "name": "max",
+            "in": "query",
+            "required": true
           }
         ],
         "responses": {
@@ -356,44 +413,6 @@ func init() {
         }
       }
     },
-    "TemperatureMonitor": {
-      "type": "object",
-      "required": [
-        "probe",
-        "scale",
-        "min",
-        "max"
-      ],
-      "properties": {
-        "label": {
-          "type": "string"
-        },
-        "max": {
-          "description": "The maximium temperature, above which an alert will be generated",
-          "type": "integer",
-          "format": "int32"
-        },
-        "min": {
-          "description": "The minimum temperature, below which an alert will be generated",
-          "type": "integer",
-          "format": "int32"
-        },
-        "probe": {
-          "type": "integer",
-          "format": "int32",
-          "default": 0,
-          "maximum": 3,
-          "minimum": 0
-        },
-        "scale": {
-          "description": "The temperature scale",
-          "type": "string",
-          "enum": [
-            "celsius"
-          ]
-        }
-      }
-    },
     "TemperatureProbe": {
       "type": "object",
       "required": [
@@ -422,7 +441,8 @@ func init() {
         "celsius",
         "fahrenheit",
         "probe",
-        "date-time"
+        "updated",
+        "warning_ackd"
       ],
       "properties": {
         "analog": {
@@ -435,11 +455,6 @@ func init() {
           "description": "Temperature reading in degrees Celsius",
           "type": "number",
           "format": "int32"
-        },
-        "date-time": {
-          "description": "The date and time of the reading",
-          "type": "string",
-          "format": "date-time"
         },
         "fahrenheit": {
           "description": "Temperature reading in degrees Fahrenheit",
@@ -454,9 +469,13 @@ func init() {
         "probe": {
           "type": "integer",
           "format": "int32",
-          "default": 0,
           "maximum": 3,
           "minimum": 0
+        },
+        "updated": {
+          "description": "The date and time of the reading",
+          "type": "string",
+          "format": "date-time"
         },
         "voltage": {
           "type": "number",
@@ -466,6 +485,10 @@ func init() {
         },
         "warning": {
           "type": "string"
+        },
+        "warning_ackd": {
+          "type": "boolean",
+          "default": false
         }
       }
     }

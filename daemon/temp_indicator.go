@@ -191,7 +191,7 @@ func (o *temperatureIndicator) tick() error {
 		"color": color.Hex(),
 		"hueGroupName": hueGroupName,
 		"nextHueUpdate": o.hueUpdTime,
-	}).Info("Updated temp indicator")
+	}).Debug("Updated temp indicator")
 
 	return nil
 }
@@ -208,11 +208,11 @@ func getTempColor(temp, min, max int32) colorful.Color {
 	// If the max limit is exceeded a visual indicator should be displayed (i.e. flashing)
 
 	if temp < min {
-		log.Warningf("%d° C is less than min %d° C...clamping", temp, min)
+		log.Debugf("%d° C is less than min %d° C...clamping", temp, min)
 		temp = min
 	}
 	if temp > max {
-			log.Warningf("%d° C is greater than max %d° C...clamping", temp, max)
+		log.Debugf("%d° C is greater than max %d° C...clamping", temp, max)
 		temp = max
 	}
 

@@ -19,18 +19,14 @@ func NewMonitorsManager() (*MonitorsManager) {
 
 // UpdateMonitor updates the temperature monitor settings for a given probe
 func (m *MonitorsManager) UpdateMonitor(params *monitors.UpdateMonitorParams) (bool, error) {
-	min := *params.Monitor.Min
-	max := *params.Monitor.Max
+	min := params.Min
+	max := params.Max
 
 	if min > max {
 		return false, fmt.Errorf("Minimum %d cannot be greater then Maximum %d", min, max)
 	}
 
-	probe := framework.Config.Hardware.Probes[*params.Monitor.Probe]
-
-	if (params.Monitor.Label != "" ) {
-		probe.Label = &params.Monitor.Label
-	}
+	probe := framework.Config.Hardware.Probes[params.Probe]
 
 	probe.Limits.MinWarnCelsius = &min
 	probe.Limits.MaxWarnCelsius = &max

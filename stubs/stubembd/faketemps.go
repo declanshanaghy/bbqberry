@@ -69,7 +69,7 @@ func getFakeTemp(probe int32) int32 {
 	celcius, _ = framework.ConvertAnalogToCF(analog)
 	analog2 := framework.ConvertCelsiusToAnalog(celcius + 1)
 
-	fakeTemps[probe] = analog2
+	//fakeTemps[probe] = analog2
 
 	log.WithFields(log.Fields{
 		"probe": probe,

@@ -1,0 +1,41 @@
+.probe-value.rzslider .rz-pointer {
+    /*width: 40px;*/
+    height: 20px;
+    top: auto; /* to remove the default positioning */
+    bottom: 0;
+    color: #b78dee;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.probe-value.rzslider[disabled] .rz-pointer {
+    color: gray;
+}
+
+.probe-value.rzslider .rz-pointer:after {
+    display: none;
+}
+
+.probe-value.rzslider .rz-bar {
+    display: none;
+}
+
+.bbq-probes {
+    /*border: 3px solid #00FF00;*/
+    height: 400px;
+}
+
+.bbq-probe {
+    border: 3px dashed gray;
+    padding-top: 400px;
+    padding-left: 40px;
+    padding-right: 50px;
+    padding-bottom: 30px;
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+label.probe-label {
+    padding-top: 200px;
+    margin-left: -120px;
+}

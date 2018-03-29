@@ -33,6 +33,7 @@ import (
 	"sync"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/system"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/monitors"
+	"github.com/declanshanaghy/bbqberry/restapi/operations/alerts"
 )
 
 
@@ -94,6 +95,11 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 		func(params monitors.UpdateMonitorParams) middleware.Responder {
 			mgr := backend.NewMonitorsManager()
 			return framework.HandleAPIRequestWithError(mgr.UpdateMonitor(&params))
+		})
+	api.AlertsUpdateAlertHandler = alerts.UpdateAlertHandlerFunc(
+		func(params alerts.UpdateAlertParams) middleware.Responder {
+			mgr := backend.NewAlertsManager()
+			return framework.HandleAPIRequestWithError(mgr.ClearAlert(&params))
 		})
 	api.LightsUpdateGrillLightsHandler = lights.UpdateGrillLightsHandlerFunc(
 		func(params lights.UpdateGrillLightsParams) middleware.Responder {

@@ -16,6 +16,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
+	"github.com/declanshanaghy/bbqberry/restapi/operations/alerts"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/hardware"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/lights"
@@ -47,6 +48,9 @@ func NewBbqberryAPI(spec *loads.Document) *BbqberryAPI {
 		}),
 		SystemShutdownHandler: system.ShutdownHandlerFunc(func(params system.ShutdownParams) middleware.Responder {
 			return middleware.NotImplemented("operation SystemShutdown has not yet been implemented")
+		}),
+		AlertsUpdateAlertHandler: alerts.UpdateAlertHandlerFunc(func(params alerts.UpdateAlertParams) middleware.Responder {
+			return middleware.NotImplemented("operation AlertsUpdateAlert has not yet been implemented")
 		}),
 		LightsUpdateGrillLightsHandler: lights.UpdateGrillLightsHandlerFunc(func(params lights.UpdateGrillLightsParams) middleware.Responder {
 			return middleware.NotImplemented("operation LightsUpdateGrillLights has not yet been implemented")
@@ -80,6 +84,8 @@ type BbqberryAPI struct {
 	HealthHealthHandler health.HealthHandler
 	// SystemShutdownHandler sets the operation handler for the shutdown operation
 	SystemShutdownHandler system.ShutdownHandler
+	// AlertsUpdateAlertHandler sets the operation handler for the update alert operation
+	AlertsUpdateAlertHandler alerts.UpdateAlertHandler
 	// LightsUpdateGrillLightsHandler sets the operation handler for the update grill lights operation
 	LightsUpdateGrillLightsHandler lights.UpdateGrillLightsHandler
 	// MonitorsUpdateMonitorHandler sets the operation handler for the update monitor operation
@@ -161,6 +167,10 @@ func (o *BbqberryAPI) Validate() error {
 
 	if o.SystemShutdownHandler == nil {
 		unregistered = append(unregistered, "system.ShutdownHandler")
+	}
+
+	if o.AlertsUpdateAlertHandler == nil {
+		unregistered = append(unregistered, "alerts.UpdateAlertHandler")
 	}
 
 	if o.LightsUpdateGrillLightsHandler == nil {
@@ -270,6 +280,11 @@ func (o *BbqberryAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/system/shutdown"] = system.NewShutdown(o.context, o.SystemShutdownHandler)
+
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/alerts"] = alerts.NewUpdateAlert(o.context, o.AlertsUpdateAlertHandler)
 
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)

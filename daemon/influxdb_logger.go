@@ -80,11 +80,11 @@ func (o *influxDBLogger) collectTemperatureMetrics() ([]*models.TemperatureReadi
 
 	readings := make([]*models.TemperatureReading, 0)
 	for _, i := range(*o.probes) {
-		reading := models.TemperatureReading{}
-		if err := o.reader.GetTemperatureReading(i, &reading); err != nil {
+		reading, err := o.reader.GetTemperatureReading(i)
+		if err != nil {
 			return nil, err
 		}
-		readings = append(readings, &reading)
+		readings = append(readings, reading)
 	}
 	return readings, nil
 }
@@ -118,7 +118,7 @@ func (o *influxDBLogger) writeToInflux(reading *models.TemperatureReading, probe
 		"Label": *probe.Label,
 		"Probe": *reading.Probe,
 		"Fahrenheit": *reading.Fahrenheit,
-	}).Info("Logging temperature to InfluxDB")
+	}).Debugf("Logging temperature to InfluxDB")
 
 	if _, err := influxdb.WritePoint("temp", tags, fields); err != nil {
 		return err

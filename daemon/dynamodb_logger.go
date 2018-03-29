@@ -134,7 +134,7 @@ func (o *dynamoDBLogger) start() error {
 	var err error
 
 	if o.dynamo, err = initializeDynamoDB(); err == nil {
-		if err := o.writeCurrentStateToDynamoDB("On"); err != nil {
+		if err := o.writeCurrentStateToDynamoDB("OK"); err != nil {
 			log.WithField("err", err).Error("Unable to write CurrentState to DynamoDB")
 			// Returning an error from start causes a panic. if DynamoDB is not available just ignore it
 			return nil
@@ -154,7 +154,7 @@ func (o *dynamoDBLogger) stop() error {
 		}
 	}
 
-	if err := o.writeCurrentStateToDynamoDB("Off"); err != nil {
+	if err := o.writeCurrentStateToDynamoDB("UNREACHABLE"); err != nil {
 		log.WithField("err", err).Error("Unable to write CurrentState to DynamoDB")
 	}
 
@@ -190,11 +190,11 @@ func (o *dynamoDBLogger) collectTemperatureMetrics() ([]*models.TemperatureReadi
 
 	readings := make([]*models.TemperatureReading, 0)
 	for _, i := range(*o.probes) {
-		reading := models.TemperatureReading{}
-		if err := o.reader.GetTemperatureReading(i, &reading); err != nil {
+		reading, err := o.reader.GetTemperatureReading(i)
+		if err != nil {
 			return nil, err
 		}
-		readings = append(readings, &reading)
+		readings = append(readings, reading)
 	}
 	return readings, nil
 }

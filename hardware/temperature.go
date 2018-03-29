@@ -14,7 +14,7 @@ import (
 // TemperatureReader provides an interface to read temperature values from the physical temperature probes
 type TemperatureReader interface {
 	// GetTemperatureReading reads the tempearature from the requested probe
-	GetTemperatureReading(probe int32, reading *models.TemperatureReading) error
+	GetTemperatureReading(probe int32) (*models.TemperatureReading, error)
 	// GetNumProbes returns the number of configured temperature probes
 	GetNumProbes() int32
 	// Close closes communication with the underlying hardware
@@ -25,16 +25,26 @@ type temperatureReader struct {
 	numProbes int32
 	bus       embd.I2CBus
 	adc       ADC
+	readings  []*models.TemperatureReading
 }
 
 // newTemperatureReader constructs a concrete implementation of
 // TemperatureReader which can communicate with the underlying hardware
 func newTemperatureReader(numProbes int32, bus embd.I2CBus) TemperatureReader {
-	return &temperatureReader{
-		numProbes: numProbes,
-		bus:       bus,
-		adc:       NewADS1115(bus),
+	o := temperatureReader{
+		bus:       	bus,
+		adc:       	NewADS1115(bus),
+		numProbes:	numProbes,
+		readings:	make([]*models.TemperatureReading, numProbes),
 	}
+
+	for i := int32(0); i < numProbes; i++ {
+		o.readings[i] = &models.TemperatureReading{
+			WarningAckd: false,
+		}
+	}
+
+	return &o
 }
 
 func (o *temperatureReader) Close() {
@@ -72,10 +82,10 @@ func (o *temperatureReader) readProbe(probe int32) (a int32, err error) {
 	return int32(a), err
 }
 
-func (o *temperatureReader) GetTemperatureReading(probe int32, reading *models.TemperatureReading) error {
+func (o *temperatureReader) GetTemperatureReading(probe int32) (*models.TemperatureReading, error) {
 	analog, err := o.readProbe(probe)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	hwCfg := framework.Config.Hardware
@@ -87,6 +97,8 @@ func (o *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 	log.Debugf("probe=%d A=%d V=%0.5f K=%d C=%d F=%d minC=%d maxC=%d",
 		probe, analog, vOut, tempK, tempC, tempF, probeLimits.MinWarnCelsius, probeLimits.MaxWarnCelsius)
 
+	reading := o.readings[probe]
+
 	if tempC < *probeLimits.MinWarnCelsius {
 		reading.Warning = fmt.Sprintf("%d° C exceeds low temperature warning limit of %d° C",
 			int32(tempC), int32(*probeLimits.MinWarnCelsius))
@@ -96,18 +108,15 @@ func (o *temperatureReader) GetTemperatureReading(probe int32, reading *models.T
 			int32(tempC), int32(*probeLimits.MaxWarnCelsius))
 	}
 
-	if len(reading.Warning) > 0 {
-		log.WithField("probe", probe).Warning(reading.Warning)
-	}
-
 	t := strfmt.DateTime(time.Now())
+
 	reading.Probe = &probe
-	reading.DateTime = &t
+	reading.Updated = &t
 	reading.Analog = &analog
 	reading.Voltage = &vOut
 	reading.Kelvin = &tempK
 	reading.Celsius = &tempC
 	reading.Fahrenheit = &tempF
 
-	return nil
+	return reading, nil
 }

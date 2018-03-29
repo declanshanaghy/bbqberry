@@ -53,7 +53,9 @@ func (o *Commander) initializeHue() error {
 	if err != nil {
 		return err
 	}
-	o.huePortal = &pp[0]
+	if len(pp) > 0 {
+		o.huePortal = &pp[0]
+	}
 
 	return nil
 }
