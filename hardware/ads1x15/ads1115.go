@@ -107,11 +107,13 @@ func (o *ads1x15) read(mux, gain, mode int) (int, error) {
 
 	// Wait for the ADC sample to finish based on the sample rate plus a
 	// small offset to be sure (0.1 millisecond).
-	s := (1.0 / float32(data_rate)) + float32(time.Millisecond)
+	//s := 0.007812 + 0.0001
+	s := time.Duration((float32(time.Second) / float32(data_rate))) + time.Millisecond / 100
+	//log.WithFields(log.Fields{
+	//	"s": fmt.Sprintf("%s", time.Duration(s)),
+	//}).Info("Sleep")
 	time.Sleep(time.Duration(s))
-	log.WithFields(log.Fields{
-		"s": fmt.Sprintf("%f", s),
-	}).Debug("Sleep")
+
 
 	// Retrieve the result.
 	//result = self._device.readList(ADS1x15_POINTER_CONVERSION, 2)

@@ -17,8 +17,8 @@ angular.module('bbqberry.overview', ['ngRoute', 'ui.bootstrap'])
             $scope.isCollapsedHorizontal = false;
 
             var floor = 0;
-            var ceil = 250;
-            var interval = 50;
+            var ceil = 500;
+            var interval = 100;
             var nTicks = ((ceil - floor) / interval) + 1;
             var ticksArray = Array.apply(null, {length: nTicks}).map(function(value, index){
                 return Math.floor(floor + (index * interval));
@@ -72,19 +72,19 @@ angular.module('bbqberry.overview', ['ngRoute', 'ui.bootstrap'])
 
                 myPoller.promise.then(null, null, function (response) {
                     if ( $scope.probes[0].enabled ) {
-                        $scope.probe1Val.value = response.data[0].celsius;
+                        $scope.probe1Val.value = response.data[0].fahrenheit;
                         $scope.probes[0].data = response.data[0];
                     }
                     if ( $scope.probes[1].enabled ) {
-                        $scope.probe2Val.value = response.data[1].celsius;
+                        $scope.probe2Val.value = response.data[1].fahrenheit;
                         $scope.probes[1].data = response.data[1];
                     }
                     if ( $scope.probes[2].enabled ) {
-                        $scope.probe3Val.value = response.data[2].celsius;
+                        $scope.probe3Val.value = response.data[2].fahrenheit;
                         $scope.probes[2].data = response.data[2];
                     }
                     if ( $scope.probes[3].enabled ) {
-                        $scope.probe4Val.value = response.data[3].celsius;
+                        $scope.probe4Val.value = response.data[3].fahrenheit;
                         $scope.probes[3].data = response.data[3];
                     }
                 });
@@ -92,8 +92,8 @@ angular.module('bbqberry.overview', ['ngRoute', 'ui.bootstrap'])
 
             var newRangeSlider = function(probe) {
                 return {
-                    minValue: probe.limits.minWarnCelsius,
-                    maxValue: probe.limits.maxWarnCelsius,
+                    minValue: celsiusToFahrenheit(probe.limits.minWarnCelsius),
+                    maxValue: celsiusToFahrenheit(probe.limits.maxWarnCelsius),
                     options: {
                         id: probe.index,
                         disabled: !probe.enabled,
@@ -116,8 +116,8 @@ angular.module('bbqberry.overview', ['ngRoute', 'ui.bootstrap'])
                                 method: 'PUT',
                                 url: '/api/monitors',
                                 data: {
-                                    "max": high,
-                                    "min": low,
+                                    "max": fahrenheitToCelsius(high),
+                                    "min": fahrenheitToCelsius(low),
                                     "probe": id,
                                     "scale": "celsius"
                                 }
@@ -140,7 +140,7 @@ angular.module('bbqberry.overview', ['ngRoute', 'ui.bootstrap'])
                         ceil: ceil,
                         vertical: true,
                         translate: function(value) {
-                            return value + "° C";
+                            return value + "° F";
                         },
                         showTicksValues: false,
                         hideLimitLabels: true,
