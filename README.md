@@ -3,9 +3,9 @@
 
 # BBQ Berry - Raspberry Pi controlled BBQ
 
-
+## System Overview
 ![System Overview](design/components.png)
 
-![Circuit Design](design/physical_layout.png | width=400)
-
+## Physical Layout
+![Physical Layout](design/physical_layout.png)
 
