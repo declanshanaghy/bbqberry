@@ -6,6 +6,6 @@
 
 ![System Overview](design/components.png)
 
-![Circuit Design]<img src="design/physical_layout.png" width="480">
+![Circuit Design](design/physical_layout.png | width=400)
 
 
