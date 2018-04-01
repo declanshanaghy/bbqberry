@@ -14,7 +14,7 @@ var _ = Describe("WS2801", func() {
 	)
 
 	BeforeEach(func() {
-		strand = hardware.NewStrandController()
+		strand = hardware.NewGrillLightController()
 		hardware.StubSPIBus.Reset()
 	})
 

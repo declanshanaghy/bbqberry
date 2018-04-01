@@ -107,6 +107,30 @@ func init() {
       }
     },
     "/lights/grill": {
+      "get": {
+        "tags": [
+          "Lights"
+        ],
+        "summary": "Get the colors currently showing on the grill lights",
+        "operationId": "getGrillLights",
+        "responses": {
+          "200": {
+            "description": "Pixels were read successfully",
+            "schema": {
+              "type": "object",
+              "items": {
+                "$ref": "#/definitions/LightStrip"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "Lights"
@@ -268,6 +292,18 @@ func init() {
     }
   },
   "definitions": {
+    "Color": {
+      "type": "object",
+      "required": [
+        "hex"
+      ],
+      "properties": {
+        "hex": {
+          "description": "Color in hex representation",
+          "type": "string"
+        }
+      }
+    },
     "Error": {
       "type": "object",
       "required": [
@@ -346,6 +382,25 @@ func init() {
         },
         "service_info": {
           "$ref": "#/definitions/ServiceInfo"
+        }
+      }
+    },
+    "LightStrip": {
+      "type": "object",
+      "required": [
+        "name",
+        "pixels"
+      ],
+      "properties": {
+        "name": {
+          "description": "Name of the light strip",
+          "type": "string"
+        },
+        "pixels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Color"
+          }
         }
       }
     },

@@ -82,7 +82,7 @@ func RedGreenBlueRandom(strand0 hardware.WS2801) {
 }
 
 func main() {
-	strand := hardware.NewStrandController()
+	strand := hardware.NewGrillLightController()
 	defer strand.Close()
 
 	RedGreenBlueRandom(strand)

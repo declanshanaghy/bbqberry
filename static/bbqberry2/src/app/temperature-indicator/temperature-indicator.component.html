@@ -1,0 +1,8 @@
+
+
+<span *ngIf="probe != null && reading != null">
+  <mat-slider vertical disabled thumbLabel tickInterval="auto"
+              min="{{probe.limits.minAbsCelsius}}" max="{{probe.limits.maxAbsCelsius}}" step="1"
+              value="{{reading.celsius}}"></mat-slider>
+  <mat-card-subtitle>{{probe.label}} - {{reading.celsius}}</mat-card-subtitle>
+</span>

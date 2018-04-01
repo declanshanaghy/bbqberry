@@ -101,6 +101,10 @@ func configureAPI(api *operations.BbqberryAPI) http.Handler {
 			mgr := backend.NewAlertsManager()
 			return framework.HandleAPIRequestWithError(mgr.ClearAlert(&params))
 		})
+	api.LightsGetGrillLightsHandler = lights.GetGrillLightsHandlerFunc(
+		func(params lights.GetGrillLightsParams) middleware.Responder {
+			return framework.HandleAPIRequestWithError(commander.GetGrillLights(&params))
+		})
 	api.LightsUpdateGrillLightsHandler = lights.UpdateGrillLightsHandlerFunc(
 		func(params lights.UpdateGrillLightsParams) middleware.Responder {
 			return framework.HandleAPIRequestWithError(commander.UpdateGrillLights(&params))

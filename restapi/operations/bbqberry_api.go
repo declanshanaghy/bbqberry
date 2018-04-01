@@ -37,6 +37,9 @@ func NewBbqberryAPI(spec *loads.Document) *BbqberryAPI {
 		ServeError:      errors.ServeError,
 		JSONConsumer:    runtime.JSONConsumer(),
 		JSONProducer:    runtime.JSONProducer(),
+		LightsGetGrillLightsHandler: lights.GetGrillLightsHandlerFunc(func(params lights.GetGrillLightsParams) middleware.Responder {
+			return middleware.NotImplemented("operation LightsGetGrillLights has not yet been implemented")
+		}),
 		HardwareGetHardwareHandler: hardware.GetHardwareHandlerFunc(func(params hardware.GetHardwareParams) middleware.Responder {
 			return middleware.NotImplemented("operation HardwareGetHardware has not yet been implemented")
 		}),
@@ -76,6 +79,8 @@ type BbqberryAPI struct {
 	// JSONProducer registers a producer for a "application/json" mime type
 	JSONProducer runtime.Producer
 
+	// LightsGetGrillLightsHandler sets the operation handler for the get grill lights operation
+	LightsGetGrillLightsHandler lights.GetGrillLightsHandler
 	// HardwareGetHardwareHandler sets the operation handler for the get hardware operation
 	HardwareGetHardwareHandler hardware.GetHardwareHandler
 	// TemperaturesGetTemperaturesHandler sets the operation handler for the get temperatures operation
@@ -151,6 +156,10 @@ func (o *BbqberryAPI) Validate() error {
 
 	if o.JSONProducer == nil {
 		unregistered = append(unregistered, "JSONProducer")
+	}
+
+	if o.LightsGetGrillLightsHandler == nil {
+		unregistered = append(unregistered, "lights.GetGrillLightsHandler")
 	}
 
 	if o.HardwareGetHardwareHandler == nil {
@@ -260,6 +269,11 @@ func (o *BbqberryAPI) initHandlerCache() {
 	if o.handlers == nil {
 		o.handlers = make(map[string]map[string]http.Handler)
 	}
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/lights/grill"] = lights.NewGetGrillLights(o.context, o.LightsGetGrillLightsHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)

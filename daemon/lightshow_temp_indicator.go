@@ -16,9 +16,8 @@ import (
 
 // temperatureIndicator collects and logs temperature metrics
 type temperatureIndicator struct {
-	basicTickable
+	lightShowTickable
 	reader      	hardware.TemperatureReader
-	strip       	hardware.WS2801
 	errorCount  	int
 	probeNumber 	int32
 	huePortal		*portal.Portal
@@ -32,18 +31,18 @@ type temperatureIndicator struct {
 
 // newTemperatureIndicator creates a new temperatureIndicator instance which can be
 // run in the background to check average temperature and indicate it visually on the LED strip
-func newTemperatureIndicator(huePortal *portal.Portal) RunnableTicker {
+func newTemperatureIndicator(huePortal *portal.Portal) LightShow {
 	t := &temperatureIndicator{
 		reader: 		hardware.NewTemperatureReader(),
-		strip:  		hardware.NewStrandController(),
 		huePortal:		huePortal,
 		probeNumber:	-1,
 		hueUpdTime:		time.Now(),
 		hueUpdInterval: time.Second * 10,
 	}
+	t.strip = hardware.NewGrillLightController()
 	t.Period = time.Second
 
-	return newRunnableTicker(t)
+	return newLightShow(t)
 }
 
 // GetName returns a human readable name for this background task

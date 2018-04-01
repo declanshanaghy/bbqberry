@@ -12,10 +12,10 @@ import (
 type testingTickable struct {
 	basicTickable
 
-	// These variables keep track of interactions between this tickable and the runner
+	// These variables keep track of interactions between this tickableIFC and the runner
 	startCalls, stopCalls, tickCalls int
 
-	// These variables control how this tickable behaves
+	// These variables control how this tickableIFC behaves
 
 	// max # of times tick can be called before it will indicate that it wants to exit. < 0 means execute forever
 	maxTickCalls int
@@ -62,7 +62,7 @@ func (t *testingTickable) tick() error {
 }
 
 var _ = Describe("The runner", func() {
-	Context("When given a tickable that exits immediately", func() {
+	Context("When given a tickableIFC that exits immediately", func() {
 		It("it should exit cleanly", func() {
 			tt := testingTickable{maxTickCalls:1}
 			rt := newRunnableTicker(&tt)
@@ -70,23 +70,23 @@ var _ = Describe("The runner", func() {
 			err := rt.runnable.StartBackground()
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(rt.runnable.IsRunning()).To(BeTrue(), "Expected the tickable to be running")
+			Expect(rt.runnable.IsRunning()).To(BeTrue(), "Expected the tickableIFC to be running")
 
-			// This should allow at least 1 tickable execution
+			// This should allow at least 1 tickableIFC execution
 			time.Sleep(time.Millisecond)
 
 			// Requesting stop should fail because it exits on its own
 			err = rt.runnable.StopBackground()
 			Expect(err).To(HaveOccurred())
 
-			Expect(rt.runnable.IsRunning()).To(BeFalse(), "Expected the tickable to not be running")
+			Expect(rt.runnable.IsRunning()).To(BeFalse(), "Expected the tickableIFC to not be running")
 
 			Expect(tt.startCalls).Should(Equal(1), "Number of calls to start is incorrect")
 			Expect(tt.tickCalls).Should(Equal(1), "Number of calls to tick is incorrect")
 			Expect(tt.stopCalls).Should(Equal(0), "Number of calls to stop is incorrect")
 		})
 	})
-	Context("When given a tickable that never exits", func() {
+	Context("When given a tickableIFC that never exits", func() {
 		var tt testingTickable
 		var rt RunnableTicker
 
@@ -106,7 +106,7 @@ var _ = Describe("The runner", func() {
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(Equal("Cannot execute StartBackground. Already running"))
 
-			// This should allow at least 1 tickable execution
+			// This should allow at least 1 tickableIFC execution
 			time.Sleep(time.Millisecond)
 
 			err = rt.runnable.StopBackground()
@@ -130,7 +130,7 @@ var _ = Describe("The runner", func() {
 			err := rt.runnable.StartBackground()
 			Expect(err).ToNot(HaveOccurred())
 
-			// This should allow at least 1 tickable execution
+			// This should allow at least 1 tickableIFC execution
 			time.Sleep(time.Millisecond)
 
 			err = rt.runnable.StopBackground()

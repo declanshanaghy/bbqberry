@@ -22,8 +22,8 @@ type ADC interface {
 	AnalogValueAt(chanNum int) (int, error)
 }
 
-// NewStrandController provides an abstracted interface to the LED strands
-func NewStrandController() WS2801 {
+// NewGrillLightController provides an abstracted interface to the LED strands
+func NewGrillLightController() WS2801 {
 	config := framework.Config.Hardware
 
 	bus := newSPIBus(0)

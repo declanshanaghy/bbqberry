@@ -149,7 +149,7 @@ def get_endpoint_from_v2_appliance(appliance):
         "friendlyName": appliance["friendlyName"],
         "description": appliance["friendlyDescription"],
         "cookie": appliance["additionalApplianceDetails"],
-        "displayCategories": ["THERMOSTAT"],
+        "displayCategories": ["TEMPERATURE_SENSOR"],
         "capabilities": [
             {
                 "type": "AlexaInterface",

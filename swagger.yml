@@ -27,6 +27,22 @@ paths:
           schema:
             $ref: "#/definitions/Error"
   /lights/grill:
+    get:
+      operationId: getGrillLights
+      tags:
+        - Lights
+      summary: "Get the colors currently showing on the grill lights"
+      responses:
+        200:
+          description: "Pixels were read successfully"
+          schema:
+            type: object
+            items:
+              $ref: "#/definitions/LightStrip"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
     put:
       operationId: updateGrillLights
       tags:
@@ -253,6 +269,27 @@ definitions:
         type: string
       Message:
         type: string
+  LightStrip:
+    type: object
+    required:
+      - name
+      - pixels
+    properties:
+      name:
+        type: string
+        description: Name of the light strip
+      pixels:
+        type: array
+        items:
+          $ref: "#/definitions/Color"
+  Color:
+    type: object
+    required:
+      - hex
+    properties:
+      hex:
+        type: string
+        description: Color in hex representation
   TemperatureReading:
     type: object
     required:

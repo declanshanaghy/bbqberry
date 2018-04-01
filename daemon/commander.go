@@ -18,14 +18,14 @@ import (
 // Commander is the main controller of all background goroutines
 type Commander struct {
 	runner
-	basicTickable
+	lightShowTickable
 
 	Options     *framework.CmdOptions
 
 	period      time.Duration
-	tempLoggers [2]Runnable
-	currentShow *RunnableTicker
-	lightShows  map[string]RunnableTicker
+	tempLoggers [2]RunnableIFC
+	currentShow *LightShow
+	lightShows  map[string]LightShow
 	strip       hardware.WS2801
 	huePortal   *portal.Portal
 }
@@ -36,7 +36,7 @@ type Commander struct {
 func NewCommander() *Commander {
 	c := Commander{
 		Options: 	framework.NewCmdOptions(),
-		strip: 		hardware.NewStrandController(),
+		strip: 		hardware.NewGrillLightController(),
 	}
 	c.runner.tickable = &c
 	c.runner.tickable.setPeriod(time.Second)
@@ -69,7 +69,7 @@ func (o *Commander) start() (error) {
 
 	o.initializeLightShows()
 
-	o.tempLoggers = [2]Runnable {
+	o.tempLoggers = [2]RunnableIFC{
 		newInfluxDBLoggerRunnable(),
 		newDynamoDBLoggerRunnable(),
 	}
@@ -120,12 +120,12 @@ func (o *Commander) tick() error {
 }
 
 func (o* Commander) initializeLightShows() {
-	shows := []RunnableTicker {
+	shows := []LightShow {
 		newSimpleShifter(time.Second),
 		newTemperatureIndicator(o.huePortal),
-		newRainbow(time.Millisecond * 100),
+		newRainbow(time.Millisecond * 10),
 	}
-	lightShows := make(map[string]RunnableTicker)
+	lightShows := make(map[string]LightShow)
 	for _, show := range(shows) {
 		lightShows[show.tickable.GetName()] = show
 	}
@@ -133,13 +133,33 @@ func (o* Commander) initializeLightShows() {
 	o.lightShows = lightShows
 }
 
-func (o* Commander) getLightShow(name string) (RunnableTicker, error) {
+func (o* Commander) getLightShow(name string) (LightShow, error) {
 	show, ok := o.lightShows[o.Options.LightShow]
 	if ok {
 		return show, nil
 	} else {
 		return show, fmt.Errorf("Unable to find light show with name='%s'", name)
 	}
+}
+
+func (o *Commander) GetGrillLights(params *lights.GetGrillLightsParams) (*models.LightStrip, error) {
+	name := "Grill"
+	colors, err := o.currentShow.tickable.GetStrip().GetColors()
+	if err != nil {
+		return nil, err
+	}
+
+	pixels := make([]*models.Color, len(colors))
+	for i := 0; i < len(colors); i++ {
+		h := colors[i].Hex()
+		pixels[i] = &models.Color{ Hex: &h }
+	}
+
+	grill := models.LightStrip{
+		Name: &name,
+		Pixels: pixels,
+	}
+	return &grill, nil
 }
 
 func (o *Commander) UpdateGrillLights(params *lights.UpdateGrillLightsParams) (bool, error) {
@@ -192,7 +212,7 @@ func (o *Commander) ShutdownSystem(params *system.ShutdownParams) (*models.Shutd
 	return &shdn, nil
 }
 
-func (o *Commander) changeLightShow(lightShow *RunnableTicker, period int64) error {
+func (o *Commander) changeLightShow(lightShow *LightShow, period int64) error {
 	o.DisableLights()
 
 	o.currentShow = lightShow

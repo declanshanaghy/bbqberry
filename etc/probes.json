@@ -1,7 +1,7 @@
 [
   {
-    "enabled": false,
-    "label": "Chamber Alt",
+    "enabled": true,
+    "label": "Chamber",
     "limits": {
       "maxAbsCelsius": 400,
       "maxWarnCelsius": 205,
@@ -34,7 +34,7 @@
   },
   {
     "enabled": true,
-    "label": "Chamber",
+    "label": "Chamber Alt",
     "limits": {
       "maxAbsCelsius": 400,
       "maxWarnCelsius": 205,

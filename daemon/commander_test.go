@@ -18,7 +18,7 @@ var _ = Describe("Commander daemon", func() {
 		err := cmdr.StartBackground()
 		Expect(err).ToNot(HaveOccurred())
 
-		// This should allow at least 1 tickable execution
+		// This should allow at least 1 tickableIFC execution
 		time.Sleep(time.Millisecond * 1000)
 
 		err = cmdr.StopBackground()

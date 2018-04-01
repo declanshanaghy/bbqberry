@@ -28,7 +28,7 @@ type dynamoDBLogger struct {
 
 // newInfluxDBLogger creates a new influxDBLogger instance which can be
 // run in the background to collect and log temperature metrics
-func newDynamoDBLoggerRunnable() Runnable {
+func newDynamoDBLoggerRunnable() RunnableIFC {
 	return newRunnable(newDynamoDBLogger())
 }
 

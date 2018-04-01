@@ -23,6 +23,34 @@ type Client struct {
 }
 
 /*
+GetGrillLights gets the colors currently showing on the grill lights
+*/
+func (a *Client) GetGrillLights(params *GetGrillLightsParams) (*GetGrillLightsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetGrillLightsParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "getGrillLights",
+		Method:             "GET",
+		PathPattern:        "/lights/grill",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetGrillLightsReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetGrillLightsOK), nil
+
+}
+
+/*
 UpdateGrillLights enables a light show on the grill lights
 */
 func (a *Client) UpdateGrillLights(params *UpdateGrillLightsParams) (*UpdateGrillLightsOK, error) {

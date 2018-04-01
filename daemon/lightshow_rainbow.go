@@ -9,20 +9,18 @@ import (
 
 // rainbow displays a single colored pulse on the strand
 type rainbow struct {
-	basicTickable
+	lightShowTickable
 	j		int
-	strip   hardware.WS2801
 }
 
 // newSimpleShifter creates a new temperatureIndicator instance which can be
 // run in the background to check average temperature and indicate it visually on the LED strip
-func newRainbow(period time.Duration) RunnableTicker {
-	t := &rainbow{
-		strip: hardware.NewStrandController(),
-	}
+func newRainbow(period time.Duration) LightShow {
+	t := &rainbow{}
+	t.strip = hardware.NewGrillLightController()
 	t.Period = period
 
-	return newRunnableTicker(t)
+	return newLightShow(t)
 }
 
 // GetName returns a human readable name for this background task
@@ -35,7 +33,7 @@ func (o *rainbow) start() error {
 	log.WithFields(log.Fields{
 		"name": o.GetName(),
 		"period": o.getPeriod(),
-	}).Info("Starting tickable execution")
+	}).Info("Starting tickableIFC execution")
 	return o.strip.Off()
 }
 
@@ -43,7 +41,7 @@ func (o *rainbow) start() error {
 func (o *rainbow) stop() error {
 	log.WithFields(log.Fields{
 		"name": o.GetName(),
-	}).Info("Stopping tickable execution")
+	}).Info("Stopping tickableIFC execution")
 	return o.strip.Off()
 }
 /*

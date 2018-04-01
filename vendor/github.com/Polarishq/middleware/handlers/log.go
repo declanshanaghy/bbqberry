@@ -60,6 +60,9 @@ func (l *LoggingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	startTime := time.Now()
 	log.Debugf("LoggingHandler: request: %+v string_request %+v", r, stringify(r))
 	lwr := loggingResponseWriter{w: w, captureBody: l.logResponseBody}
+
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+
 	l.handler.ServeHTTP(&lwr, r)
 	endTime := time.Now()
 	// if the code is 0, it means that an outter handler will write the code

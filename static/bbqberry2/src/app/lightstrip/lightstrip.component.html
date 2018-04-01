@@ -1,0 +1,5 @@
+<div class="lightStrip" *ngIf="strip != null">
+  <span class="pixel" *ngFor="let pixel of strip.pixels" [style.background-color]="pixel.hex">
+    &nbsp;
+  </span>
+</div>
