@@ -17,6 +17,11 @@ import (
 // swagger:model LightStrip
 type LightStrip struct {
 
+	// The time interval between updates in microseconds
+	// Required: true
+	// Minimum: 0
+	Interval *int32 `json:"interval"`
+
 	// Name of the light strip
 	// Required: true
 	Name *string `json:"name"`
@@ -29,6 +34,11 @@ type LightStrip struct {
 // Validate validates this light strip
 func (m *LightStrip) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateInterval(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
 
 	if err := m.validateName(formats); err != nil {
 		// prop
@@ -43,6 +53,19 @@ func (m *LightStrip) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *LightStrip) validateInterval(formats strfmt.Registry) error {
+
+	if err := validate.Required("interval", "body", m.Interval); err != nil {
+		return err
+	}
+
+	if err := validate.MinimumInt("interval", "body", int64(*m.Interval), 0, false); err != nil {
+		return err
+	}
+
 	return nil
 }
 

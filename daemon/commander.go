@@ -123,7 +123,7 @@ func (o* Commander) initializeLightShows() {
 	shows := []LightShow {
 		newSimpleShifter(time.Second),
 		newTemperatureIndicator(o.huePortal),
-		newRainbow(time.Millisecond * 10),
+		newRainbow(time.Millisecond * 100),
 	}
 	lightShows := make(map[string]LightShow)
 	for _, show := range(shows) {
@@ -143,23 +143,28 @@ func (o* Commander) getLightShow(name string) (LightShow, error) {
 }
 
 func (o *Commander) GetGrillLights(params *lights.GetGrillLightsParams) (*models.LightStrip, error) {
-	name := "Grill"
-	colors, err := o.currentShow.tickable.GetStrip().GetColors()
-	if err != nil {
-		return nil, err
-	}
+	if ( o.currentShow != nil ) {
+		colors, err := o.currentShow.tickable.GetStrip().GetColors()
+		if err != nil {
+			return nil, err
+		}
 
-	pixels := make([]*models.Color, len(colors))
-	for i := 0; i < len(colors); i++ {
-		h := colors[i].Hex()
-		pixels[i] = &models.Color{ Hex: &h }
-	}
+		pixels := make([]*models.Color, len(colors))
+		for i := 0; i < len(colors); i++ {
+			h := colors[i].Hex()
+			pixels[i] = &models.Color{ Hex: &h }
+		}
 
-	grill := models.LightStrip{
-		Name: &name,
-		Pixels: pixels,
+		name := o.currentShow.tickable.GetName()
+		interval := int32(o.currentShow.tickable.getPeriod() / time.Microsecond)
+		grill := models.LightStrip{
+			Name: &name,
+			Interval: &interval,
+			Pixels: pixels,
+		}
+		return &grill, nil
 	}
-	return &grill, nil
+	return nil, fmt.Errorf("Lights are not enabled")
 }
 
 func (o *Commander) UpdateGrillLights(params *lights.UpdateGrillLightsParams) (bool, error) {

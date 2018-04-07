@@ -134,14 +134,17 @@ func (o *dynamoDBLogger) start() error {
 	var err error
 
 	if o.dynamo, err = initializeDynamoDB(); err == nil {
+		// Returning an error from start causes a panic.
+		// 	if DynamoDB is not available just log the error and move on
 		if err := o.writeCurrentStateToDynamoDB("OK"); err != nil {
 			log.WithField("err", err).Error("Unable to write CurrentState to DynamoDB")
-			// Returning an error from start causes a panic. if DynamoDB is not available just ignore it
-			return nil
+		}
+		if err := o.tick(); err != nil {
+			log.WithField("err", err).Error("Unable to tick")
 		}
 	}
 
-	return o.tick()
+	return nil
 }
 
 // Stop performs cleanup when the goroutine is exiting
@@ -298,6 +301,24 @@ func (o *dynamoDBLogger) writeToDynamoDB(reading *models.TemperatureReading, pro
 		"Fahrenheit": *reading.Fahrenheit,
 	}).Debug("Logging temperature to DynamoDB")
 
+	// TODO: Need to add a panic recovery handler here:
+	defer func() {
+		if err := recover(); err != nil {
+			log.WithField("err", err).Error("Recovered panic while logging to dynamodb")
+		}
+	}()
 	_, err := o.dynamo.UpdateItem(input)
+	/*
+	goroutine 41 [running]:
+github.com/declanshanaghy/bbqberry/vendor/github.com/aws/aws-sdk-go/service/dynamodb.(*DynamoDB).newRequest(0x0, 0xc420b23dc0, 0x167b220, 0xc4211863c0, 0x1625280, 0xc420a13c20, 0x0)
+	/Users/dshanaghy/go/src/github.com/declanshanaghy/bbqberry/vendor/github.com/aws/aws-sdk-go/service/dynamodb/service.go:87 +0x26
+github.com/declanshanaghy/bbqberry/vendor/github.com/aws/aws-sdk-go/service/dynamodb.(*DynamoDB).UpdateItemRequest(0x0, 0xc4211863c0, 0x0, 0x0)
+	/Users/dshanaghy/go/src/github.com/declanshanaghy/bbqberry/vendor/github.com/aws/aws-sdk-go/service/dynamodb/api.go:3145 +0x10d
+github.com/declanshanaghy/bbqberry/vendor/github.com/aws/aws-sdk-go/service/dynamodb.(*DynamoDB).UpdateItem(0x0, 0xc4211863c0, 0x1, 0x1, 0xc4219c3bf0)
+	/Users/dshanaghy/go/src/github.com/declanshanaghy/bbqberry/vendor/github.com/aws/aws-sdk-go/service/dynamodb/api.go:3192 +0x35
+github.com/declanshanaghy/bbqberry/daemon.(*dynamoDBLogger).writeToDynamoDB(0xc42036d050, 0xc420074820, 0xc420243320, 0x1, 0xc421209540)
+	/Users/dshanaghy/go/src/github.com/declanshanaghy/bbqberry/daemon/dynamodb_logger.go:301 +0x9ca
+github.com/declanshanaghy/bbqberry/daemon.(*dynamoDBLogger).logTemperatureMetrics(0xc42036d050, 0xc4219d26f0, 0x2, 0x2, 0x0, 0x0)
+	 */
 	return err
 }

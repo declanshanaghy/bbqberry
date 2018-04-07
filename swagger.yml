@@ -273,8 +273,14 @@ definitions:
     type: object
     required:
       - name
+      - interval
       - pixels
     properties:
+      interval:
+        type: integer
+        format: int32
+        minimum: 0
+        description: The time interval between updates in microseconds
       name:
         type: string
         description: Name of the light strip

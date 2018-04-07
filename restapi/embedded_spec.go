@@ -389,9 +389,16 @@ func init() {
       "type": "object",
       "required": [
         "name",
+        "interval",
         "pixels"
       ],
       "properties": {
+        "interval": {
+          "description": "The time interval between updates in microseconds",
+          "type": "integer",
+          "format": "int32",
+          "minimum": 0
+        },
         "name": {
           "description": "Name of the light strip",
           "type": "string"

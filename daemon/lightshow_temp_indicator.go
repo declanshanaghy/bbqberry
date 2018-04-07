@@ -45,6 +45,15 @@ func newTemperatureIndicator(huePortal *portal.Portal) LightShow {
 	return newLightShow(t)
 }
 
+func (o *temperatureIndicator) setPeriod(period time.Duration)  {
+	if period < time.Second {
+		log.Warning("Can't set interval to less that 1 second")
+		o.Period = time.Second
+	} else {
+		o.Period = period
+	}
+}
+
 // GetName returns a human readable name for this background task
 func (o *temperatureIndicator) GetName() string {
 	return "Temperature"
