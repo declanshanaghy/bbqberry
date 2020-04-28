@@ -22,9 +22,9 @@ type ADC interface {
 	AnalogValueAt(chanNum int) (int, error)
 }
 
-// NewStrandController provides an abstracted interface to the LED strands
-func NewStrandController() WS2801 {
-	config := framework.Constants.Hardware
+// NewGrillLightController provides an abstracted interface to the LED strands
+func NewGrillLightController() WS2801 {
+	config := framework.Config.Hardware
 
 	bus := newSPIBus(0)
 	return newWS2801(*config.NumLedPixels, bus)
@@ -32,7 +32,7 @@ func NewStrandController() WS2801 {
 
 // NewTemperatureReader provides an abstracted interface to the temperature probes
 func NewTemperatureReader() TemperatureReader {
-	config := framework.Constants.Hardware
+	config := framework.Config.Hardware
 
 	//bus := newSPIBus(1)
 	bus := newI2CBus(1)
@@ -40,7 +40,7 @@ func NewTemperatureReader() TemperatureReader {
 }
 
 func newSPIBus(channel byte) embd.SPIBus {
-	if framework.Constants.Stub {
+	if framework.Config.Stub {
 		//log.Warningf("action=NewSPIBus channel=%d STUBBED", channel)
 		if StubSPIBus == nil {
 			StubSPIBus = stubembd.NewStubSPIBus(channel)
@@ -52,7 +52,7 @@ func newSPIBus(channel byte) embd.SPIBus {
 }
 
 func newI2CBus(device byte) embd.I2CBus {
-	if framework.Constants.Stub {
+	if framework.Config.Stub {
 		//log.Warningf("action=NewSPIBus channel=%d STUBBED", channel)
 		if StubI2CBus == nil {
 			StubI2CBus = stubembd.NewStubI2CBus()
@@ -76,7 +76,7 @@ func NewMCP3008(bus embd.SPIBus) ADC {
 // Startup initializes the hardware, should be called before first access
 func Startup() {
 	// no-op when stubbed
-	if framework.Constants.Stub {
+	if framework.Config.Stub {
 		return
 	}
 
@@ -88,7 +88,7 @@ func Startup() {
 // Shutdown de-initializes the hardware, should be called when the service is shutting down
 func Shutdown() {
 	// no-op when stubbed
-	if framework.Constants.Stub {
+	if framework.Config.Stub {
 		return
 	}
 

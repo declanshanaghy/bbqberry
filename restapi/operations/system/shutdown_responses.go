@@ -19,6 +19,11 @@ const ShutdownOKCode int = 200
 swagger:response shutdownOK
 */
 type ShutdownOK struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Shutdown `json:"body,omitempty"`
 }
 
 // NewShutdownOK creates ShutdownOK with default headers values
@@ -26,10 +31,27 @@ func NewShutdownOK() *ShutdownOK {
 	return &ShutdownOK{}
 }
 
+// WithPayload adds the payload to the shutdown o k response
+func (o *ShutdownOK) WithPayload(payload *models.Shutdown) *ShutdownOK {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the shutdown o k response
+func (o *ShutdownOK) SetPayload(payload *models.Shutdown) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *ShutdownOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(200)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
 }
 
 /*ShutdownDefault Unexpected error

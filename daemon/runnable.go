@@ -9,10 +9,11 @@ import (
 	"math"
 
 	"github.com/Polarishq/middleware/framework/log"
+	"github.com/declanshanaghy/bbqberry/hardware"
 )
 
-// tickable objects are executed in the background by a runner
-type tickable interface {
+// tickableIFC objects are executed in the background by a runner
+type tickableIFC interface {
 	// start is called when the goroutine is starting up, before the first tick
 	start() error
 	// tick is called on a time.Ticker period. Returning false will cause the goroutine to exit
@@ -31,7 +32,22 @@ type tickable interface {
 	GetName() string
 }
 
-// basicTickable provides common functionality for tickable implementations
+type lightShowTickableIFC interface {
+	tickableIFC
+	GetStrip() hardware.WS2801
+}
+
+// RunnableIFC objects are executed in the background by a runner
+type RunnableIFC interface {
+	// StartBackground starts the runnable in a goroutine
+	StartBackground() error
+	// StopBackground stops the background goroutine
+	StopBackground() error
+	// IsRunning determines if the main loop is executing
+	IsRunning() bool
+}
+
+// basicTickable provides common functionality for tickableIFC implementations
 type basicTickable struct {
 	Period	time.Duration
 }
@@ -44,25 +60,24 @@ func (o *basicTickable) setPeriod(period time.Duration)  {
 	o.Period = period
 }
 
-
-// Runnable objects are executed in the background by a runner
-type Runnable interface {
-	// StartBackground starts the runnable in a goroutine
-	StartBackground() error
-	// StopBackground stops the background goroutine
-	StopBackground() error
-	// IsRunning determines if the main loop is executing
-	IsRunning() bool
+// lightShowTickable provides common functionality for light show implementations
+type lightShowTickable struct {
+	basicTickable
+	strip   hardware.WS2801
 }
 
-type RunnableTicker struct {
-	runnable Runnable
-	tickable tickable
+func (o *lightShowTickable) GetStrip() hardware.WS2801  {
+	return o.strip
 }
 
-func newRunnableTicker(tickable tickable) RunnableTicker {
+type LightShow struct {
+	runnable RunnableIFC
+	tickable lightShowTickableIFC
+}
+
+func newLightShow(tickable lightShowTickableIFC) LightShow {
 	r := newRunnable(tickable)
-	return RunnableTicker{r, tickable}
+	return LightShow{r, tickable}
 }
 
 // runner represents a single background goroutine
@@ -70,10 +85,10 @@ type runner struct {
 	running  bool
 	ch       chan bool
 	wg       *sync.WaitGroup
-	tickable tickable
+	tickable tickableIFC
 }
 
-func newRunnable(tickable tickable) Runnable {
+func newRunnable(tickable tickableIFC) RunnableIFC {
 	return &runner{
 		tickable: tickable,
 	}
@@ -85,7 +100,7 @@ func (o *runner) IsRunning() bool {
 }
 
 // startBackground starts the main loop of the runner resulting the the given
-// tickable being executed on the default Ticker schedule
+// tickableIFC being executed on the default Ticker schedule
 func (o *runner) StartBackground() error {
 	log.WithField("name", o.tickable.GetName()).Infof("Starting in background")
 
@@ -115,7 +130,7 @@ func (o *runner) loop() {
 	// Ensure running flag is set
 	o.running = true
 
-	// Start the tickable before entering the loop
+	// Start the tickableIFC before entering the loop
 	if err := o.tickable.start(); err != nil {
 		panic(err)
 	}
@@ -133,8 +148,8 @@ func (o *runner) loop() {
 			}).Debug("idle")
 		case <-ticker.C:
 			//log.WithFields(log.Fields{
-			//	"name": o.tickable.GetName(),
-			//	"period": o.tickable.getPeriod(),
+			//	"name": o.tickableIFC.GetName(),
+			//	"period": o.tickableIFC.getPeriod(),
 			//}).Debugf("tick")
 			tickerErr = o.tickable.tick()
 			if tickerErr != nil {
@@ -144,7 +159,7 @@ func (o *runner) loop() {
 		}
 	}
 
-	// Stop the tickable before exiting
+	// Stop the tickableIFC before exiting
 	if tickerErr == nil {
 		if err := o.tickable.stop(); err != nil {
 			log.Error(err)

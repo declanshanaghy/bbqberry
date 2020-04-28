@@ -1,0 +1,49 @@
+
+<div class="alert alert-dismissible alert-success hide-empty">{{successMessage}}</div>
+<div class="alert alert-dismissible alert-danger hide-empty">{{errorMessage}}</div>
+
+<div class="bbq-probes">
+    <span class="bbq-probe">
+        <rzslider class="probe-range"
+                  rz-slider-model="probe1Rng.minValue"
+                  rz-slider-high="probe1Rng.maxValue"
+                  rz-slider-options="probe1Rng.options"></rzslider>
+        <rzslider class="probe-value"
+                  rz-slider-model="probe1Val.value"
+                  rz-slider-options="probe1Val.options"></rzslider>
+        <label class="probe-label" ng-bind="probes[0].label">LABEL0</label>
+    </span>
+
+    <span class="bbq-probe">
+        <rzslider class="probe-range"
+                  rz-slider-model="probe2Rng.minValue"
+                  rz-slider-high="probe2Rng.maxValue"
+                  rz-slider-options="probe2Rng.options"></rzslider>
+        <rzslider class="probe-value"
+                  rz-slider-model="probe2Val.value"
+                  rz-slider-options="probe2Val.options"></rzslider>
+        <label class="probe-label" ng-bind="probes[1].label">LABEL1</label>
+    </span>
+
+    <span class="bbq-probe">
+        <rzslider class="probe-range"
+                  rz-slider-model="probe3Rng.minValue"
+                  rz-slider-high="probe3Rng.maxValue"
+                  rz-slider-options="probe3Rng.options"></rzslider>
+        <rzslider class="probe-value"
+                  rz-slider-model="probe3Val.value"
+                  rz-slider-options="probe3Val.options"></rzslider>
+        <label class="probe-label" ng-bind="probes[2].label">LABEL2</label>
+    </span>
+
+    <span class="bbq-probe">
+        <rzslider class="probe-range"
+                  rz-slider-model="probe4Rng.minValue"
+                  rz-slider-high="probe4Rng.maxValue"
+                  rz-slider-options="probe4Rng.options"></rzslider>
+        <rzslider class="probe-value"
+                  rz-slider-model="probe4Val.value"
+                  rz-slider-options="probe4Val.options"></rzslider>
+        <label class="probe-label" ng-bind="probes[3].label">LABEL3</label>
+    </span>
+</div>

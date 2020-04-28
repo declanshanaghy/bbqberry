@@ -20,11 +20,29 @@ paths:
       responses:
         200:
           description: "Shutdown executed successfully"
+          schema:
+            $ref: "#/definitions/Shutdown"
         default:
           description: Unexpected error
           schema:
             $ref: "#/definitions/Error"
   /lights/grill:
+    get:
+      operationId: getGrillLights
+      tags:
+        - Lights
+      summary: "Get the colors currently showing on the grill lights"
+      responses:
+        200:
+          description: "Pixels were read successfully"
+          schema:
+            type: object
+            items:
+              $ref: "#/definitions/LightStrip"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
     put:
       operationId: updateGrillLights
       tags:
@@ -52,17 +70,38 @@ paths:
           schema:
             $ref: "#/definitions/Error"
   /monitors:
-    post:
-      operationId: createMonitor
+    put:
+      operationId: updateMonitor
       tags:
         - Monitors
-      summary: "Get monitor settings for the requested probe"
+      summary: "Update monitor settings for the requested probe"
       parameters:
-        - name: monitor
-          in: body
+        - name: probe
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 3
+          in: query
           required: true
-          schema:
-            $ref: "#/definitions/TemperatureMonitor"
+        - name: scale
+          type: string
+          description: The temperature scale
+          enum:
+            - celsius
+          in: query
+          required: true
+        - name: min
+          type: integer
+          format: int32
+          description: The minimum temperature, below which an alert will be generated
+          in: query
+          required: true
+        - name: max
+          type: integer
+          format: int32
+          description: The maximium temperature, above which an alert will be generated
+          in: query
+          required: true
       responses:
         200:
           description: "The monitor was created successfully"
@@ -70,27 +109,22 @@ paths:
           description: Unexpected error
           schema:
             $ref: "#/definitions/Error"
-    get:
-      operationId: getMonitors
+  /alerts:
+    put:
+      operationId: updateAlert
       tags:
-        - Monitors
-      summary: "Get monitors for the requested probe"
+        - Alerts
+      summary: "Clear alert warning for a probe"
       parameters:
         - name: probe
           in: query
-          description: The probe for which to retrieve active monitors (or all probes if omitted)
-          required: false
+          required: true
           type: integer
-          format: int32
           minimum: 0
-          maximum: 7
+          maximum: 3
       responses:
         200:
-          description: "The currently configured monitor(s) were retrieved successfully"
-          schema:
-            type: array
-            items:
-              $ref: "#/definitions/TemperatureMonitor"
+          description: "The monitor was created successfully"
         default:
           description: Unexpected error
           schema:
@@ -109,7 +143,7 @@ paths:
           type: integer
           format: int32
           minimum: 0
-          maximum: 7
+          maximum: 3
       responses:
         200:
           description: "Temperature was read successfully"
@@ -225,42 +259,43 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/TemperatureProbe"
-  TemperatureMonitor:
+  Shutdown:
     type: object
     required:
-      - probe
-      - label
-      - scale
-      - min
-      - max
+      - ShutdownTime
+      - Message
     properties:
-      _id:
+      ShutdownTime:
         type: string
-        format: ObjectId
-        description: Unique ID for this temperature monitor
-        readOnly: true
-      label:
+      Message:
         type: string
-      probe:
+  LightStrip:
+    type: object
+    required:
+      - name
+      - interval
+      - pixels
+    properties:
+      interval:
         type: integer
         format: int32
         minimum: 0
-        maximum: 7
-        default: 0
-      scale:
+        description: The time interval between updates in microseconds
+      name:
         type: string
-        description: The temperature scale
-        enum:
-          - fahrenheit
-          - celsius
-      min:
-        type: integer
-        format: int32
-        description: The minimum temperature, below which an alert will be generated
-      max:
-        type: integer
-        format: int32
-        description: The maximium temperature, below which an alert will be generated
+        description: Name of the light strip
+      pixels:
+        type: array
+        items:
+          $ref: "#/definitions/Color"
+  Color:
+    type: object
+    required:
+      - hex
+    properties:
+      hex:
+        type: string
+        description: Color in hex representation
   TemperatureReading:
     type: object
     required:
@@ -270,7 +305,8 @@ definitions:
       - celsius
       - fahrenheit
       - probe
-      - date-time
+      - updated
+      - warning_ackd
     properties:
       kelvin:
         type: number
@@ -284,7 +320,7 @@ definitions:
         type: number
         format: int32
         description: Temperature reading in degrees Fahrenheit
-      date-time:
+      updated:
         type: string
         format: date-time
         description: The date and time of the reading
@@ -300,12 +336,14 @@ definitions:
         maximum: 3.3
       warning:
         type: string
+      warning_ackd:
+        type: boolean
+        default: false
       probe:
         type: integer
         format: int32
         minimum: 0
-        maximum: 7
-        default: 0
+        maximum: 3
   Error:
     type: object
     required:

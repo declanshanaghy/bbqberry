@@ -21,13 +21,13 @@ type influxDBLogger struct {
 
 // newInfluxDBLogger creates a new influxDBLogger instance which can be
 // run in the background to collect and log temperature metrics
-func newInfluxDBLoggerRunnable() Runnable {
+func newInfluxDBLoggerRunnable() RunnableIFC {
 	return newRunnable(newInfluxDBLogger())
 }
 
 func newInfluxDBLogger() *influxDBLogger {
 	reader := hardware.NewTemperatureReader()
-	probes := reader.GetEnabledPobes()
+	probes := framework.Config.GetEnabledProbeIndexes()
 
 	return &influxDBLogger{
 		reader: reader,
@@ -51,9 +51,6 @@ func (o *influxDBLogger) GetName() string {
 
 // Start performs initialization before the first tick
 func (o *influxDBLogger) start() error {
-	o.probes = o.reader.GetEnabledPobes()
-	log.WithField("probes", len(*o.probes)).Infof("Found enabled probes")
-
 	return o.tick()
 }
 
@@ -83,11 +80,11 @@ func (o *influxDBLogger) collectTemperatureMetrics() ([]*models.TemperatureReadi
 
 	readings := make([]*models.TemperatureReading, 0)
 	for _, i := range(*o.probes) {
-		reading := models.TemperatureReading{}
-		if err := o.reader.GetTemperatureReading(i, &reading); err != nil {
+		reading, err := o.reader.GetTemperatureReading(i)
+		if err != nil {
 			return nil, err
 		}
-		readings = append(readings, &reading)
+		readings = append(readings, reading)
 	}
 	return readings, nil
 }
@@ -96,7 +93,7 @@ func (o *influxDBLogger) logTemperatureMetrics(readings []*models.TemperatureRea
 	log.WithField("numReadings", len(readings)).Debug("logging temperature metrics")
 
 	for _, reading := range readings {
-		probe := framework.Constants.Hardware.Probes[*reading.Probe]
+		probe := framework.Config.Hardware.Probes[*reading.Probe]
 		if err := o.writeToInflux(reading, probe); err != nil {
 			log.WithField("err", err).Error("Unable to write to InfluxDB")
 		}

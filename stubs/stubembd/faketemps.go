@@ -19,15 +19,11 @@ func init() {
 func resetFakeTemps() {
 	rand.Seed( time.Now().UTC().UnixNano())
 
-	hwCfg := framework.Constants.Hardware
-
-	if framework.Constants.Stub {
-		nProbes := int32(len(hwCfg.Probes))
+	if framework.Config.Stub {
+		nProbes := int32(4)
 		for probe := int32(0); probe < nProbes; probe++ {
-			limit := framework.Constants.Hardware.Probes[probe].Limits
-			min := framework.ConvertCelsiusToAnalog(*limit.MinWarnCelsius - 15)
-			//max := framework.ConvertCelsiusToAnalog(*limit.MaxAbsCelsius)
-			analog := min //int32(rand.Intn(int(min)) + int(max-min))
+			min := framework.ConvertCelsiusToAnalog(50)
+			analog := min
 			celcius, _ := framework.ConvertAnalogToCF(analog)
 			fakeTemps[probe] = analog
 			log.WithFields(log.Fields{
@@ -51,7 +47,7 @@ func SetFakeTemp(probe int32, analog int32) {
 }
 
 func getFakeTemp(probe int32) int32 {
-	limit := framework.Constants.Hardware.Probes[probe].Limits
+	limit := framework.Config.Hardware.Probes[probe].Limits
 	min := framework.ConvertCelsiusToAnalog(*limit.MinWarnCelsius - 15)
 	max := framework.ConvertCelsiusToAnalog(*limit.MaxAbsCelsius)
 

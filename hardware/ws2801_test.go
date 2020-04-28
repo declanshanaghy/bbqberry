@@ -14,12 +14,12 @@ var _ = Describe("WS2801", func() {
 	)
 
 	BeforeEach(func() {
-		strand = hardware.NewStrandController()
+		strand = hardware.NewGrillLightController()
 		hardware.StubSPIBus.Reset()
 	})
 
 	Context("sanity checks", func() {
-		hwCfg := framework.Constants.Hardware
+		hwCfg := framework.Config.Hardware
 
 		It("should return correct pixel count", func() {
 			numPixels := strand.GetNumPixels()

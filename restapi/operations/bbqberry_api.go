@@ -16,6 +16,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
+	"github.com/declanshanaghy/bbqberry/restapi/operations/alerts"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/hardware"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/health"
 	"github.com/declanshanaghy/bbqberry/restapi/operations/lights"
@@ -36,14 +37,11 @@ func NewBbqberryAPI(spec *loads.Document) *BbqberryAPI {
 		ServeError:      errors.ServeError,
 		JSONConsumer:    runtime.JSONConsumer(),
 		JSONProducer:    runtime.JSONProducer(),
-		MonitorsCreateMonitorHandler: monitors.CreateMonitorHandlerFunc(func(params monitors.CreateMonitorParams) middleware.Responder {
-			return middleware.NotImplemented("operation MonitorsCreateMonitor has not yet been implemented")
+		LightsGetGrillLightsHandler: lights.GetGrillLightsHandlerFunc(func(params lights.GetGrillLightsParams) middleware.Responder {
+			return middleware.NotImplemented("operation LightsGetGrillLights has not yet been implemented")
 		}),
 		HardwareGetHardwareHandler: hardware.GetHardwareHandlerFunc(func(params hardware.GetHardwareParams) middleware.Responder {
 			return middleware.NotImplemented("operation HardwareGetHardware has not yet been implemented")
-		}),
-		MonitorsGetMonitorsHandler: monitors.GetMonitorsHandlerFunc(func(params monitors.GetMonitorsParams) middleware.Responder {
-			return middleware.NotImplemented("operation MonitorsGetMonitors has not yet been implemented")
 		}),
 		TemperaturesGetTemperaturesHandler: temperatures.GetTemperaturesHandlerFunc(func(params temperatures.GetTemperaturesParams) middleware.Responder {
 			return middleware.NotImplemented("operation TemperaturesGetTemperatures has not yet been implemented")
@@ -54,8 +52,14 @@ func NewBbqberryAPI(spec *loads.Document) *BbqberryAPI {
 		SystemShutdownHandler: system.ShutdownHandlerFunc(func(params system.ShutdownParams) middleware.Responder {
 			return middleware.NotImplemented("operation SystemShutdown has not yet been implemented")
 		}),
+		AlertsUpdateAlertHandler: alerts.UpdateAlertHandlerFunc(func(params alerts.UpdateAlertParams) middleware.Responder {
+			return middleware.NotImplemented("operation AlertsUpdateAlert has not yet been implemented")
+		}),
 		LightsUpdateGrillLightsHandler: lights.UpdateGrillLightsHandlerFunc(func(params lights.UpdateGrillLightsParams) middleware.Responder {
 			return middleware.NotImplemented("operation LightsUpdateGrillLights has not yet been implemented")
+		}),
+		MonitorsUpdateMonitorHandler: monitors.UpdateMonitorHandlerFunc(func(params monitors.UpdateMonitorParams) middleware.Responder {
+			return middleware.NotImplemented("operation MonitorsUpdateMonitor has not yet been implemented")
 		}),
 	}
 }
@@ -75,20 +79,22 @@ type BbqberryAPI struct {
 	// JSONProducer registers a producer for a "application/json" mime type
 	JSONProducer runtime.Producer
 
-	// MonitorsCreateMonitorHandler sets the operation handler for the create monitor operation
-	MonitorsCreateMonitorHandler monitors.CreateMonitorHandler
+	// LightsGetGrillLightsHandler sets the operation handler for the get grill lights operation
+	LightsGetGrillLightsHandler lights.GetGrillLightsHandler
 	// HardwareGetHardwareHandler sets the operation handler for the get hardware operation
 	HardwareGetHardwareHandler hardware.GetHardwareHandler
-	// MonitorsGetMonitorsHandler sets the operation handler for the get monitors operation
-	MonitorsGetMonitorsHandler monitors.GetMonitorsHandler
 	// TemperaturesGetTemperaturesHandler sets the operation handler for the get temperatures operation
 	TemperaturesGetTemperaturesHandler temperatures.GetTemperaturesHandler
 	// HealthHealthHandler sets the operation handler for the health operation
 	HealthHealthHandler health.HealthHandler
 	// SystemShutdownHandler sets the operation handler for the shutdown operation
 	SystemShutdownHandler system.ShutdownHandler
+	// AlertsUpdateAlertHandler sets the operation handler for the update alert operation
+	AlertsUpdateAlertHandler alerts.UpdateAlertHandler
 	// LightsUpdateGrillLightsHandler sets the operation handler for the update grill lights operation
 	LightsUpdateGrillLightsHandler lights.UpdateGrillLightsHandler
+	// MonitorsUpdateMonitorHandler sets the operation handler for the update monitor operation
+	MonitorsUpdateMonitorHandler monitors.UpdateMonitorHandler
 
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
@@ -152,16 +158,12 @@ func (o *BbqberryAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
-	if o.MonitorsCreateMonitorHandler == nil {
-		unregistered = append(unregistered, "monitors.CreateMonitorHandler")
+	if o.LightsGetGrillLightsHandler == nil {
+		unregistered = append(unregistered, "lights.GetGrillLightsHandler")
 	}
 
 	if o.HardwareGetHardwareHandler == nil {
 		unregistered = append(unregistered, "hardware.GetHardwareHandler")
-	}
-
-	if o.MonitorsGetMonitorsHandler == nil {
-		unregistered = append(unregistered, "monitors.GetMonitorsHandler")
 	}
 
 	if o.TemperaturesGetTemperaturesHandler == nil {
@@ -176,8 +178,16 @@ func (o *BbqberryAPI) Validate() error {
 		unregistered = append(unregistered, "system.ShutdownHandler")
 	}
 
+	if o.AlertsUpdateAlertHandler == nil {
+		unregistered = append(unregistered, "alerts.UpdateAlertHandler")
+	}
+
 	if o.LightsUpdateGrillLightsHandler == nil {
 		unregistered = append(unregistered, "lights.UpdateGrillLightsHandler")
+	}
+
+	if o.MonitorsUpdateMonitorHandler == nil {
+		unregistered = append(unregistered, "monitors.UpdateMonitorHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -260,20 +270,15 @@ func (o *BbqberryAPI) initHandlerCache() {
 		o.handlers = make(map[string]map[string]http.Handler)
 	}
 
-	if o.handlers["POST"] == nil {
-		o.handlers["POST"] = make(map[string]http.Handler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/monitors"] = monitors.NewCreateMonitor(o.context, o.MonitorsCreateMonitorHandler)
+	o.handlers["GET"]["/lights/grill"] = lights.NewGetGrillLights(o.context, o.LightsGetGrillLightsHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/hardware"] = hardware.NewGetHardware(o.context, o.HardwareGetHardwareHandler)
-
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/monitors"] = monitors.NewGetMonitors(o.context, o.MonitorsGetMonitorsHandler)
 
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
@@ -293,7 +298,17 @@ func (o *BbqberryAPI) initHandlerCache() {
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
+	o.handlers["PUT"]["/alerts"] = alerts.NewUpdateAlert(o.context, o.AlertsUpdateAlertHandler)
+
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
 	o.handlers["PUT"]["/lights/grill"] = lights.NewUpdateGrillLights(o.context, o.LightsUpdateGrillLightsHandler)
+
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/monitors"] = monitors.NewUpdateMonitor(o.context, o.MonitorsUpdateMonitorHandler)
 
 }
 

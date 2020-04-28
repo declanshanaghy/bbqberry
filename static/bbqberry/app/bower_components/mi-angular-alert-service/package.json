@@ -1,0 +1,89 @@
+{
+  "_from": "mi-angular-alert-service",
+  "_id": "mi-angular-alert-service@2.0.15",
+  "_inBundle": false,
+  "_integrity": "sha1-slW4uV5rFc+QE/3B866ByANYX3o=",
+  "_location": "/mi-angular-alert-service",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "mi-angular-alert-service",
+    "name": "mi-angular-alert-service",
+    "escapedName": "mi-angular-alert-service",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/mi-angular-alert-service/-/mi-angular-alert-service-2.0.15.tgz",
+  "_shasum": "b255b8b95e6b15cf9013fdc1f3ae81c803585f7a",
+  "_spec": "mi-angular-alert-service",
+  "_where": "/Users/dshanaghy/go/src/github.com/declanshanaghy/bbqberry/static/bbqberry",
+  "author": {
+    "name": "MovingIMAGE24",
+    "url": "http://www.movingimage24.com/"
+  },
+  "bugs": {
+    "url": "https://github.com/MovingImage24/mi-angular-alert-service/issues"
+  },
+  "bundleDependencies": false,
+  "contributors": [
+    {
+      "name": "Alexander Miehe",
+      "email": "alexander.miehe@movingimage.com"
+    },
+    {
+      "name": "Enrico Hoffmann",
+      "email": "enrico.hoffmann@movingimage.com"
+    }
+  ],
+  "deprecated": false,
+  "description": "Alert Service for Angular 1 ",
+  "devDependencies": {
+    "angular": "^1.4.9",
+    "angular-mocks": "^1.4.9",
+    "angular-ui-router": "^0.2.15",
+    "david": "^7.0.0",
+    "istanbul-instrumenter-loader": "^0.2.0",
+    "jasmine-core": "^2.3.4",
+    "jscs": "^2.0.0",
+    "karma": "^0.13.6",
+    "karma-coverage": "^0.5.0",
+    "karma-coveralls": "^1.1.2",
+    "karma-jasmine": "^0.3.5",
+    "karma-junit-reporter": "^0.4.0",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "karma-webpack": "^1.7.0",
+    "ng-annotate-webpack-plugin": "^0.1.2",
+    "phantomjs-prebuilt": "^2.1.4",
+    "webpack": "^1.11.0"
+  },
+  "engines": {
+    "node": ">=0.10.1"
+  },
+  "homepage": "https://github.com/MovingImage24/mi-angular-alert-service#readme",
+  "keywords": [
+    "angularjs",
+    "alert-service",
+    "bootstrap"
+  ],
+  "license": "MIT",
+  "main": "dist/mi-angular-alert-service.js",
+  "name": "mi-angular-alert-service",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MovingImage24/mi-angular-alert-service.git"
+  },
+  "scripts": {
+    "build": "npm run build:js && npm run build:js-min",
+    "build:js": "webpack --config webpack.config.js",
+    "build:js-min": "webpack --config webpack.min.config.js",
+    "prebuild:js": "jscs ./src ./test",
+    "test": "node_modules/karma/bin/karma start karma.config.js"
+  },
+  "version": "2.0.15"
+}

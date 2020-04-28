@@ -14,7 +14,7 @@ import (
 )
 
 var _ = Describe("Termperatures API", func() {
-	hwCfg := framework.Constants.Hardware
+	hwCfg := framework.Config.Hardware
 
 	It("should return a single temperature reading when given a probe number", func() {
 		probe := int32(1)

@@ -24,10 +24,6 @@ type TemperatureReading struct {
 	// Required: true
 	Celsius *int32 `json:"celsius"`
 
-	// The date and time of the reading
-	// Required: true
-	DateTime *strfmt.DateTime `json:"date-time"`
-
 	// Temperature reading in degrees Fahrenheit
 	// Required: true
 	Fahrenheit *int32 `json:"fahrenheit"`
@@ -38,9 +34,13 @@ type TemperatureReading struct {
 
 	// probe
 	// Required: true
-	// Maximum: 7
+	// Maximum: 3
 	// Minimum: 0
 	Probe *int32 `json:"probe"`
+
+	// The date and time of the reading
+	// Required: true
+	Updated *strfmt.DateTime `json:"updated"`
 
 	// voltage
 	// Required: true
@@ -50,6 +50,10 @@ type TemperatureReading struct {
 
 	// warning
 	Warning string `json:"warning,omitempty"`
+
+	// warning ackd
+	// Required: true
+	WarningAckd bool `json:"warning_ackd"`
 }
 
 // Validate validates this temperature reading
@@ -62,11 +66,6 @@ func (m *TemperatureReading) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateCelsius(formats); err != nil {
-		// prop
-		res = append(res, err)
-	}
-
-	if err := m.validateDateTime(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
@@ -86,7 +85,17 @@ func (m *TemperatureReading) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateUpdated(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
 	if err := m.validateVoltage(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateWarningAckd(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
@@ -123,15 +132,6 @@ func (m *TemperatureReading) validateCelsius(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *TemperatureReading) validateDateTime(formats strfmt.Registry) error {
-
-	if err := validate.Required("date-time", "body", m.DateTime); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (m *TemperatureReading) validateFahrenheit(formats strfmt.Registry) error {
 
 	if err := validate.Required("fahrenheit", "body", m.Fahrenheit); err != nil {
@@ -160,7 +160,16 @@ func (m *TemperatureReading) validateProbe(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := validate.MaximumInt("probe", "body", int64(*m.Probe), 7, false); err != nil {
+	if err := validate.MaximumInt("probe", "body", int64(*m.Probe), 3, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *TemperatureReading) validateUpdated(formats strfmt.Registry) error {
+
+	if err := validate.Required("updated", "body", m.Updated); err != nil {
 		return err
 	}
 
@@ -178,6 +187,15 @@ func (m *TemperatureReading) validateVoltage(formats strfmt.Registry) error {
 	}
 
 	if err := validate.Maximum("voltage", "body", float64(*m.Voltage), 3.3, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *TemperatureReading) validateWarningAckd(formats strfmt.Registry) error {
+
+	if err := validate.Required("warning_ackd", "body", bool(m.WarningAckd)); err != nil {
 		return err
 	}
 

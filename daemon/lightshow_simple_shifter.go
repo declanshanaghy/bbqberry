@@ -8,21 +8,20 @@ import (
 
 // simpleShifter displays fancy colors
 type simpleShifter struct {
-	basicTickable
+	lightShowTickable
 	curled  int32
 	lastled int32
-	strip   hardware.WS2801
+
 }
 
 // newSimpleShifter creates a new temperatureIndicator instance which can be
 // run in the background to check average temperature and indicate it visually on the LED strip
-func newSimpleShifter(period time.Duration) RunnableTicker {
-	t := &simpleShifter{
-		strip: hardware.NewStrandController(),
-	}
+func newSimpleShifter(period time.Duration) LightShow {
+	t := &simpleShifter{}
+	t.strip = hardware.NewGrillLightController()
 	t.Period = period
 
-	return newRunnableTicker(t)
+	return newLightShow(t)
 }
 
 // GetName returns a human readable name for this background task
@@ -35,7 +34,7 @@ func (o *simpleShifter) start() error {
 	log.WithFields(log.Fields{
 		"name": o.GetName(),
 		"period": o.getPeriod(),
-	}).Info("Starting tickable execution")
+	}).Info("Starting tickableIFC execution")
 	return o.strip.Off()
 }
 
@@ -43,7 +42,7 @@ func (o *simpleShifter) start() error {
 func (o *simpleShifter) stop() error {
 	log.WithFields(log.Fields{
 		"name": o.GetName(),
-	}).Info("Stopping tickable execution")
+	}).Info("Stopping tickableIFC execution")
 	return o.strip.Off()
 }
 

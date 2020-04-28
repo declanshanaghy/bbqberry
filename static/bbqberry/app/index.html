@@ -25,7 +25,9 @@
     <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/normalize.css">
     <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/main.css">
     <link rel="stylesheet" href="css/bootstrap-slate.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/angularjs-slider/dist/rzslider.css"/>
     <link rel="stylesheet" href="css/bbqberry.css">
+    <link rel="stylesheet" href="css/bbq-probes.css">
 
     <link rel="icon" href="img/favicon.ico" />
 
@@ -34,7 +36,9 @@
 <body>
     <bbqberry-nav></bbqberry-nav>
 
-    <div class="alert alert-warning hide-empty">{{glblwarning}}</div>
+    <div class="global-alerts" ng-cloak>
+        <div alert ng-repeat="alert in alerts" type="{{alert.type}}" close="alert.close()">{{alert.msg}}</div>
+    </div>
 
     <div ng-view></div>
 
@@ -53,6 +57,8 @@
     <script src="components/ui-bootstrap/ui-bootstrap-tpls-2.5.0.js"></script>
     <script src="components/d3/d3.js"></script>
     <script src="components/ngRadialGauge-master/src/ng-radial-gauge-dir.js"></script>
+    <script src="bower_components/angularjs-slider/dist/rzslider.min.js"></script>
+    <script src="bower_components/mi-angular-alert-service/dist/mi-angular-alert-service.js"></script>
 
     <!--BBQBerry Components-->
     <script src="components/nav/nav.js"></script>
@@ -62,9 +68,7 @@
 
     <!--BBQBerry Views-->
     <script src="app.js"></script>
-    <script src="views/glance/glance.js"></script>
-    <script src="views/view1/view1.js"></script>
-    <script src="views/view2/view2.js"></script>
+    <script src="views/overview/overview.js"></script>
 
     <!--Other backend scrips-->
     <script src="js/util.js"></script>

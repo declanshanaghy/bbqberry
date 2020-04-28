@@ -8,23 +8,30 @@ angular.module('bbqberry', [
     'ngAnimate',
     'ngRoute',
     'ngTouch',
-    'ngRadialGauge',
     'ui.bootstrap',
+    'mi.AlertService',
+    'ngRadialGauge',
+    'rzModule',        // Slider
+    'mi.AlertService',
 
     // BBQBerry Components
     'bbqberry.nav',
 
     //BBQBErry Views
-    'bbqberry.glance',
-    'bbqberry.view1',
-    'bbqberry.view2',
+    'bbqberry.overview',
     'bbqberry.version'
 ])
+.constant('ALERT_LEVELS', {
+    danger: {timeout: 10000},
+    warning: {timeout: 5000},
+    success: {timeout: 3000},
+    info: {timeout: 3000}
+})
 
 .config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
     $locationProvider.hashPrefix('!');
 
-    $routeProvider.otherwise({redirectTo: '/glance'});
+    $routeProvider.otherwise({redirectTo: '/overview'});
 }])
 
 ;

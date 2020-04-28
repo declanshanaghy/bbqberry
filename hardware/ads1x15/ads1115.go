@@ -5,7 +5,10 @@ import (
 	"time"
 	"fmt"
 	"github.com/Polarishq/middleware/framework/log"
+	"sync"
 )
+
+var mutex = sync.Mutex{}
 
 type ads1x15 struct {
 	bus    	embd.I2CBus
@@ -94,6 +97,9 @@ func (o *ads1x15) read(mux, gain, mode int) (int, error) {
 		"0": fmt.Sprintf("%02x", wl[0]),
 		"1": fmt.Sprintf("%02x", wl[1]),
 	}).Debug("WriteToReg")
+
+	mutex.Lock()
+
 	err := o.bus.WriteToReg(o.addr, ADS1x15_POINTER_CONFIG, wl)
 	if err != nil {
 		return ADS1x15_READ_FAIL, err
@@ -101,16 +107,20 @@ func (o *ads1x15) read(mux, gain, mode int) (int, error) {
 
 	// Wait for the ADC sample to finish based on the sample rate plus a
 	// small offset to be sure (0.1 millisecond).
-	s := (1.0 / float32(data_rate)) + float32(time.Millisecond)
+	//s := 0.007812 + 0.0001
+	s := time.Duration((float32(time.Second) / float32(data_rate))) + time.Millisecond / 100
+	//log.WithFields(log.Fields{
+	//	"s": fmt.Sprintf("%s", time.Duration(s)),
+	//}).Info("Sleep")
 	time.Sleep(time.Duration(s))
-	log.WithFields(log.Fields{
-		"s": fmt.Sprintf("%f", s),
-	}).Debug("Sleep")
+
 
 	// Retrieve the result.
 	//result = self._device.readList(ADS1x15_POINTER_CONVERSION, 2)
 	result := make([]byte, 2)
 	err = o.bus.ReadFromReg(o.addr, ADS1x15_POINTER_CONVERSION, result)
+
+	mutex.Unlock()
 
 	log.WithFields(log.Fields{
 		"result1": fmt.Sprintf("%02x", result[1]),

@@ -29,6 +29,36 @@ func init() {
   },
   "basePath": "/api",
   "paths": {
+    "/alerts": {
+      "put": {
+        "tags": [
+          "Alerts"
+        ],
+        "summary": "Clear alert warning for a probe",
+        "operationId": "updateAlert",
+        "parameters": [
+          {
+            "maximum": 3,
+            "minimum": 0,
+            "type": "integer",
+            "name": "probe",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The monitor was created successfully"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/hardware": {
       "get": {
         "tags": [
@@ -77,6 +107,30 @@ func init() {
       }
     },
     "/lights/grill": {
+      "get": {
+        "tags": [
+          "Lights"
+        ],
+        "summary": "Get the colors currently showing on the grill lights",
+        "operationId": "getGrillLights",
+        "responses": {
+          "200": {
+            "description": "Pixels were read successfully",
+            "schema": {
+              "type": "object",
+              "items": {
+                "$ref": "#/definitions/LightStrip"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "Lights"
@@ -86,7 +140,6 @@ func init() {
         "parameters": [
           {
             "enum": [
-              "Pulser",
               "Simple Shifter",
               "Rainbow",
               "Temperature"
@@ -121,55 +174,47 @@ func init() {
       }
     },
     "/monitors": {
-      "get": {
+      "put": {
         "tags": [
           "Monitors"
         ],
-        "summary": "Get monitors for the requested probe",
-        "operationId": "getMonitors",
+        "summary": "Update monitor settings for the requested probe",
+        "operationId": "updateMonitor",
         "parameters": [
           {
-            "maximum": 7,
+            "maximum": 3,
             "minimum": 0,
             "type": "integer",
             "format": "int32",
-            "description": "The probe for which to retrieve active monitors (or all probes if omitted)",
             "name": "probe",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The currently configured monitor(s) were retrieved successfully",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/TemperatureMonitor"
-              }
-            }
+            "in": "query",
+            "required": true
           },
-          "default": {
-            "description": "Unexpected error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Monitors"
-        ],
-        "summary": "Get monitor settings for the requested probe",
-        "operationId": "createMonitor",
-        "parameters": [
           {
-            "name": "monitor",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/TemperatureMonitor"
-            }
+            "enum": [
+              "celsius"
+            ],
+            "type": "string",
+            "description": "The temperature scale",
+            "name": "scale",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "The minimum temperature, below which an alert will be generated",
+            "name": "min",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "description": "The maximium temperature, above which an alert will be generated",
+            "name": "max",
+            "in": "query",
+            "required": true
           }
         ],
         "responses": {
@@ -194,7 +239,10 @@ func init() {
         "operationId": "shutdown",
         "responses": {
           "200": {
-            "description": "Shutdown executed successfully"
+            "description": "Shutdown executed successfully",
+            "schema": {
+              "$ref": "#/definitions/Shutdown"
+            }
           },
           "default": {
             "description": "Unexpected error",
@@ -214,7 +262,7 @@ func init() {
         "operationId": "getTemperatures",
         "parameters": [
           {
-            "maximum": 7,
+            "maximum": 3,
             "minimum": 0,
             "type": "integer",
             "format": "int32",
@@ -244,6 +292,18 @@ func init() {
     }
   },
   "definitions": {
+    "Color": {
+      "type": "object",
+      "required": [
+        "hex"
+      ],
+      "properties": {
+        "hex": {
+          "description": "Color in hex representation",
+          "type": "string"
+        }
+      }
+    },
     "Error": {
       "type": "object",
       "required": [
@@ -325,6 +385,32 @@ func init() {
         }
       }
     },
+    "LightStrip": {
+      "type": "object",
+      "required": [
+        "name",
+        "interval",
+        "pixels"
+      ],
+      "properties": {
+        "interval": {
+          "description": "The time interval between updates in microseconds",
+          "type": "integer",
+          "format": "int32",
+          "minimum": 0
+        },
+        "name": {
+          "description": "Name of the light strip",
+          "type": "string"
+        },
+        "pixels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Color"
+          }
+        }
+      }
+    },
     "ServiceInfo": {
       "type": "object",
       "required": [
@@ -338,6 +424,21 @@ func init() {
         },
         "version": {
           "description": "Service API version",
+          "type": "string"
+        }
+      }
+    },
+    "Shutdown": {
+      "type": "object",
+      "required": [
+        "ShutdownTime",
+        "Message"
+      ],
+      "properties": {
+        "Message": {
+          "type": "string"
+        },
+        "ShutdownTime": {
           "type": "string"
         }
       }
@@ -374,52 +475,6 @@ func init() {
         }
       }
     },
-    "TemperatureMonitor": {
-      "type": "object",
-      "required": [
-        "probe",
-        "label",
-        "scale",
-        "min",
-        "max"
-      ],
-      "properties": {
-        "_id": {
-          "description": "Unique ID for this temperature monitor",
-          "type": "string",
-          "format": "ObjectId",
-          "readOnly": true
-        },
-        "label": {
-          "type": "string"
-        },
-        "max": {
-          "description": "The maximium temperature, below which an alert will be generated",
-          "type": "integer",
-          "format": "int32"
-        },
-        "min": {
-          "description": "The minimum temperature, below which an alert will be generated",
-          "type": "integer",
-          "format": "int32"
-        },
-        "probe": {
-          "type": "integer",
-          "format": "int32",
-          "default": 0,
-          "maximum": 7,
-          "minimum": 0
-        },
-        "scale": {
-          "description": "The temperature scale",
-          "type": "string",
-          "enum": [
-            "fahrenheit",
-            "celsius"
-          ]
-        }
-      }
-    },
     "TemperatureProbe": {
       "type": "object",
       "required": [
@@ -448,7 +503,8 @@ func init() {
         "celsius",
         "fahrenheit",
         "probe",
-        "date-time"
+        "updated",
+        "warning_ackd"
       ],
       "properties": {
         "analog": {
@@ -461,11 +517,6 @@ func init() {
           "description": "Temperature reading in degrees Celsius",
           "type": "number",
           "format": "int32"
-        },
-        "date-time": {
-          "description": "The date and time of the reading",
-          "type": "string",
-          "format": "date-time"
         },
         "fahrenheit": {
           "description": "Temperature reading in degrees Fahrenheit",
@@ -480,9 +531,13 @@ func init() {
         "probe": {
           "type": "integer",
           "format": "int32",
-          "default": 0,
-          "maximum": 7,
+          "maximum": 3,
           "minimum": 0
+        },
+        "updated": {
+          "description": "The date and time of the reading",
+          "type": "string",
+          "format": "date-time"
         },
         "voltage": {
           "type": "number",
@@ -492,6 +547,10 @@ func init() {
         },
         "warning": {
           "type": "string"
+        },
+        "warning_ackd": {
+          "type": "boolean",
+          "default": false
         }
       }
     }

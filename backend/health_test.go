@@ -21,8 +21,8 @@ var _ = Describe("Health API", func() {
 
 			healthy := true
 			si := models.ServiceInfo{
-				Name:    &framework.Constants.ServiceName,
-				Version: &framework.Constants.Version,
+				Name:    &framework.Config.ServiceName,
+				Version: &framework.Config.Version,
 			}
 			h := models.Health{
 				Healthy:     &healthy,
@@ -53,8 +53,8 @@ var _ = Describe("Health API", func() {
 
 			healthy := false
 			si := models.ServiceInfo{
-				Name:    &framework.Constants.ServiceName,
-				Version: &framework.Constants.Version,
+				Name:    &framework.Config.ServiceName,
+				Version: &framework.Config.Version,
 			}
 			h := models.Health{
 				Healthy:     &healthy,

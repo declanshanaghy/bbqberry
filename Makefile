@@ -71,8 +71,12 @@ run_deployed:
 	    --static=/home/pi/go/src/github.com/declanshanaghy/bbqberry/static
 
 sync_web:
-	@echo "Syncing BBQBerry webapp..."
-	rsync -rv ./static/ pi@bbqberry-gaff:~/go/src/github.com/declanshanaghy/bbqberry/static/
+	@echo "Syncing entire BBQBerry webapp..."
+	@rsync -rv ./static/ pi@bbqberry-gaff:~/go/src/github.com/declanshanaghy/bbqberry/static/
+
+sync_views:
+	@echo "Syncing BBQBerry views..."
+	@scp -r ./static/bbqberry/app/views/ pi@bbqberry-gaff:~/go/src/github.com/declanshanaghy/bbqberry/static/bbqberry/app/
 
 clean_swagger:
 #
@@ -93,7 +97,7 @@ validate_swagger:
 	    swagger validate $(SWAGGER_YML); \
 	fi
 
-swagger: validate_swagger
+swagger: validate_swagger clean_swagger
 #
 #__Generates swagger source files__
 #
@@ -126,10 +130,11 @@ generate: swagger
 #
 	@printf "Code generation completed\n"
 
-lambda:
+lambda_BBQBerry:
 	@cd alexa/BBQBerry && zip -r ../../tmp/BBQBerry.zip .
 	@aws lambda update-function-code --function-name BBQBerry --zip-file fileb://tmp/BBQBerry.zip
 
-lambda_test:
-	rm -f tmp/invocation_result.json
-	aws lambda invoke --function-name BBQBerry --payload ./alexa/TestData/invocation.json outfile=file://tmp/invocation_result.json && cat tmp/invocation_result.json
+lambda_BBQBerrySmartHome:
+	@cd alexa/BBQBerrySmartHome && zip -r ../../tmp/BBQBerrySmartHome.zip .
+	@aws lambda update-function-code --function-name BBQBerrySmartHome --zip-file fileb://tmp/BBQBerrySmartHome.zip
+

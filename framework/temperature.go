@@ -31,7 +31,7 @@ func AdafruitAD8495ThermocoupleVtoKCF(v float32) (tempK int32, tempC int32, temp
 
 // ConvertAnalogToVoltage converts an analog reading to its corresponding voltage value
 func ConvertAnalogToVoltage(analog int32) float32 {
-	hwCfg := Constants.Hardware
+	hwCfg := Config.Hardware
 	vcc := *hwCfg.Vcc
 	// volts per analog unit = VCC / Analog max
 	amax := float32(*hwCfg.AnalogMax)
@@ -41,7 +41,7 @@ func ConvertAnalogToVoltage(analog int32) float32 {
 
 // ConvertVoltageToAnalog converts the given voltage to its corresponding analog value
 func ConvertVoltageToAnalog(v float32) (a int32) {
-	hwCfg := Constants.Hardware
+	hwCfg := Config.Hardware
 	vcc := *hwCfg.Vcc
 	amax := float32(*hwCfg.AnalogMax)
 	// volts per analog unit = VCC / Analog max

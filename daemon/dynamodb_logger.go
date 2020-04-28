@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/declanshanaghy/bbqberry/framework"
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/endpoints"
 )
 
 const dynamoDBTableName = "BBQBerry-Temperature"
@@ -27,13 +28,13 @@ type dynamoDBLogger struct {
 
 // newInfluxDBLogger creates a new influxDBLogger instance which can be
 // run in the background to collect and log temperature metrics
-func newDynamoDBLoggerRunnable() Runnable {
+func newDynamoDBLoggerRunnable() RunnableIFC {
 	return newRunnable(newDynamoDBLogger())
 }
 
 func newDynamoDBLogger() *dynamoDBLogger {
 	reader := hardware.NewTemperatureReader()
-	probes := reader.GetEnabledPobes()
+	probes := framework.Config.GetEnabledProbeIndexes()
 
 	return &dynamoDBLogger{
 		reader: reader,
@@ -104,28 +105,27 @@ func createDynamoDBTable(dynamo *dynamodb.DynamoDB) error {
 }
 
 func initializeDynamoDB() (*dynamodb.DynamoDB, error) {
-	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String(framework.AWS_DEFAULT_REGION)},
-	)
-	if ( err != nil ) {
-		log.WithField("err", err).Error("Error initializing AWS session")
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		Config: aws.Config{
+			Region: aws.String(endpoints.UsEast1RegionID),
+		},
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+
+	dynamo := dynamodb.New(sess)
+	create, err := shouldCreateDynamoDBTable(dynamo)
+	if err != nil {
+		log.WithField("err", err).Error("Error determining DynamoDB table status")
 		return nil, err
-	} else {
-		dynamo := dynamodb.New(sess)
-		create, err := shouldCreateDynamoDBTable(dynamo)
-		if err != nil {
-			log.WithField("err", err).Error("Error determining DynamoDB table status")
+	} else if create {
+		if err := createDynamoDBTable(dynamo); err != nil {
+			log.WithField("err", err).Error("Error creating DynamoDB table")
 			return nil, err
-		} else if create {
-			if err := createDynamoDBTable(dynamo); err != nil {
-				log.WithField("err", err).Error("Error creating DynamoDB table")
-				return nil, err
-			}
-			return dynamo, nil
-		} else {
-			// The table already exists
-			return dynamo, nil
 		}
+		return dynamo, nil
+	} else {
+		// The table already exists
+		return dynamo, nil
 	}
 }
 
@@ -133,27 +133,34 @@ func initializeDynamoDB() (*dynamodb.DynamoDB, error) {
 func (o *dynamoDBLogger) start() error {
 	var err error
 
-	o.probes = o.reader.GetEnabledPobes()
-	log.WithField("probes", len(*o.probes)).Infof("Found enabled probes")
-
 	if o.dynamo, err = initializeDynamoDB(); err == nil {
-		if err := o.writeCurrentStateToDynamoDB("On"); err != nil {
+		// Returning an error from start causes a panic.
+		// 	if DynamoDB is not available just log the error and move on
+		if err := o.writeCurrentStateToDynamoDB("OK"); err != nil {
 			log.WithField("err", err).Error("Unable to write CurrentState to DynamoDB")
+		}
+		if err := o.tick(); err != nil {
+			log.WithField("err", err).Error("Unable to tick")
 		}
 	}
 
-	return o.tick()
+	return nil
 }
 
 // Stop performs cleanup when the goroutine is exiting
 func (o *dynamoDBLogger) stop() error {
 	var err error
 
-	if o.dynamo, err = initializeDynamoDB(); err == nil {
-		if err := o.writeCurrentStateToDynamoDB("Off"); err != nil {
-			log.WithField("err", err).Error("Unable to write CurrentState to DynamoDB")
+	if o.dynamo == nil {
+		if o.dynamo, err = initializeDynamoDB(); err != nil {
+			return err
 		}
 	}
+
+	if err := o.writeCurrentStateToDynamoDB("UNREACHABLE"); err != nil {
+		log.WithField("err", err).Error("Unable to write CurrentState to DynamoDB")
+	}
+
 	return nil
 }
 
@@ -186,11 +193,11 @@ func (o *dynamoDBLogger) collectTemperatureMetrics() ([]*models.TemperatureReadi
 
 	readings := make([]*models.TemperatureReading, 0)
 	for _, i := range(*o.probes) {
-		reading := models.TemperatureReading{}
-		if err := o.reader.GetTemperatureReading(i, &reading); err != nil {
+		reading, err := o.reader.GetTemperatureReading(i)
+		if err != nil {
 			return nil, err
 		}
-		readings = append(readings, &reading)
+		readings = append(readings, reading)
 	}
 	return readings, nil
 }
@@ -199,7 +206,7 @@ func (o *dynamoDBLogger) logTemperatureMetrics(readings []*models.TemperatureRea
 	log.WithField("numReadings", len(readings)).Debug("logging temperature metrics")
 
 	for _, reading := range readings {
-		probe := framework.Constants.Hardware.Probes[*reading.Probe]
+		probe := framework.Config.Hardware.Probes[*reading.Probe]
 		if err := o.writeToDynamoDB(reading, probe); err != nil {
 			log.WithField("err", err).Error("Unable to write to DynamoDB. Disabling logging")
 			o.dynamo = nil
@@ -211,7 +218,7 @@ func (o *dynamoDBLogger) logTemperatureMetrics(readings []*models.TemperatureRea
 
 func (o *dynamoDBLogger) writeCurrentStateToDynamoDB(currentState string) error {
 	for _, p := range *o.probes {
-		probe := framework.Constants.Hardware.Probes[p]
+		probe := framework.Config.Hardware.Probes[p]
 		input := &dynamodb.UpdateItemInput{
 			TableName: aws.String(dynamoDBTableName),
 			Key: map[string]*dynamodb.AttributeValue{
@@ -294,6 +301,24 @@ func (o *dynamoDBLogger) writeToDynamoDB(reading *models.TemperatureReading, pro
 		"Fahrenheit": *reading.Fahrenheit,
 	}).Debug("Logging temperature to DynamoDB")
 
+	// TODO: Need to add a panic recovery handler here:
+	defer func() {
+		if err := recover(); err != nil {
+			log.WithField("err", err).Error("Recovered panic while logging to dynamodb")
+		}
+	}()
 	_, err := o.dynamo.UpdateItem(input)
+	/*
+	goroutine 41 [running]:
+github.com/declanshanaghy/bbqberry/vendor/github.com/aws/aws-sdk-go/service/dynamodb.(*DynamoDB).newRequest(0x0, 0xc420b23dc0, 0x167b220, 0xc4211863c0, 0x1625280, 0xc420a13c20, 0x0)
+	/Users/dshanaghy/go/src/github.com/declanshanaghy/bbqberry/vendor/github.com/aws/aws-sdk-go/service/dynamodb/service.go:87 +0x26
+github.com/declanshanaghy/bbqberry/vendor/github.com/aws/aws-sdk-go/service/dynamodb.(*DynamoDB).UpdateItemRequest(0x0, 0xc4211863c0, 0x0, 0x0)
+	/Users/dshanaghy/go/src/github.com/declanshanaghy/bbqberry/vendor/github.com/aws/aws-sdk-go/service/dynamodb/api.go:3145 +0x10d
+github.com/declanshanaghy/bbqberry/vendor/github.com/aws/aws-sdk-go/service/dynamodb.(*DynamoDB).UpdateItem(0x0, 0xc4211863c0, 0x1, 0x1, 0xc4219c3bf0)
+	/Users/dshanaghy/go/src/github.com/declanshanaghy/bbqberry/vendor/github.com/aws/aws-sdk-go/service/dynamodb/api.go:3192 +0x35
+github.com/declanshanaghy/bbqberry/daemon.(*dynamoDBLogger).writeToDynamoDB(0xc42036d050, 0xc420074820, 0xc420243320, 0x1, 0xc421209540)
+	/Users/dshanaghy/go/src/github.com/declanshanaghy/bbqberry/daemon/dynamodb_logger.go:301 +0x9ca
+github.com/declanshanaghy/bbqberry/daemon.(*dynamoDBLogger).logTemperatureMetrics(0xc42036d050, 0xc4219d26f0, 0x2, 0x2, 0x0, 0x0)
+	 */
 	return err
 }
